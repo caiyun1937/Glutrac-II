@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -42,6 +43,7 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.dataGridViewSN = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.pictureBoxShow = new System.Windows.Forms.PictureBox();
             this.dataGridViewMainBoardTest = new System.Windows.Forms.DataGridView();
             this.btn_output_excel = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -90,10 +92,12 @@
             this.Lbl_Label_W = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.textBoxMAC = new System.Windows.Forms.TextBox();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSN)).BeginInit();
             this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxShow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMainBoardTest)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.noUpDown)).BeginInit();
             this.tabPage1.SuspendLayout();
@@ -202,7 +206,6 @@
             // 
             this.textBoxSN.Location = new System.Drawing.Point(567, 30);
             this.textBoxSN.Name = "textBoxSN";
-            this.textBoxSN.ReadOnly = true;
             this.textBoxSN.Size = new System.Drawing.Size(223, 25);
             this.textBoxSN.TabIndex = 13;
             // 
@@ -232,13 +235,13 @@
             this.dataGridViewSN.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewSN.Location = new System.Drawing.Point(6, 6);
             this.dataGridViewSN.Name = "dataGridViewSN";
-            this.dataGridViewSN.ReadOnly = true;
             this.dataGridViewSN.RowTemplate.Height = 27;
             this.dataGridViewSN.Size = new System.Drawing.Size(1227, 448);
             this.dataGridViewSN.TabIndex = 0;
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.pictureBoxShow);
             this.tabPage2.Controls.Add(this.dataGridViewMainBoardTest);
             this.tabPage2.Controls.Add(this.btn_output_excel);
             this.tabPage2.Controls.Add(this.label3);
@@ -253,6 +256,14 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "主板测试";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // pictureBoxShow
+            // 
+            this.pictureBoxShow.Location = new System.Drawing.Point(6, 39);
+            this.pictureBoxShow.Name = "pictureBoxShow";
+            this.pictureBoxShow.Size = new System.Drawing.Size(400, 400);
+            this.pictureBoxShow.TabIndex = 11;
+            this.pictureBoxShow.TabStop = false;
             // 
             // dataGridViewMainBoardTest
             // 
@@ -878,6 +889,17 @@
             this.textBoxMAC.Size = new System.Drawing.Size(223, 25);
             this.textBoxMAC.TabIndex = 16;
             // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "led_off.jpg");
+            this.imageList1.Images.SetKeyName(1, "led_on.jpg");
+            this.imageList1.Images.SetKeyName(2, "nir_green.jpg");
+            this.imageList1.Images.SetKeyName(3, "nir_red.jpg");
+            this.imageList1.Images.SetKeyName(4, "ppg_red_green.jpg");
+            this.imageList1.Images.SetKeyName(5, "screen_white.jpg");
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -899,6 +921,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSN)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxShow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMainBoardTest)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.noUpDown)).EndInit();
             this.tabPage1.ResumeLayout(false);
@@ -992,6 +1015,8 @@
         private System.Windows.Forms.Label Lbl_Label_W;
         public System.Windows.Forms.NumericUpDown Num_QRSize;
         private System.Windows.Forms.Button buttonManual;
+        private System.Windows.Forms.PictureBox pictureBoxShow;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }
 

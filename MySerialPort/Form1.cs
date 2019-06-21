@@ -32,6 +32,8 @@ namespace MySerialPort
         private int rowSN = new int();
         private bool testError = true;
 
+        private myMsgBox myMessageBox = new myMsgBox();
+
         private void GetNewSN()
         {
             if (File.Exists("backup.xlsx"))
@@ -43,7 +45,7 @@ namespace MySerialPort
                 }
                 catch
                 {
-                    MessageBox.Show("请关闭\"SN.xlsx\"并重启软件");
+                    myMessageBox.Show("请关闭\"SN.xlsx\"并重启软件!",Color.Black);
                     strSN = "";
                     return;
                 }
@@ -71,6 +73,8 @@ namespace MySerialPort
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            pictureBoxShow.Visible = false;
+
             RegistryKey keyCom = Registry.LocalMachine.OpenSubKey("Hardware\\DeviceMap\\SerialComm");
             if (keyCom != null)
             {
@@ -158,7 +162,7 @@ namespace MySerialPort
                 }
                 catch
                 {
-                     MessageBox.Show("串口被占用");
+                    myMessageBox.Show("串口被占用!", Color.Black);
                 }
             }
             else
@@ -173,7 +177,7 @@ namespace MySerialPort
                 }
                 catch
                 {
-                    MessageBox.Show("串口关闭失败！");
+                    myMessageBox.Show("串口关闭失败!", Color.Black);
                 }
             }  
             
@@ -237,12 +241,12 @@ namespace MySerialPort
                 }
                 else
                 {
-                    MessageBox.Show("发送框没有数据");
+                    myMessageBox.Show("发送框没有数据", Color.Black);
                 }
             }
             else
             {
-                MessageBox.Show("串口未打开");
+                myMessageBox.Show("串口未打开", Color.Black);
             }
         }
 
@@ -396,17 +400,55 @@ namespace MySerialPort
                     cmbPort.SelectedIndex = 0;
             }
         }
+        private void sampleImageShow(String str)            //显示示例图
+        {
+            if (str.Substring(4, 2).Equals("0E"))   //背灯关
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[0];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("0D"))   //背灯开
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[1];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("0F"))   //白场
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[5];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("30"))   //nir 绿灯
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[2];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("31"))   //nir 红灯
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[3];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("37"))   //ppg 绿灯
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[4];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("38"))   //ppg 红灯
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[4];
+                pictureBoxShow.Visible = true;
+            }
+        }
 
         private void btn_go_Click(object sender, EventArgs e)
         {
             if (!serialPort.IsOpen)
             {
-                MessageBox.Show("串口未打开");
+                myMessageBox.Show("串口未打开", Color.Black);
                 return;
             }
             if (dataGridViewMainBoardTest.DataSource == null)
             {
-                MessageBox.Show("目标数据源为空,请导入数据");
+                myMessageBox.Show("目标数据源为空,请导入数据", Color.Black);
                 return;
             }
 
@@ -430,20 +472,21 @@ namespace MySerialPort
 
                     if ("充电电流" == dgr.Cells["名字"].Value.ToString())
                     {
-                        DialogResult dr = MessageBox.Show("请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否在100~450mA之间？", "提示", MessageBoxButtons.YesNo);
-                        if (dr == DialogResult.Yes)
+                        myMessageBox.Show("请观察万用表" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否在100~450mA之间？", Color.Black);
+                        if (myMessageBox.DialogResult == DialogResult.Yes)
                         {
                             dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                             dgr.Cells["是否通过"].Value = "✔";
                             dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
                         }
-                        else
+                        else if(myMessageBox.DialogResult == DialogResult.No)
                         {
                             dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                             dgr.Cells["是否通过"].Value = "✘";
                             dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
                             testError = false;
                         }
+
                         continue;
                     }
 
@@ -479,13 +522,22 @@ namespace MySerialPort
                     }
                     else if ("02".Equals(result))
                     {
-                       
-                        DialogResult dr = MessageBox.Show("请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", "提示", MessageBoxButtons.YesNo);
-                        if (dr == DialogResult.Yes)
+                        sampleImageShow(str);
+
+                        if (str.Substring(4, 2).Equals("19"))   //蓝牙不提醒
+                            myMessageBox.DialogResult = DialogResult.Yes;
+                        else if (str.Substring(4, 2).Equals("24"))   //sn不提醒
+                            myMessageBox.DialogResult = DialogResult.Yes;
+                        else
+                            myMessageBox.Show("对比示例图,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+
+                        pictureBoxShow.Visible = false;
+
+                        if (myMessageBox.DialogResult == DialogResult.Yes)
                         {
                             yesResult(dgr, str);
                         }
-                        else
+                        else if(myMessageBox.DialogResult == DialogResult.No)
                         {
                             failResult(dgr, str.Substring(4, 2));
                         }
@@ -497,21 +549,21 @@ namespace MySerialPort
             catch (Exception ex)
             {
                 Console.WriteLine(ex.GetBaseException());
-                MessageBox.Show(ex.GetBaseException().ToString());
+                testError = false;
             }
             if (true == testError)
             {
                 if(File.Exists("主板测试.xlsx"))
-                    MessageBox.Show("主板测试成功,请使用APP链接蓝牙继续整机测试！");
+                    myMessageBox.Show("主板测试成功,请使用APP扫描屏幕二维码继续整机测试!", Color.Green);
                 else if(File.Exists("PPG测试.xlsx"))
-                    MessageBox.Show("PPG测试成功！");
+                    myMessageBox.Show("PPG测试成功!", Color.Green);
                 else if(File.Exists("NIR测试.xlsx"))
-                    MessageBox.Show("NIR测试成功！");
+                    myMessageBox.Show("NIR测试成功!", Color.Green);
                 else
-                    MessageBox.Show("测试成功！");
+                    myMessageBox.Show("测试成功!", Color.Green);
             }
             else
-                MessageBox.Show("测试失败,请检查环境重新测试！");
+                myMessageBox.Show("测试失败,请检查环境重新测试!", Color.Red);
         }
 
         public static object _lock = new object();
@@ -603,7 +655,7 @@ namespace MySerialPort
 
             if (dataGridViewMainBoardTest.DataSource == null)
             {
-                MessageBox.Show("目标数据源为空");
+                myMessageBox.Show("目标数据源为空!", Color.Black);
                 return;
             }
             DataTable table = (DataTable)dataGridViewMainBoardTest.DataSource;
@@ -631,7 +683,7 @@ namespace MySerialPort
                 excelHelper = new ExcelHelper("SN.xlsx");
                 if (0 == excelHelper.DataTableToExcel(table, "Sheet1", true))
                 {
-                    MessageBox.Show("写入失败!!");
+                    myMessageBox.Show("写入失败!!", Color.Red);
                 }
             }
             catch
@@ -648,13 +700,13 @@ namespace MySerialPort
 
             if (!serialPort.IsOpen)
             {
-                MessageBox.Show("串口未打开");
+                myMessageBox.Show("请先打开串口!", Color.Red);
                 return;
             }
             DataGridViewSelectedRowCollection drc= dataGridViewMainBoardTest.SelectedRows;
             if (drc.Count == 0)
             {
-                MessageBox.Show("无选中行！！！");
+                myMessageBox.Show("无效行!", Color.Red);
                 return;
             }
             try
@@ -673,14 +725,14 @@ namespace MySerialPort
 
                 if ("充电电流" == dgv.Cells["名字"].Value.ToString())
                 {
-                    DialogResult dr = MessageBox.Show("请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否在200~600mA之间？", "提示", MessageBoxButtons.YesNo);
-                    if (dr == DialogResult.Yes)
+                    myMessageBox.Show("请观察万用表" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否在200~600mA之间？", Color.Black);
+                    if (myMessageBox.DialogResult == DialogResult.Yes)
                     {
                         dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                         dgv.Cells["是否通过"].Value = "✔";
                         dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
                     }
-                    else
+                    else if(myMessageBox.DialogResult == DialogResult.No)
                     {
                         dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                         dgv.Cells["是否通过"].Value = "✘";
@@ -716,12 +768,22 @@ namespace MySerialPort
                 }
                 else if ("02".Equals(result))
                 {
-                    DialogResult dr = MessageBox.Show("请观察"+ dgv.Cells["名字"].EditedFormattedValue.ToString()+"是否正常？", "提示", MessageBoxButtons.YesNo);
-                    if (dr == DialogResult.Yes)
+                    sampleImageShow(str);
+
+                    if (str.Substring(4, 2).Equals("19"))   //蓝牙不提醒
+                        myMessageBox.DialogResult = DialogResult.Yes;
+                    else if (str.Substring(4, 2).Equals("24"))   //sn不提醒
+                        myMessageBox.DialogResult = DialogResult.Yes;
+                    else
+                        myMessageBox.Show("对比示例图,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+
+                    pictureBoxShow.Visible = false;
+
+                    if (myMessageBox.DialogResult == DialogResult.Yes)
                     {
                         yesResult(dgv, str);
                     }
-                    else
+                    else if(myMessageBox.DialogResult == DialogResult.No)
                     {
                         failResult(dgv, str.Substring(4, 2));
                     }
@@ -731,7 +793,6 @@ namespace MySerialPort
             catch (Exception ex)
             {
                 Console.WriteLine(ex.GetBaseException());
-                MessageBox.Show(ex.GetBaseException().ToString());
             }
         }
 
@@ -755,7 +816,6 @@ namespace MySerialPort
             }
 
             //手动输入机器码
-            //string str = Interaction.InputBox("请输入本次测试的机器码", "输入框", "", -1, -1);
             GetNewSN();
             textBoxSN.Text = strSN.ToString();
             string str = strSN;
@@ -783,8 +843,11 @@ namespace MySerialPort
             }
 
             //将buffer清空
-            byte[] recData = new byte[serialPort.BytesToRead];
-            serialPort.Read(recData, 0, recData.Length);
+            if (serialPort.IsOpen)
+            {
+                byte[] recData = new byte[serialPort.BytesToRead];
+                serialPort.Read(recData, 0, recData.Length);
+            }
         }
 
         //将参数获取出来然后判断是否存在参数
@@ -822,7 +885,7 @@ namespace MySerialPort
 
                 textBoxMAC.Text = finaltypes;
             }
-            else if ("24".Equals(types))//写入机器码
+            else if ("24".Equals(types))//读出机器码
             {
                 // result = "12345678910";
                 
@@ -978,7 +1041,7 @@ namespace MySerialPort
             }
             else
             {
-                MessageBox.Show("无法获取蓝牙MAC地址!!");
+                myMessageBox.Show("无法获取蓝牙MAC地址!!", Color.Red);
             }
         }
 
