@@ -45,7 +45,7 @@ namespace MySerialPort
                 }
                 catch
                 {
-                    myMessageBox.Show("请关闭\"SN.xlsx\"并重启软件!",Color.Black);
+                    //myMessageBox.Show("请关闭\"SN.xlsx\"并重启软件!",Color.Black);
                     strSN = "";
                     return;
                 }
@@ -179,11 +179,8 @@ namespace MySerialPort
                 {
                     myMessageBox.Show("串口关闭失败!", Color.Black);
                 }
-            }  
-            
+            }
         }
-
-
 
         //接收
         private void post_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -414,17 +411,42 @@ namespace MySerialPort
             }
             else if (str.Substring(4, 2).Equals("0F"))   //白场
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[5];
+                pictureBoxShow.BackgroundImage = imageList1.Images[2];
                 pictureBoxShow.Visible = true;
             }
             else if (str.Substring(4, 2).Equals("30"))   //nir 绿灯
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[2];
+                pictureBoxShow.BackgroundImage = imageList1.Images[6];
                 pictureBoxShow.Visible = true;
             }
             else if (str.Substring(4, 2).Equals("31"))   //nir 红灯
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[3];
+                pictureBoxShow.BackgroundImage = imageList1.Images[7];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("32"))   //nir ir
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[8];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("33"))   //nir 810
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[9];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("34"))   //nir 1050
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[10];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("35"))   //nir 1450
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[11];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("36"))   //nir 1550
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[12];
                 pictureBoxShow.Visible = true;
             }
             else if (str.Substring(4, 2).Equals("37"))   //ppg 绿灯
@@ -434,7 +456,12 @@ namespace MySerialPort
             }
             else if (str.Substring(4, 2).Equals("38"))   //ppg 红灯
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[4];
+                pictureBoxShow.BackgroundImage = imageList1.Images[3];
+                pictureBoxShow.Visible = true;
+            }
+            else if (str.Substring(4, 2).Equals("39"))   //ppg ir
+            {
+                pictureBoxShow.BackgroundImage = imageList1.Images[5];
                 pictureBoxShow.Visible = true;
             }
         }
@@ -526,8 +553,17 @@ namespace MySerialPort
 
                         if (str.Substring(4, 2).Equals("19"))   //蓝牙不提醒
                             myMessageBox.DialogResult = DialogResult.Yes;
+
                         else if (str.Substring(4, 2).Equals("24"))   //sn不提醒
                             myMessageBox.DialogResult = DialogResult.Yes;
+
+                        else if(str.Substring(4, 2).Equals("39"))   // ppg_ir
+                            myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+
+                        else if (str.Substring(4, 2).Equals("32") || str.Substring(4, 2).Equals("33")
+                                || str.Substring(4, 2).Equals("34") || str.Substring(4, 2).Equals("35") || str.Substring(4, 2).Equals("36"))   // nir
+                            myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+
                         else
                             myMessageBox.Show("对比示例图,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
 
@@ -772,8 +808,17 @@ namespace MySerialPort
 
                     if (str.Substring(4, 2).Equals("19"))   //蓝牙不提醒
                         myMessageBox.DialogResult = DialogResult.Yes;
+
                     else if (str.Substring(4, 2).Equals("24"))   //sn不提醒
                         myMessageBox.DialogResult = DialogResult.Yes;
+
+                    else if (str.Substring(4, 2).Equals("39"))   // ppg_ir
+                        myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+
+                    else if (str.Substring(4, 2).Equals("32") || str.Substring(4, 2).Equals("33")
+                            || str.Substring(4, 2).Equals("34") || str.Substring(4, 2).Equals("35") || str.Substring(4, 2).Equals("36"))   // nir
+                        myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+
                     else
                         myMessageBox.Show("对比示例图,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
 

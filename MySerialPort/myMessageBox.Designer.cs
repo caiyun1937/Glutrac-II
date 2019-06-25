@@ -87,6 +87,7 @@
             this.Controls.Add(this.buttonNo);
             this.Controls.Add(this.buttonYes);
             this.Name = "myMsgBox";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "提示";
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);

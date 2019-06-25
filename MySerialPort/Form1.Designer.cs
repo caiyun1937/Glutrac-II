@@ -895,10 +895,17 @@
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             this.imageList1.Images.SetKeyName(0, "led_off.jpg");
             this.imageList1.Images.SetKeyName(1, "led_on.jpg");
-            this.imageList1.Images.SetKeyName(2, "nir_green.jpg");
-            this.imageList1.Images.SetKeyName(3, "nir_red.jpg");
-            this.imageList1.Images.SetKeyName(4, "ppg_red_green.jpg");
-            this.imageList1.Images.SetKeyName(5, "screen_white.jpg");
+            this.imageList1.Images.SetKeyName(2, "screen_white.jpg");
+            this.imageList1.Images.SetKeyName(3, "ppg_red_green.jpg");
+            this.imageList1.Images.SetKeyName(4, "ppg_green.jpg");
+            this.imageList1.Images.SetKeyName(5, "ppg_ir.png");
+            this.imageList1.Images.SetKeyName(6, "nir_green.jpg");
+            this.imageList1.Images.SetKeyName(7, "nir_red.jpg");
+            this.imageList1.Images.SetKeyName(8, "nir_ir.png");
+            this.imageList1.Images.SetKeyName(9, "nir_810.png");
+            this.imageList1.Images.SetKeyName(10, "nir_1050.png");
+            this.imageList1.Images.SetKeyName(11, "nir_1450.png");
+            this.imageList1.Images.SetKeyName(12, "nir_1550.png");
             // 
             // Form1
             // 
