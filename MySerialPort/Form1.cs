@@ -682,12 +682,18 @@ namespace MySerialPort
             DateTime dt = DateTime.Now;
             String commandFile = "";
 
+            if (textBoxMAC.Text == "")
+            {
+                myMessageBox.Show("请单击蓝牙测试页面那一行获取MAC地址", Color.Black);
+                return;
+            }
+
             if (File.Exists("主板测试.xlsx"))
-                commandFile = "主板检测报告" + dt.ToString("yyyyMMdd_HHmmssffff") + ".xlsx";
+                commandFile = "主板检测报告" + dt.ToString("yyyyMMdd_HH_mm_ss") + ".xlsx";
             else if (File.Exists("PPG测试.xlsx"))
-                commandFile = "PPG检测报告" + dt.ToString("yyyyMMdd_HHmmssffff") + ".xlsx";
+                commandFile = "PPG检测报告" + dt.ToString("yyyyMMdd_HH_mm_ss") + ".xlsx";
             else if (File.Exists("NIR测试.xlsx"))
-                commandFile = "NIR检测报告" + dt.ToString("yyyyMMdd_HHmmssffff") + ".xlsx";
+                commandFile = "NIR检测报告" + dt.ToString("yyyyMMdd_HH_mm_ss") + ".xlsx";
 
             if (dataGridViewMainBoardTest.DataSource == null)
             {
@@ -710,6 +716,8 @@ namespace MySerialPort
 
             // 保存SN码
             dataGridViewSN.Rows[rowSN].Cells["已写入"].Value = 1;
+            if(textBoxMAC.Text != "")
+                dataGridViewSN.Rows[rowSN].Cells["MAC"].Value = textBoxMAC.Text.ToString();
 
             table = (DataTable)dataGridViewSN.DataSource;
 
