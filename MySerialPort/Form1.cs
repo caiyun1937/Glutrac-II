@@ -31,17 +31,18 @@ namespace MySerialPort
         private string strSN = "";
         private int rowSN = new int();
         private bool testError = true;
+        private string ExpandedName = "";
 
         private myMsgBox myMessageBox = new myMsgBox();
 
         private void GetNewSN()
         {
-            if (File.Exists("backup.xlsx"))
+            if (File.Exists("backup" + ExpandedName))
             {
                 try
                 {
-                    File.Delete("SN.xlsx");
-                    File.Move("backup.xlsx", "SN.xlsx");
+                    File.Delete("SN" + ExpandedName);
+                    File.Move("backup" + ExpandedName, "SN" + ExpandedName);
                 }
                 catch
                 {
@@ -51,7 +52,7 @@ namespace MySerialPort
                 }
             }
 
-            this.dataGridViewSN.DataSource = bindData("SN.xlsx");
+            this.dataGridViewSN.DataSource = bindData("SN" + ExpandedName);
 
             DateTime dateTime = DateTime.Now;
 
@@ -91,6 +92,11 @@ namespace MySerialPort
           
             cmbBaud.Text = "115200";
 
+            if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xls").Length > 0)
+                ExpandedName = ".xls";
+            else
+                ExpandedName = ".xlsx";
+
             // 读取SN号
 
             GetNewSN();
@@ -100,19 +106,19 @@ namespace MySerialPort
             else
                 textBoxSN.Text = strSN;
 
-            if (File.Exists("主板测试.xlsx"))
+            if (File.Exists("主板测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试.xlsx");
+                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
                 this.tabPage2.Text = "主板测试";
             }
-            else if(File.Exists("PPG测试.xlsx"))
+            else if(File.Exists("PPG测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试.xlsx");
+                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
                 this.tabPage2.Text = "PPG测试";
             }
-            else if (File.Exists("NIR测试.xlsx"))
+            else if (File.Exists("NIR测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试.xlsx");
+                this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试" + ExpandedName);
                 this.tabPage2.Text = "NIR测试";
             }
 
@@ -589,12 +595,15 @@ namespace MySerialPort
             }
             if (true == testError)
             {
-                if(File.Exists("主板测试.xlsx"))
+                if(File.Exists("主板测试" + ExpandedName))
                     myMessageBox.Show("主板测试成功,请使用APP扫描屏幕二维码继续整机测试!", Color.Green);
-                else if(File.Exists("PPG测试.xlsx"))
+
+                else if(File.Exists("PPG测试" + ExpandedName))
                     myMessageBox.Show("PPG测试成功!", Color.Green);
-                else if(File.Exists("NIR测试.xlsx"))
+
+                else if(File.Exists("NIR测试" + ExpandedName))
                     myMessageBox.Show("NIR测试成功!", Color.Green);
+
                 else
                     myMessageBox.Show("测试成功!", Color.Green);
             }
@@ -643,12 +652,14 @@ namespace MySerialPort
 
         private void btn_inupt_excel_Click(object sender, EventArgs e)
         {
-            if (File.Exists("主板测试.xlsx"))
-                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试.xlsx");
-            else if(File.Exists("PPG测试.xlsx"))
-                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试.xlsx");
-            else if (File.Exists("NIR测试.xlsx"))
-                this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试.xlsx");
+            if (File.Exists("主板测试" + ExpandedName))
+                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
+
+            else if(File.Exists("PPG测试" + ExpandedName))
+                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
+
+            else if (File.Exists("NIR测试" + ExpandedName))
+                this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试" + ExpandedName);
 
             string str = strSN;
 
@@ -682,18 +693,12 @@ namespace MySerialPort
             DateTime dt = DateTime.Now;
             String commandFile = "";
 
-            if (textBoxMAC.Text == "")
-            {
-                myMessageBox.Show("请单击蓝牙测试页面那一行获取MAC地址", Color.Black);
-                return;
-            }
-
-            if (File.Exists("主板测试.xlsx"))
-                commandFile = "主板检测报告" + dt.ToString("yyyyMMdd_HH_mm_ss") + ".xlsx";
+            if (File.Exists("主板测试" + ExpandedName))
+                commandFile = "Main" + "_" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             else if (File.Exists("PPG测试.xlsx"))
-                commandFile = "PPG检测报告" + dt.ToString("yyyyMMdd_HH_mm_ss") + ".xlsx";
+                commandFile = "PPG" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             else if (File.Exists("NIR测试.xlsx"))
-                commandFile = "NIR检测报告" + dt.ToString("yyyyMMdd_HH_mm_ss") + ".xlsx";
+                commandFile = "NIR" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
 
             if (dataGridViewMainBoardTest.DataSource == null)
             {
@@ -710,21 +715,18 @@ namespace MySerialPort
                 txt_output_excel.Text = commandFile;
             }
 
-            if (!File.Exists("主板测试.xlsx"))      // 非主板测试不用保存SN码
+            if (!File.Exists("主板测试" + ExpandedName))      // 非主板测试不用保存SN码
                 return;
-
 
             // 保存SN码
             dataGridViewSN.Rows[rowSN].Cells["已写入"].Value = 1;
-            if(textBoxMAC.Text != "")
-                dataGridViewSN.Rows[rowSN].Cells["MAC"].Value = textBoxMAC.Text.ToString();
 
             table = (DataTable)dataGridViewSN.DataSource;
 
             try
             {
-                File.Delete("SN.xlsx");
-                excelHelper = new ExcelHelper("SN.xlsx");
+                File.Delete("SN" + ExpandedName);
+                excelHelper = new ExcelHelper("SN" + ExpandedName);
                 if (0 == excelHelper.DataTableToExcel(table, "Sheet1", true))
                 {
                     myMessageBox.Show("写入失败!!", Color.Red);
@@ -733,8 +735,8 @@ namespace MySerialPort
             catch
             {
                 //MessageBox.Show("\"SN.xlsx\"文件被打开,另存到backup!!");
-                File.Delete("backup.xlsx");
-                excelHelper = new ExcelHelper("backup.xlsx");
+                File.Delete("backup" + ExpandedName);
+                excelHelper = new ExcelHelper("backup" + ExpandedName);
                 excelHelper.DataTableToExcel(table, "Sheet1", true);
             }
         }
@@ -852,25 +854,31 @@ namespace MySerialPort
         private void btn_again_Click(object sender, EventArgs e)
         {
             //初始化dataCommond
-            if (File.Exists("主板测试.xlsx"))
+            if (File.Exists("主板测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试.xlsx");
+                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
                 this.tabPage2.Text = "主板测试";
             }
-            else if (File.Exists("PPG测试.xlsx"))
+            else if (File.Exists("PPG测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试.xlsx");
+                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
                 this.tabPage2.Text = "PPG测试";
             }
-            else if (File.Exists("NIR测试.xlsx"))
+            else if (File.Exists("NIR测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试.xlsx");
+                this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试" + ExpandedName);
                 this.tabPage2.Text = "NIR测试";
             }
 
             //手动输入机器码
             GetNewSN();
-            textBoxSN.Text = strSN.ToString();
+            if (strSN == "")
+                textBoxSN.Text = "SN获取失败!!";
+            else
+                textBoxSN.Text = strSN;
+
+            textBoxMAC.Text = "";
+
             string str = strSN;
             if (str.IndexOf("\n") != -1)
             {
@@ -937,6 +945,9 @@ namespace MySerialPort
                 result = "蓝牙地址：" + finaltypes;
 
                 textBoxMAC.Text = finaltypes;
+
+                if (textBoxMAC.Text != "")
+                    dataGridViewSN.Rows[rowSN].Cells["MAC"].Value = textBoxMAC.Text.ToString();
             }
             else if ("24".Equals(types))//读出机器码
             {
@@ -956,8 +967,6 @@ namespace MySerialPort
                     result = result.Replace("\r", "");
                 }
             }
-
-
                 return result;
         }
 
@@ -1012,6 +1021,9 @@ namespace MySerialPort
                 String finaltypes = str.Substring(8, 12);
 
                 textBoxMAC.Text = finaltypes;
+
+                if (textBoxMAC.Text != "")
+                    dataGridViewSN.Rows[rowSN].Cells["MAC"].Value = textBoxMAC.Text.ToString();
             }
         }
         public void failResult(DataGridViewRow dgr, String type)
@@ -1023,7 +1035,6 @@ namespace MySerialPort
             {
             }
         }
-
 
         private void ConnectPrinter()
         {
@@ -1098,20 +1109,24 @@ namespace MySerialPort
             }
         }
 
+        private bool Manual_MAC_SN = false;
         private void buttonManual_Click(object sender, EventArgs e)
         {
-            if (textBoxSN.ReadOnly == true && textBoxMAC.ReadOnly == true)
+            if (Manual_MAC_SN)
             {
-                buttonManual.Text = "关闭手动输入";
-                textBoxSN.ReadOnly = false;
-                textBoxMAC.ReadOnly = false;
-            }
-            else
-            {
+                Manual_MAC_SN = false;
                 buttonManual.Text = "启动手动输入";
                 textBoxSN.ReadOnly = true;
                 textBoxMAC.ReadOnly = true;
             }
+            else
+            {
+                Manual_MAC_SN = true;
+                buttonManual.Text = "关闭手动输入";
+                textBoxSN.ReadOnly = false;
+                textBoxMAC.ReadOnly = false;
+            }
+
         }
     }
 }
