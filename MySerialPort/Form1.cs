@@ -14,12 +14,34 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using EzioDll;
+using C_Sharp_Application;
+using System.Runtime.InteropServices;
 
 namespace MySerialPort
 {
     public partial class Form1 : Form
     {
         GodexPrinter Printer = new GodexPrinter();
+
+        public long m_DeviceHandle_8U2;
+        public long m_DeviceHandle_9U2;
+        ushort m_StartPixels_8U2;
+        ushort m_StopPixels_8U2;
+        ushort m_StartPixels_9U2;
+        ushort m_StopPixels_9U2;
+        ulong m_StartTicks;
+        uint m_Measurements;
+        uint m_Failures;
+        public avaspec.PixelArrayType m_Lambda_8U2 = new avaspec.PixelArrayType();
+        public avaspec.PixelArrayType m_Lambda_9U2 = new avaspec.PixelArrayType();
+        public avaspec.PixelArrayType m_Spectrum_8U2 = new avaspec.PixelArrayType();
+        public avaspec.PixelArrayType m_Spectrum_9U2 = new avaspec.PixelArrayType();
+        ushort m_NrPixels_8U2;
+        ushort m_NrPixels_9U2;
+        uint m_PreviousTimeStamp_8U2;
+        uint m_PreviousTimeStamp_9U2;
+
+
 
         public Form1()
         {
@@ -64,17 +86,67 @@ namespace MySerialPort
                     //帧头	序列号	产地	年	月	型号	已写入
 
                     rowSN = dgr.Index;
-                    strSN = dgr.Cells["帧头"].Value.ToString() + dgr.Cells["序列号"].Value.ToString() +
+                    strSN = dgr.Cells["帧头"].Value.ToString() + dgr.Cells["序列号"].Value.ToString().PadLeft(4, '0') +
                             dgr.Cells["产地"].Value.ToString() + dgr.Cells["年"].Value.ToString() +
                             dgr.Cells["月"].Value.ToString() + dgr.Cells["型号"].Value.ToString();
                     return ;
                 }
             }
         }
+        private void ConnectGui()
+        {
+            avaspec.DeviceConfigType l_pDeviceData_8U2 = new avaspec.DeviceConfigType();
+            avaspec.DeviceConfigType l_pDeviceData_9U2 = new avaspec.DeviceConfigType();
+
+            uint l_Size = 0;
+
+            avaspec.AVS_GetNumPixels((IntPtr)m_DeviceHandle_8U2, ref m_NrPixels_8U2);
+            avaspec.AVS_GetNumPixels((IntPtr)m_DeviceHandle_9U2, ref m_NrPixels_9U2);
+
+            l_Size = (uint)Marshal.SizeOf(typeof(avaspec.DeviceConfigType));
+
+            int l_Res_8U2 = (int)avaspec.AVS_GetParameter((IntPtr)m_DeviceHandle_8U2, l_Size, ref l_Size, ref l_pDeviceData_8U2);
+            if (l_Res_8U2 != avaspec.ERR_SUCCESS)
+                return;
+
+            int l_Res_9U2 = (int)avaspec.AVS_GetParameter((IntPtr)m_DeviceHandle_9U2, l_Size, ref l_Size, ref l_pDeviceData_9U2);
+            if (l_Res_9U2 != avaspec.ERR_SUCCESS)
+                return;
+
+            m_StartPixels_8U2 = l_pDeviceData_8U2.m_StandAlone.m_Meas.m_StartPixel;
+            m_StopPixels_8U2 = l_pDeviceData_8U2.m_StandAlone.m_Meas.m_StopPixel;
+
+            m_StartPixels_9U2 = l_pDeviceData_9U2.m_StandAlone.m_Meas.m_StartPixel;
+            m_StopPixels_9U2 = l_pDeviceData_9U2.m_StandAlone.m_Meas.m_StopPixel;
+        }
+
+        private void Form1_Closed(object sender, System.EventArgs e)
+        {
+            int l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
+            int l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
+
+            avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_8U2);
+            m_DeviceHandle_8U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
+
+            avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_9U2);
+            m_DeviceHandle_9U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
+
+            if (m_DeviceHandle_8U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
+            {
+                l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
+            }
+            if (m_DeviceHandle_9U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
+            {
+                l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
+            }
+            avaspec.AVS_Done();
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             pictureBoxShow.Visible = false;
+
+            this.Location = new Point(0, 0);
 
             RegistryKey keyCom = Registry.LocalMachine.OpenSubKey("Hardware\\DeviceMap\\SerialComm");
             if (keyCom != null)
@@ -148,8 +220,158 @@ namespace MySerialPort
 
             // 二维码
             Cbo_PaperType.SelectedIndex = 1;
+
+            // 光谱仪
+            chart1.SendToBack();
+            chart1.Visible = false;
+
+            if (this.tabPage2.Text != "PPG测试" && this.tabPage2.Text != "NIR测试")
+                return;
+
+            int l_Port = avaspec.AVS_Init(0);
+            avaspec.AVS_Register(this.Handle);
+
+            if (l_Port == avaspec.ERR_DEVICE_NOT_FOUND)
+            {
+                avaspec.AVS_Done();
+            }
+
+            avaspec.AvsIdentityType channel_8U2 = new avaspec.AvsIdentityType();
+            avaspec.AvsIdentityType channel_9U2 = new avaspec.AvsIdentityType();
+
+            long hDevice_8U2 = 0, hDevice_9U2 = 0;
+
+            channel_8U2.m_SerialNumber = "1703018U2";
+            channel_9U2.m_SerialNumber = "1703019U2";
+
+            hDevice_8U2 = (long)avaspec.AVS_Activate(ref channel_8U2);
+            hDevice_9U2 = (long)avaspec.AVS_Activate(ref channel_9U2);
+
+            m_DeviceHandle_8U2 = hDevice_8U2;
+            if (avaspec.AVS_UseHighResAdc((IntPtr)m_DeviceHandle_8U2, true) != avaspec.ERR_SUCCESS)
+            {
+                myMessageBox.Show("PPG和NIR测试请链接光谱仪，重启软件!!", Color.Red);
+                System.Environment.Exit(0);
+            }
+
+            m_DeviceHandle_9U2 = hDevice_9U2;
+            if (avaspec.AVS_UseHighResAdc((IntPtr)m_DeviceHandle_9U2, true) != avaspec.ERR_SUCCESS)
+            {
+                myMessageBox.Show("PPG和NIR测试请链接光谱仪，重启软件!!", Color.Red);
+                System.Environment.Exit(0);
+            }
+
+            ConnectGui();
+            
+            //Prepare Measurement
+            avaspec.MeasConfigType l_PrepareMeasData_8U2 = new avaspec.MeasConfigType();
+            avaspec.MeasConfigType l_PrepareMeasData_9U2 = new avaspec.MeasConfigType();
+
+            l_PrepareMeasData_9U2.m_StartPixel = l_PrepareMeasData_8U2.m_StartPixel = 0;
+            l_PrepareMeasData_8U2.m_StopPixel = 2047;
+            l_PrepareMeasData_9U2.m_StopPixel = 511;
+
+            l_PrepareMeasData_9U2.m_IntegrationTime = l_PrepareMeasData_8U2.m_IntegrationTime = 100;
+            double l_NanoSec = 20;
+            uint l_FPGAClkCycles = (uint)(6.0 * (l_NanoSec + 20.84) / 125.0);
+            l_PrepareMeasData_9U2.m_IntegrationDelay = l_PrepareMeasData_8U2.m_IntegrationDelay = l_FPGAClkCycles;
+            l_PrepareMeasData_9U2.m_NrAverages = l_PrepareMeasData_8U2.m_NrAverages = 1;
+
+            l_FPGAClkCycles = (uint)(6.0 * l_NanoSec / 125.0);
+            l_PrepareMeasData_9U2.m_Control.m_LaserDelay = l_PrepareMeasData_8U2.m_Control.m_LaserDelay = l_FPGAClkCycles;
+            l_FPGAClkCycles = (uint)(6.0 * l_NanoSec / 125.0);
+            l_PrepareMeasData_9U2.m_Control.m_LaserWidth = l_PrepareMeasData_8U2.m_Control.m_LaserWidth = l_FPGAClkCycles;
+
+            int l_Res_8U2 = (int)avaspec.AVS_PrepareMeasure((IntPtr)m_DeviceHandle_8U2, ref l_PrepareMeasData_8U2);
+            int l_Res_9U2 = (int)avaspec.AVS_PrepareMeasure((IntPtr)m_DeviceHandle_9U2, ref l_PrepareMeasData_9U2);
+            //Get Nr Of Scans
+
+            short l_NrOfScans = -1;
+            if ((l_PrepareMeasData_8U2.m_Control.m_StoreToRam > 0) && (l_PrepareMeasData_9U2.m_Control.m_StoreToRam > 0) && (l_NrOfScans != 1))
+            {
+                l_NrOfScans = 1;
+            }
+            //Start Measurement
+
+            m_StartTicks = (ulong)Environment.TickCount;
+            m_Measurements = 0;
+            m_Failures = 0;
+            m_StartPixels_8U2 = l_PrepareMeasData_8U2.m_StartPixel;
+            m_StopPixels_8U2 = l_PrepareMeasData_8U2.m_StopPixel;
+            m_StartPixels_9U2 = l_PrepareMeasData_9U2.m_StartPixel;
+            m_StopPixels_9U2 = l_PrepareMeasData_9U2.m_StopPixel;
+
+            if (avaspec.ERR_SUCCESS == (int)avaspec.AVS_GetLambda((IntPtr)m_DeviceHandle_8U2, ref m_Lambda_8U2))
+            {
+            }
+            if (avaspec.ERR_SUCCESS == (int)avaspec.AVS_GetLambda((IntPtr)m_DeviceHandle_9U2, ref m_Lambda_9U2))
+            {
+            }
+            chart1.ChartAreas[0].AxisX.Minimum = 200;
+            chart1.ChartAreas[0].AxisX.Maximum = 1700;
+            chart1.ChartAreas[0].AxisX.LabelStyle.Format = "{0.0}";
+
+            l_Res_8U2 = (int)avaspec.AVS_Measure((IntPtr)m_DeviceHandle_8U2, this.Handle, l_NrOfScans);
+            l_Res_9U2 = (int)avaspec.AVS_Measure((IntPtr)m_DeviceHandle_9U2, this.Handle, l_NrOfScans);
         }
-        
+
+        private const int WM_APP = 0x8000;
+        private const int WM_MEAS_READY = WM_APP + 1;
+        private const int WM_DBG_INFOAs = WM_APP + 2;
+        private const int WM_DEVICE_RESET = WM_APP + 3;
+
+        protected override void WndProc(ref Message a_WinMess)
+        {
+            ulong l_Ticks = 0;
+
+            if (a_WinMess.Msg == WM_MEAS_READY)
+            {
+                if ((int)a_WinMess.WParam >= avaspec.ERR_SUCCESS)
+                {
+                    if (avaspec.ERR_SUCCESS == (int)a_WinMess.WParam) // normal measurements
+                    {
+                        if (m_NrPixels_8U2 > 0 && m_NrPixels_9U2 > 0)
+                        {
+                            uint l_Time_8U2 = 0, l_Time_9U2 = 0;
+                            if (avaspec.ERR_SUCCESS == (int)avaspec.AVS_GetScopeData((IntPtr)m_DeviceHandle_8U2, ref l_Time_8U2, ref m_Spectrum_8U2))
+                            {
+                                m_PreviousTimeStamp_8U2 = l_Time_8U2;
+                            }
+                            if (avaspec.ERR_SUCCESS == (int)avaspec.AVS_GetScopeData((IntPtr)m_DeviceHandle_9U2, ref l_Time_9U2, ref m_Spectrum_9U2))
+                            {
+                                m_PreviousTimeStamp_9U2 = l_Time_9U2;
+                            }
+                            timer1.Start();
+                        }
+                        m_Measurements++;
+                        l_Ticks = (ulong)Environment.TickCount;
+                    }
+                    else
+                    {
+                        for (int j = 1; j <= a_WinMess.WParam.ToInt32(); j++)
+                        {
+                            avaspec.PixelArrayType l_pSpectrum = new avaspec.PixelArrayType();
+                            uint l_Time = 0;
+                            if (avaspec.ERR_SUCCESS == avaspec.AVS_GetScopeData((IntPtr)m_DeviceHandle_8U2, ref l_Time, ref l_pSpectrum))
+                            {
+                                double l_Dif = l_Time - m_PreviousTimeStamp_8U2;  //l_Time in 10 us ticks
+                                m_PreviousTimeStamp_8U2 = l_Time;
+                            }
+                            l_Ticks = (ulong)Environment.TickCount;
+                        }
+                    }
+                }
+                else // message.WParam < 0 indicates error 
+                {
+                    m_Failures++;
+                }
+            }
+            else
+            {
+                base.WndProc(ref a_WinMess);
+            }
+        }
+
         bool isOpened = false;//串口状态标志
         private void button1_Click(object sender, EventArgs e)
         {
@@ -563,17 +785,27 @@ namespace MySerialPort
                         else if (str.Substring(4, 2).Equals("24"))   //sn不提醒
                             myMessageBox.DialogResult = DialogResult.Yes;
 
-                        else if(str.Substring(4, 2).Equals("39"))   // ppg_ir
+                        else if (str.Substring(4, 2).Equals("39"))   // ppg_ir
+                        {
+                            chart1.Visible = true;
+                            chart1.BringToFront();
                             myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+                        }
 
                         else if (str.Substring(4, 2).Equals("32") || str.Substring(4, 2).Equals("33")
                                 || str.Substring(4, 2).Equals("34") || str.Substring(4, 2).Equals("35") || str.Substring(4, 2).Equals("36"))   // nir
+                        {
+                            chart1.Visible = true;
+                            chart1.BringToFront();
                             myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+                        }
 
                         else
                             myMessageBox.Show("对比示例图,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
 
                         pictureBoxShow.Visible = false;
+                        chart1.Visible = false;
+                        chart1.SendToBack();
 
                         if (myMessageBox.DialogResult == DialogResult.Yes)
                         {
@@ -694,11 +926,17 @@ namespace MySerialPort
             String commandFile = "";
 
             if (File.Exists("主板测试" + ExpandedName))
-                commandFile = "Main" + "_" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
-            else if (File.Exists("PPG测试.xlsx"))
-                commandFile = "PPG" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
-            else if (File.Exists("NIR测试.xlsx"))
-                commandFile = "NIR" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+            {
+                if(textBoxMAC.Text.ToString().Length != 12)
+                    commandFile = "Main_" + strSN.ToString() + "_" + "###########" + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                else
+                commandFile = "Main_" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+            }
+            else if (File.Exists("PPG测试" + ExpandedName))
+                commandFile = "PPG_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+
+            else if (File.Exists("NIR测试" + ExpandedName))
+                commandFile = "NIR_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
 
             if (dataGridViewMainBoardTest.DataSource == null)
             {
@@ -823,16 +1061,26 @@ namespace MySerialPort
                         myMessageBox.DialogResult = DialogResult.Yes;
 
                     else if (str.Substring(4, 2).Equals("39"))   // ppg_ir
+                    {
+                        chart1.Visible = true;
+                        chart1.BringToFront();
                         myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+                    }
 
                     else if (str.Substring(4, 2).Equals("32") || str.Substring(4, 2).Equals("33")
                             || str.Substring(4, 2).Equals("34") || str.Substring(4, 2).Equals("35") || str.Substring(4, 2).Equals("36"))   // nir
+                    {
+                        chart1.Visible = true;
+                        chart1.BringToFront();
                         myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+                    }
 
                     else
                         myMessageBox.Show("对比示例图,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
 
                     pictureBoxShow.Visible = false;
+                    chart1.Visible = false;
+                    chart1.SendToBack();
 
                     if (myMessageBox.DialogResult == DialogResult.Yes)
                     {
@@ -1127,6 +1375,35 @@ namespace MySerialPort
                 textBoxMAC.ReadOnly = false;
             }
 
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            int pixel;
+            double axisyMax = 0.0;
+            timer1.Stop();
+            chart1.Series["Series1"].Points.Clear();
+            chart1.Series.SuspendUpdates();
+
+            for (pixel = 0; pixel <= 1050 - 1; pixel++)
+            {
+                chart1.Series["Series1"].Points.AddXY(m_Lambda_8U2.Value[pixel], m_Spectrum_8U2.Value[pixel]);
+                if (m_Spectrum_8U2.Value[pixel] > axisyMax)
+                    axisyMax = m_Spectrum_8U2.Value[pixel];
+            }
+
+            for (pixel = 0; pixel <= m_NrPixels_9U2 - 1; pixel++)
+            {
+                chart1.Series["Series1"].Points.AddXY(m_Lambda_9U2.Value[pixel], m_Spectrum_9U2.Value[pixel]);
+                if (m_Spectrum_9U2.Value[pixel] > axisyMax)
+                    axisyMax = m_Spectrum_9U2.Value[pixel];
+            }
+
+            chart1.ChartAreas[0].AxisY.Maximum = axisyMax;
+
+            chart1.Series.ResumeUpdates();
+            chart1.Series.Invalidate();
+            chart1.Update();
         }
     }
 }

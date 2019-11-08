@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -43,6 +46,7 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.dataGridViewSN = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.pictureBoxShow = new System.Windows.Forms.PictureBox();
             this.dataGridViewMainBoardTest = new System.Windows.Forms.DataGridView();
             this.btn_output_excel = new System.Windows.Forms.Button();
@@ -93,10 +97,12 @@
             this.label5 = new System.Windows.Forms.Label();
             this.textBoxMAC = new System.Windows.Forms.TextBox();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSN)).BeginInit();
             this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxShow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMainBoardTest)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.noUpDown)).BeginInit();
@@ -241,6 +247,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.chart1);
             this.tabPage2.Controls.Add(this.pictureBoxShow);
             this.tabPage2.Controls.Add(this.dataGridViewMainBoardTest);
             this.tabPage2.Controls.Add(this.btn_output_excel);
@@ -256,6 +263,31 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "主板测试";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // chart1
+            // 
+            chartArea1.AxisX.Maximum = 1100D;
+            chartArea1.AxisX.Minimum = 400D;
+            chartArea1.AxisX.Title = "Wavelength [nm]";
+            chartArea1.AxisY.Maximum = 0D;
+            chartArea1.AxisY.Minimum = -1000D;
+            chartArea1.AxisY.Title = "Counts";
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            legend1.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chart1.Legends.Add(legend1);
+            this.chart1.Location = new System.Drawing.Point(554, 39);
+            this.chart1.Name = "chart1";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
+            this.chart1.Size = new System.Drawing.Size(682, 415);
+            this.chart1.TabIndex = 17;
+            this.chart1.Text = "chart1";
             // 
             // pictureBoxShow
             // 
@@ -907,6 +939,10 @@
             this.imageList1.Images.SetKeyName(11, "nir_1450.png");
             this.imageList1.Images.SetKeyName(12, "nir_1550.png");
             // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -921,6 +957,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "串口测试工具";
+            this.Closed += new System.EventHandler(this.Form1_Closed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -928,6 +965,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSN)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxShow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMainBoardTest)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.noUpDown)).EndInit();
@@ -1024,6 +1062,8 @@
         private System.Windows.Forms.Button buttonManual;
         private System.Windows.Forms.PictureBox pictureBoxShow;
         private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 
