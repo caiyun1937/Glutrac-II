@@ -706,7 +706,7 @@ namespace MySerialPort
             }
             if (dataGridViewMainBoardTest.DataSource == null)
             {
-                myMessageBox.Show("目标数据源为空,请导入数据", Color.Black);
+                myMessageBox.Show("目标数据源为空,请确认目录下存在测试表!", Color.Black);
                 return;
             }
 
@@ -831,19 +831,21 @@ namespace MySerialPort
             if (true == testError)
             {
                 if(File.Exists("主板测试" + ExpandedName))
-                    myMessageBox.Show("主板测试成功,请使用APP扫描屏幕二维码继续整机测试!", Color.Green);
+                    myMessageBox.Show("主板测试成功,请保存测试报告!", Color.Green);
 
                 else if(File.Exists("PPG测试" + ExpandedName))
-                    myMessageBox.Show("PPG测试成功!", Color.Green);
+                    myMessageBox.Show("PPG测试成功,请保存测试报告!", Color.Green);
 
                 else if(File.Exists("NIR测试" + ExpandedName))
-                    myMessageBox.Show("NIR测试成功!", Color.Green);
+                    myMessageBox.Show("NIR测试成功,请保存测试报告!", Color.Green);
 
                 else
-                    myMessageBox.Show("测试成功!", Color.Green);
+                    myMessageBox.Show("测试成功,请保存测试报告!", Color.Green);
             }
             else
                 myMessageBox.Show("测试失败,请检查环境重新测试!", Color.Red);
+
+            btn_go.Enabled = false;
         }
 
         public static object _lock = new object();
@@ -868,7 +870,13 @@ namespace MySerialPort
 
             //读取返回数据
             DateTime dt = DateTime.Now;
-            int noresponse = Convert.ToInt32(noUpDown.Value);
+            int noresponse = 0;
+
+            if (sendData[2] == 0x22)
+                noresponse = 30;
+            else
+                noresponse = Convert.ToInt32(noUpDown.Value);
+
             while (serialPort.BytesToRead == 0)
             {
                 
@@ -928,12 +936,14 @@ namespace MySerialPort
             DateTime dt = DateTime.Now;
             String commandFile = "";
 
+            btn_go.Enabled = true;
+
             if (File.Exists("主板测试" + ExpandedName))
             {
                 if(textBoxMAC.Text.ToString().Length != 12)
                     commandFile = "Main_" + strSN.ToString() + "_" + "###########" + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
                 else
-                commandFile = "Main_" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                    commandFile = "Main_" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
             else if (File.Exists("PPG测试" + ExpandedName))
                 commandFile = "PPG_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
