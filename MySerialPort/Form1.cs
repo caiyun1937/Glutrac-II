@@ -122,6 +122,9 @@ namespace MySerialPort
 
         private void Form1_Closed(object sender, System.EventArgs e)
         {
+            //if (this.tabPage2.Text != "PPG测试" && this.tabPage2.Text != "NIR测试")
+                //return;
+
             int l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
             int l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
 
@@ -953,7 +956,10 @@ namespace MySerialPort
                 txt_output_excel.Text = commandFile;
             }
 
-            if (!File.Exists("主板测试" + ExpandedName))      // 非主板测试不用保存SN码
+            if (!File.Exists("主板测试" + ExpandedName))        // 非主板测试不用保存SN码
+                return;
+
+            if (!File.Exists("SN" + ExpandedName))              // 目录没有SN码表不用保存
                 return;
 
             // 保存SN码
@@ -1385,7 +1391,7 @@ namespace MySerialPort
             chart1.Series["Series1"].Points.Clear();
             chart1.Series.SuspendUpdates();
 
-            for (pixel = 0; pixel <= 1050 - 1; pixel++)
+            for (pixel = 0; pixel <= 1550 - 1; pixel++)
             {
                 chart1.Series["Series1"].Points.AddXY(m_Lambda_8U2.Value[pixel], m_Spectrum_8U2.Value[pixel]);
                 if (m_Spectrum_8U2.Value[pixel] > axisyMax)
