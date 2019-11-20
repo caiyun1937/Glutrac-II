@@ -89,9 +89,16 @@ namespace MySerialPort
                     strSN = dgr.Cells["帧头"].Value.ToString() + dgr.Cells["序列号"].Value.ToString().PadLeft(4, '0') +
                             dgr.Cells["产地"].Value.ToString() + dgr.Cells["年"].Value.ToString() +
                             dgr.Cells["月"].Value.ToString() + dgr.Cells["型号"].Value.ToString();
+
+                    if (strSN == "")
+                        textBoxSN.Text = "SN获取失败!!";
+                    else
+                        textBoxSN.Text = strSN;
+
                     return ;
                 }
             }
+            textBoxSN.Text = "已无可用SN码!!";
         }
         private void ConnectGui()
         {
@@ -148,6 +155,9 @@ namespace MySerialPort
         private void Form1_Load(object sender, EventArgs e)
         {
             pictureBoxShow.Visible = false;
+            btn_go.Enabled = true;
+            btn_again.Enabled = true;
+            btn_output_excel.Enabled = false;
 
             this.Location = new Point(0, 0);
 
@@ -175,11 +185,6 @@ namespace MySerialPort
             // 读取SN号
 
             GetNewSN();
-
-            if (strSN == "")
-                textBoxSN.Text = "SN获取失败!!";
-            else
-                textBoxSN.Text = strSN;
 
             if (File.Exists("主板测试" + ExpandedName))
             {
@@ -760,20 +765,22 @@ namespace MySerialPort
 
                     if (result != null && "00".Equals(result))
                     {
+                        dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                         dgr.Cells["是否通过"].Value = "✔";
                         dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
                         dgr.Cells["数值显示"].Value = getResultInRecve(str);
                         //判断温湿度命令
                         if (str.Substring(4, 2).Equals("17") && str.Substring(8, 2).Equals("01"))  //判断hdtc2是否通过
                         {
+                            dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                             dgr.Cells["是否通过"].Value = "✘";
                             dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
                             testError = false;
                         }
-                       
                     }
                     else if ("01".Equals(result))
                     {
+                        dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                         dgr.Cells["是否通过"].Value = "✘";
                         dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
                         testError = false;
@@ -819,8 +826,7 @@ namespace MySerialPort
                             failResult(dgr, str.Substring(4, 2));
                         }
                     }
-                    dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
-                    Thread.Sleep(2000);
+                    Thread.Sleep(500);
                 }
             }
             catch (Exception ex)
@@ -846,6 +852,8 @@ namespace MySerialPort
                 myMessageBox.Show("测试失败,请检查环境重新测试!", Color.Red);
 
             btn_go.Enabled = false;
+            btn_again.Enabled = false;
+            btn_output_excel.Enabled = true;
         }
 
         public static object _lock = new object();
@@ -879,7 +887,6 @@ namespace MySerialPort
 
             while (serialPort.BytesToRead == 0)
             {
-                
                 Thread.Sleep(1);
                 if (DateTime.Now.Subtract(dt).TotalMilliseconds > (noresponse * 1000)) //如果30秒后仍然无数据返回，则视为超时
                 {
@@ -937,6 +944,8 @@ namespace MySerialPort
             String commandFile = "";
 
             btn_go.Enabled = true;
+            btn_again.Enabled = true;
+            btn_output_excel.Enabled = false;
 
             if (File.Exists("主板测试" + ExpandedName))
             {
@@ -1136,12 +1145,9 @@ namespace MySerialPort
 
             //手动输入机器码
             GetNewSN();
-            if (strSN == "")
-                textBoxSN.Text = "SN获取失败!!";
-            else
-                textBoxSN.Text = strSN;
 
             textBoxMAC.Text = "";
+            txt_output_excel.Text = "";
 
             string str = strSN;
             if (str.IndexOf("\n") != -1)
@@ -1156,7 +1162,6 @@ namespace MySerialPort
             str = str.Replace(" ", "");
             foreach (DataGridViewRow dgr in dataGridViewMainBoardTest.Rows)
             {
-
                 //判断关键列是否是空，空就跳过
                 Object input = dgr.Cells["名字"].EditedFormattedValue;
                 if (input == null || input.ToString() == "" || !"机器码写入".Equals(input.ToString()))
@@ -1173,6 +1178,10 @@ namespace MySerialPort
                 byte[] recData = new byte[serialPort.BytesToRead];
                 serialPort.Read(recData, 0, recData.Length);
             }
+
+            btn_go.Enabled = true;
+            btn_again.Enabled = true;
+            btn_output_excel.Enabled = false;
         }
 
         //将参数获取出来然后判断是否存在参数
@@ -1211,7 +1220,10 @@ namespace MySerialPort
                 textBoxMAC.Text = finaltypes;
 
                 if (textBoxMAC.Text != "")
+                {
+                    //foreach(textBoxMAC.Text in)
                     dataGridViewSN.Rows[rowSN].Cells["MAC"].Value = textBoxMAC.Text.ToString();
+                }
             }
             else if ("24".Equals(types))//读出机器码
             {
@@ -1266,6 +1278,7 @@ namespace MySerialPort
 
         public void yesResult(DataGridViewRow dgr,String str)
         {
+            dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
             dgr.Cells["是否通过"].Value = "✔";
             dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
             if (str.Substring(4, 2).Equals("24"))
@@ -1287,11 +1300,59 @@ namespace MySerialPort
                 textBoxMAC.Text = finaltypes;
 
                 if (textBoxMAC.Text != "")
+                {
+                    foreach (DataGridViewRow dgr_MAC in dataGridViewSN.Rows)
+                    {
+                        //检验该设备是否已经经过测试
+                        Object input = dgr_MAC.Cells["MAC"].EditedFormattedValue;
+                        if (textBoxMAC.Text.Equals(input.ToString()))
+                        {
+                            rowSN = dgr_MAC.Index;
+                            strSN = dgr_MAC.Cells["帧头"].Value.ToString() + dgr_MAC.Cells["序列号"].Value.ToString().PadLeft(4, '0') +
+                                    dgr_MAC.Cells["产地"].Value.ToString() + dgr_MAC.Cells["年"].Value.ToString() +
+                                    dgr_MAC.Cells["月"].Value.ToString() + dgr_MAC.Cells["型号"].Value.ToString();
+
+                            if (strSN == "")
+                                textBoxSN.Text = "SN获取失败!!";
+                            else
+                                textBoxSN.Text = strSN;
+
+                            string strTemp = strSN;
+
+                            if (strTemp.IndexOf("\n") != -1)
+                            {
+                                strTemp = strTemp.Replace("\n", "");
+                            }
+                            if (strTemp.IndexOf("\r") != -1)
+                            {
+                                strTemp = strTemp.Replace("\r", "");
+                            }
+                            strTemp = asciiToHex(strTemp);
+                            strTemp = strTemp.Replace(" ", "");
+
+                            foreach (DataGridViewRow dgrSN in dataGridViewMainBoardTest.Rows)
+                            {
+                                //判断关键列是否是空，空就跳过
+                                Object inputSN = dgrSN.Cells["名字"].EditedFormattedValue;
+                                if (inputSN == null || inputSN.ToString() == "" || !"机器码写入".Equals(inputSN.ToString()))
+                                {
+                                    continue;
+                                }
+                                String fins = "bc aa 23 " + strTemp + " 0d";
+                                dgrSN.Cells["输入命令"].Value = fins;
+                            }
+
+                            myMessageBox.Show("该主板已有测试报告,已经使用原来的SN码", Color.Red);
+                            break;
+                        }
+                    }
                     dataGridViewSN.Rows[rowSN].Cells["MAC"].Value = textBoxMAC.Text.ToString();
+                }
             }
         }
         public void failResult(DataGridViewRow dgr, String type)
         {
+            dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
             dgr.Cells["是否通过"].Value = "✘";
             dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
             testError = false;
