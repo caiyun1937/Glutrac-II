@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -266,25 +266,25 @@
             // 
             // chart1
             // 
-            chartArea3.AxisX.Maximum = 1100D;
-            chartArea3.AxisX.Minimum = 400D;
-            chartArea3.AxisX.Title = "Wavelength [nm]";
-            chartArea3.AxisY.Maximum = 0D;
-            chartArea3.AxisY.Minimum = -1000D;
-            chartArea3.AxisY.Title = "Counts";
-            chartArea3.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea3);
-            legend3.Enabled = false;
-            legend3.Name = "Legend1";
-            legend3.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chart1.Legends.Add(legend3);
+            chartArea1.AxisX.Maximum = 1100D;
+            chartArea1.AxisX.Minimum = 400D;
+            chartArea1.AxisX.Title = "Wavelength [nm]";
+            chartArea1.AxisY.Maximum = 0D;
+            chartArea1.AxisY.Minimum = -1000D;
+            chartArea1.AxisY.Title = "Counts";
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            legend1.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(554, 39);
             this.chart1.Name = "chart1";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.chart1.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(682, 415);
             this.chart1.TabIndex = 17;
             this.chart1.Text = "chart1";
@@ -483,7 +483,6 @@
             // 
             // tabPage4
             // 
-            this.tabPage4.Controls.Add(this.buttonManual);
             this.tabPage4.Controls.Add(this.groupBox4);
             this.tabPage4.Controls.Add(this.Grp_Label);
             this.tabPage4.Controls.Add(this.button3);
@@ -497,11 +496,11 @@
             // 
             // buttonManual
             // 
-            this.buttonManual.Location = new System.Drawing.Point(92, 357);
+            this.buttonManual.Location = new System.Drawing.Point(1096, 28);
             this.buttonManual.Name = "buttonManual";
-            this.buttonManual.Size = new System.Drawing.Size(133, 38);
+            this.buttonManual.Size = new System.Drawing.Size(132, 29);
             this.buttonManual.TabIndex = 35;
-            this.buttonManual.Text = "启动手动输入";
+            this.buttonManual.Text = "手动输入SN码";
             this.buttonManual.UseVisualStyleBackColor = true;
             this.buttonManual.Click += new System.EventHandler(this.buttonManual_Click);
             // 
@@ -948,6 +947,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1271, 575);
+            this.Controls.Add(this.buttonManual);
             this.Controls.Add(this.textBoxMAC);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.textBoxSN);

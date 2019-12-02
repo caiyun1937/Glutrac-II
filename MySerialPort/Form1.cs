@@ -68,7 +68,7 @@ namespace MySerialPort
                 }
                 catch
                 {
-                    //myMessageBox.Show("请关闭\"SN.xlsx\"并重启软件!",Color.Black);
+                    myMessageBox.Show("请关闭\"SN.xlsx\"并重启软件!",Color.Red);
                     strSN = "";
                     return;
                 }
@@ -156,7 +156,7 @@ namespace MySerialPort
         {
             pictureBoxShow.Visible = false;
             btn_go.Enabled = true;
-            btn_again.Enabled = true;
+            btn_again.Enabled = false;
             btn_output_excel.Enabled = false;
 
             this.Location = new Point(0, 0);
@@ -943,7 +943,7 @@ namespace MySerialPort
             DateTime dt = DateTime.Now;
             String commandFile = "";
 
-            btn_go.Enabled = true;
+            btn_go.Enabled = false;
             btn_again.Enabled = true;
             btn_output_excel.Enabled = false;
 
@@ -1006,7 +1006,6 @@ namespace MySerialPort
 
         private void dataGridView1_MouseClick(object sender, MouseEventArgs e)
         {
-
             if (!serialPort.IsOpen)
             {
                 myMessageBox.Show("请先打开串口!", Color.Red);
@@ -1018,6 +1017,7 @@ namespace MySerialPort
                 myMessageBox.Show("无效行!", Color.Red);
                 return;
             }
+            
             try
             {
                 serialPort.DataReceived -= new SerialDataReceivedEventHandler(post_DataReceived);
@@ -1180,7 +1180,7 @@ namespace MySerialPort
             }
 
             btn_go.Enabled = true;
-            btn_again.Enabled = true;
+            btn_again.Enabled = false;
             btn_output_excel.Enabled = false;
         }
 
@@ -1253,13 +1253,10 @@ namespace MySerialPort
             {
                String temp= oriStr.Substring(i * size, size);
                char[] cs= temp.ToArray();  //分解成字符
-                                          
                
                 String newStr= strConvert(temp);
                 long final= System.Int64.Parse(newStr, System.Globalization.NumberStyles.HexNumber);
                 splitStr[i] = final+"";
-
-
             }
             return splitStr;
         }
@@ -1281,7 +1278,7 @@ namespace MySerialPort
             dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
             dgr.Cells["是否通过"].Value = "✔";
             dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
-            if (str.Substring(4, 2).Equals("24"))
+            if (str.Substring(4, 2).Equals("24"))           // SN
             {
                 String currentCode = getResultInRecve(str);
                 if (currentCode.Equals(strSN))
@@ -1437,21 +1434,37 @@ namespace MySerialPort
         private bool Manual_MAC_SN = false;
         private void buttonManual_Click(object sender, EventArgs e)
         {
-            if (Manual_MAC_SN)
+            if (!serialPort.IsOpen)
             {
-                Manual_MAC_SN = false;
-                buttonManual.Text = "启动手动输入";
-                textBoxSN.ReadOnly = true;
-                textBoxMAC.ReadOnly = true;
-            }
-            else
-            {
-                Manual_MAC_SN = true;
-                buttonManual.Text = "关闭手动输入";
-                textBoxSN.ReadOnly = false;
-                textBoxMAC.ReadOnly = false;
+                myMessageBox.Show("请先打开串口!", Color.Red);
+                return;
             }
 
+            string str = textBoxSN.Text.ToString();
+
+            if (str.IndexOf("\n") != -1)
+            {
+                str = str.Replace("\n", "");
+            }
+            if (str.IndexOf("\r") != -1)
+            {
+                str = str.Replace("\r", "");
+            }
+            str = asciiToHex(str);
+            str = str.Replace(" ", "");
+            foreach (DataGridViewRow dgr in dataGridViewMainBoardTest.Rows)
+            {
+                //判断关键列是否是空，空就跳过
+                Object input = dgr.Cells["名字"].EditedFormattedValue;
+                if (input == null || input.ToString() == "" || !"机器码写入".Equals(input.ToString()))
+                {
+                    continue;
+                }
+                String fins = "bc aa 23 " + str + " 0d";
+                dgr.Cells["输入命令"].Value = fins;
+            }
+
+            //修改后的SN码同步到SN码表            未完成
         }
 
         private void timer1_Tick(object sender, EventArgs e)
