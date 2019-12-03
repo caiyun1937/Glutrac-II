@@ -129,8 +129,8 @@ namespace MySerialPort
 
         private void Form1_Closed(object sender, System.EventArgs e)
         {
-            //if (this.tabPage2.Text != "PPG测试" && this.tabPage2.Text != "NIR测试")
-                //return;
+            if (this.tabPage2.Text != "PPG测试" && this.tabPage2.Text != "NIR测试")
+                return;
 
             int l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
             int l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
@@ -1220,10 +1220,7 @@ namespace MySerialPort
                 textBoxMAC.Text = finaltypes;
 
                 if (textBoxMAC.Text != "")
-                {
-                    //foreach(textBoxMAC.Text in)
                     dataGridViewSN.Rows[rowSN].Cells["MAC"].Value = textBoxMAC.Text.ToString();
-                }
             }
             else if ("24".Equals(types))//读出机器码
             {
