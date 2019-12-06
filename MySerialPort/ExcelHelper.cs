@@ -79,6 +79,7 @@ namespace MySerialPort
                     ++count;
                 }
                 workbook.Write(fs); //写入到excel
+                //fs.Close();
                 return count;
             }
             catch (Exception ex)

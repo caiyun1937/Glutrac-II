@@ -178,8 +178,7 @@ namespace C_Sharp_Application
 		public struct DetectorType
 		{
 			public byte			m_SensorType;
-			public ushort		m_NrPixels_8U2;
-            public ushort       m_NrPixels_9U2;
+			public ushort		m_NrPixels;
 			[MarshalAs(UnmanagedType.ByValArray,SizeConst=NR_WAVELEN_POL_COEF)]
 			public float[]		m_aFit;
 			public byte			m_NLEnable;
@@ -359,7 +358,7 @@ namespace C_Sharp_Application
 			public DetectorType				m_Detector;
 			public IrradianceType			m_Irradiance;
 			public SpectrumCalibrationType	m_Reflectance;
-			public SpectrumCorrectionType	m_Spectrum_8U2Correct;
+			public SpectrumCorrectionType	m_SpectrumCorrect;
 			public StandAloneType			m_StandAlone;
             public DynamicStorageType       m_DynamicStorage;
 			[MarshalAs(UnmanagedType.ByValArray,SizeConst=15)]//(MAX_TEMP_SENSORS*NR_TEMP_POL_COEF)

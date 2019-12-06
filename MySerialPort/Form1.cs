@@ -16,11 +16,21 @@ using System.Windows.Forms;
 using EzioDll;
 using C_Sharp_Application;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+
+enum UPPER_MODE
+{
+    SCAN_QRCODE = 0,
+    PRINT_QRCODE,
+}
 
 namespace MySerialPort
 {
     public partial class Form1 : Form
     {
+        UPPER_MODE UpperMode = UPPER_MODE.SCAN_QRCODE;
+        //UPPER_MODE UpperMode = UPPER_MODE.PRINT_QRCODE;
+
         GodexPrinter Printer = new GodexPrinter();
 
         public long m_DeviceHandle_8U2;
@@ -41,17 +51,17 @@ namespace MySerialPort
         uint m_PreviousTimeStamp_8U2;
         uint m_PreviousTimeStamp_9U2;
 
-
-
         public Form1()
         {
             InitializeComponent();
-            System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;//设置该属性 为false
+            System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
 
         }
 
         private string strSN = "";
+        private string devSN = "";
         private int rowSN = new int();
+        private bool SNSave = true;
         private bool testError = true;
         private string ExpandedName = "";
 
@@ -76,30 +86,56 @@ namespace MySerialPort
 
             this.dataGridViewSN.DataSource = bindData("SN" + ExpandedName);
 
-            DateTime dateTime = DateTime.Now;
-
             foreach (DataGridViewRow dgr in dataGridViewSN.Rows)        // 寻找空闲的SN码
             {
                 Object input = dgr.Cells["已写入"].EditedFormattedValue;
                 if (input.ToString() == "0")
                 {
                     //帧头	序列号	产地	年	月	型号	已写入
-
                     rowSN = dgr.Index;
                     strSN = dgr.Cells["帧头"].Value.ToString() + dgr.Cells["序列号"].Value.ToString().PadLeft(4, '0') +
                             dgr.Cells["产地"].Value.ToString() + dgr.Cells["年"].Value.ToString() +
                             dgr.Cells["月"].Value.ToString() + dgr.Cells["型号"].Value.ToString();
 
-                    if (strSN == "")
+                    if ((tabPage2.Text == "主板测试" && strSN.Length != 14) || ((tabPage2.Text == "PPG测试" || tabPage2.Text == "NIR测试") && strSN.Length != 13))
                         textBoxSN.Text = "SN获取失败!!";
                     else
+                    {
                         textBoxSN.Text = strSN;
 
-                    return ;
+                        string str = strSN;
+
+                        if (str.IndexOf("\n") != -1)
+                        {
+                            str = str.Replace("\n", "");
+                        }
+                        if (str.IndexOf("\r") != -1)
+                        {
+                            str = str.Replace("\r", "");
+                        }
+                        str = asciiToHex(str);
+                        str = str.Replace(" ", "");
+
+                        foreach (DataGridViewRow dgrSN in dataGridViewMainBoardTest.Rows)
+                        {
+                            //更新测试表
+                            Object inputSN = dgrSN.Cells["名字"].EditedFormattedValue;
+                            if (inputSN == null || inputSN.ToString() == "" || !"机器码写入".Equals(inputSN.ToString()))
+                            {
+                                continue;
+                            }
+                            String fins = "bc aa 23 " + str + " 0d";
+                            dgrSN.Cells["输入命令"].Value = fins;
+                        }
+                        SNSave = true;
+                    }
+
+                    return;
                 }
             }
-            textBoxSN.Text = "已无可用SN码!!";
+            textBoxSN.Text = "请关闭SN码表或者增加新的SN码!!";
         }
+
         private void ConnectGui()
         {
             avaspec.DeviceConfigType l_pDeviceData_8U2 = new avaspec.DeviceConfigType();
@@ -155,9 +191,11 @@ namespace MySerialPort
         private void Form1_Load(object sender, EventArgs e)
         {
             pictureBoxShow.Visible = false;
+
             btn_go.Enabled = true;
-            btn_again.Enabled = false;
             btn_output_excel.Enabled = false;
+            btn_print_QRCode.Enabled = false;
+            btn_again.Enabled = false;
 
             this.Location = new Point(0, 0);
 
@@ -182,16 +220,12 @@ namespace MySerialPort
             else
                 ExpandedName = ".xlsx";
 
-            // 读取SN号
-
-            GetNewSN();
-
             if (File.Exists("主板测试" + ExpandedName))
             {
                 this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
                 this.tabPage2.Text = "主板测试";
             }
-            else if(File.Exists("PPG测试" + ExpandedName))
+            else if (File.Exists("PPG测试" + ExpandedName))
             {
                 this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
                 this.tabPage2.Text = "PPG测试";
@@ -201,29 +235,17 @@ namespace MySerialPort
                 this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试" + ExpandedName);
                 this.tabPage2.Text = "NIR测试";
             }
+            else
+                myMessageBox.Show("请在根目录下添加测试表", Color.Red);
 
-            string str = strSN;
-
-            if (str.IndexOf("\n") != -1)
+            // 读取SN号
+            if (UpperMode == UPPER_MODE.PRINT_QRCODE)
             {
-                str = str.Replace("\n", "");
+                GetNewSN();
             }
-            if (str.IndexOf("\r") != -1)
+            else
             {
-                str = str.Replace("\r", "");
-            }
-            str = asciiToHex(str);
-            str = str.Replace(" ", "");
-            foreach (DataGridViewRow dgr in dataGridViewMainBoardTest.Rows)
-            {
-                //判断关键列是否是空，空就跳过
-                Object input = dgr.Cells["名字"].EditedFormattedValue;
-                if (input == null || input.ToString() == "" || !"机器码写入".Equals(input.ToString()))
-                {
-                    continue;
-                }
-                String fins = "bc aa 23 " + str + " 0d";
-                dgr.Cells["输入命令"].Value = fins;
+                textBoxSN.Text = "";
             }
 
             // 二维码
@@ -234,7 +256,7 @@ namespace MySerialPort
             chart1.Visible = false;
 
             if (this.tabPage2.Text != "PPG测试" && this.tabPage2.Text != "NIR测试")
-                return;
+               return;
 
             int l_Port = avaspec.AVS_Init(0);
             avaspec.AVS_Register(this.Handle);
@@ -398,7 +420,7 @@ namespace MySerialPort
                 }
                 catch
                 {
-                    myMessageBox.Show("串口被占用!", Color.Black);
+                    myMessageBox.Show("串口打开失败,请点亮屏幕再继续操作!", Color.Red);
                 }
             }
             else
@@ -413,9 +435,10 @@ namespace MySerialPort
                 }
                 catch
                 {
-                    myMessageBox.Show("串口关闭失败!", Color.Black);
+                    myMessageBox.Show("串口关闭失败,请点亮屏幕再继续操作!", Color.Red);
                 }
             }
+            textBoxSN.Focus();
         }
 
         //接收
@@ -715,6 +738,21 @@ namespace MySerialPort
                 return;
             }
 
+            if (UpperMode == UPPER_MODE.SCAN_QRCODE)
+            {
+                if ((tabPage2.Text == "主板测试" && textBoxSN.Text.Length != 14) || ((tabPage2.Text == "NIR测试" || tabPage2.Text == "PPG测试") && textBoxSN.Text.Length != 13))
+                {
+                    textBoxSN.Text = "";
+                    textBoxSN.Focus();
+                    myMessageBox.Show("请在英文输入法环境下使用扫码枪扫描二维码!!", Color.Green);
+                    return;
+                }
+                else
+                    strSN = textBoxSN.Text;
+            }
+                
+            myMessageBox.Show("如果熄屏的话请先用手指点亮屏幕再关掉该对话框!!", Color.Black);
+
             testError = true;
 
             serialPort.DataReceived -= new SerialDataReceivedEventHandler(post_DataReceived);
@@ -781,7 +819,7 @@ namespace MySerialPort
                     else if ("01".Equals(result))
                     {
                         dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
-                        dgr.Cells["是否通过"].Value = "✘";
+                        dgr.Cells["是否通过"].Value = "✘"; 
                         dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
                         testError = false;
                     }
@@ -790,26 +828,25 @@ namespace MySerialPort
                         sampleImageShow(str);
 
                         if (str.Substring(4, 2).Equals("19"))   //蓝牙不提醒
-                            myMessageBox.DialogResult = DialogResult.Yes;
-
+                        {
+                            CheckMAC(dgr, str);
+                        }
                         else if (str.Substring(4, 2).Equals("24"))   //sn不提醒
-                            myMessageBox.DialogResult = DialogResult.Yes;
-
+                        {
+                            CheckSN(dgr, str);
+                        }
                         else if (str.Substring(4, 2).Equals("39"))   // ppg_ir
                         {
                             chart1.Visible = true;
                             chart1.BringToFront();
                             myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                         }
-
-                        else if (str.Substring(4, 2).Equals("32") || str.Substring(4, 2).Equals("33")
-                                || str.Substring(4, 2).Equals("34") || str.Substring(4, 2).Equals("35") || str.Substring(4, 2).Equals("36"))   // nir
+                        else if (str.Substring(4, 2).Equals("32") || str.Substring(4, 2).Equals("33") || str.Substring(4, 2).Equals("34") || str.Substring(4, 2).Equals("35") || str.Substring(4, 2).Equals("36"))   // nir
                         {
                             chart1.Visible = true;
                             chart1.BringToFront();
                             myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                         }
-
                         else
                             myMessageBox.Show("对比示例图,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
 
@@ -837,23 +874,24 @@ namespace MySerialPort
             if (true == testError)
             {
                 if(File.Exists("主板测试" + ExpandedName))
-                    myMessageBox.Show("主板测试成功,请保存测试报告!", Color.Green);
+                    myMessageBox.Show("主板测试通过,请保存测试报告!", Color.Green);
 
                 else if(File.Exists("PPG测试" + ExpandedName))
-                    myMessageBox.Show("PPG测试成功,请保存测试报告!", Color.Green);
+                    myMessageBox.Show("PPG测试通过,请保存测试报告!", Color.Green);
 
                 else if(File.Exists("NIR测试" + ExpandedName))
-                    myMessageBox.Show("NIR测试成功,请保存测试报告!", Color.Green);
+                    myMessageBox.Show("NIR测试通过,请保存测试报告!", Color.Green);
 
                 else
-                    myMessageBox.Show("测试成功,请保存测试报告!", Color.Green);
+                    myMessageBox.Show("测试通过,请保存测试报告!", Color.Green);
             }
             else
-                myMessageBox.Show("测试失败,请检查环境重新测试!", Color.Red);
+                myMessageBox.Show("测试未通过,请保存测试报告,检查环境后重新测试!", Color.Red);
 
             btn_go.Enabled = false;
-            btn_again.Enabled = false;
             btn_output_excel.Enabled = true;
+            btn_print_QRCode.Enabled = false;
+            btn_again.Enabled = false;
         }
 
         public static object _lock = new object();
@@ -880,7 +918,7 @@ namespace MySerialPort
             DateTime dt = DateTime.Now;
             int noresponse = 0;
 
-            if (sendData[2] == 0x22)
+            if (sendData[2] == 0x22)            // nir时钟矫正需要等待反馈
                 noresponse = 30;
             else
                 noresponse = Convert.ToInt32(noUpDown.Value);
@@ -900,43 +938,6 @@ namespace MySerialPort
             return recData;
         }
 
-        private void btn_inupt_excel_Click(object sender, EventArgs e)
-        {
-            if (File.Exists("主板测试" + ExpandedName))
-                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
-
-            else if(File.Exists("PPG测试" + ExpandedName))
-                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
-
-            else if (File.Exists("NIR测试" + ExpandedName))
-                this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试" + ExpandedName);
-
-            string str = strSN;
-
-            if (str.IndexOf("\n") != -1)
-            {
-                str = str.Replace("\n", "");
-            }
-            if (str.IndexOf("\r") != -1)
-            {
-                str = str.Replace("\r", "");
-            }
-            str = asciiToHex(str);
-            str = str.Replace(" ", "");
-            foreach (DataGridViewRow dgr in dataGridViewMainBoardTest.Rows)
-            {
-
-                //判断关键列是否是空，空就跳过
-                Object input = dgr.Cells["名字"].EditedFormattedValue;
-                if (input == null || input.ToString() == "" ||  !"机器码写入".Equals(input.ToString()))
-                {
-                    continue;
-                }
-                String fins = "bc aa 23 " + str + " 0d";
-                dgr.Cells["输入命令"].Value = fins;
-            }
-         }
-
         private void btn_output_excel_Click(object sender, EventArgs e)
         {
             // 保存测试报告
@@ -944,29 +945,33 @@ namespace MySerialPort
             String commandFile = "";
 
             btn_go.Enabled = false;
-            btn_again.Enabled = true;
             btn_output_excel.Enabled = false;
+            //btn_print_QRCode.Enabled = true;
+            btn_print_QRCode.Enabled = false;
+            btn_again.Enabled = true;
+
+            Directory.CreateDirectory(@"D:\TestReport\Local");
+            Directory.CreateDirectory(@"D:\TestReport\Server");
 
             if (File.Exists("主板测试" + ExpandedName))
             {
                 if(textBoxMAC.Text.ToString().Length != 12)
-                    commandFile = "Main_" + strSN.ToString() + "_" + "###########" + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                    commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + "###########" + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
                 else
-                    commandFile = "Main_" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                    commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
             else if (File.Exists("PPG测试" + ExpandedName))
-                commandFile = "PPG_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
 
             else if (File.Exists("NIR测试" + ExpandedName))
-                commandFile = "NIR_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
 
             if (dataGridViewMainBoardTest.DataSource == null)
             {
-                myMessageBox.Show("目标数据源为空!", Color.Black);
+                myMessageBox.Show("测试表格没有数据,无法保存,请关闭测试表重新测试!", Color.Red);
                 return;
             }
             DataTable table = (DataTable)dataGridViewMainBoardTest.DataSource;
-            //File.Create(commandFile);
 
             ExcelHelper excelHelper = new ExcelHelper(commandFile);
             int count = excelHelper.DataTableToExcel(table, "Sheet1", true);
@@ -975,32 +980,32 @@ namespace MySerialPort
                 txt_output_excel.Text = commandFile;
             }
 
-            if (!File.Exists("主板测试" + ExpandedName))        // 非主板测试不用保存SN码
-                return;
-
-            if (!File.Exists("SN" + ExpandedName))              // 目录没有SN码表不用保存
-                return;
-
             // 保存SN码
-            dataGridViewSN.Rows[rowSN].Cells["已写入"].Value = 1;
-
-            table = (DataTable)dataGridViewSN.DataSource;
-
-            try
+            if (UpperMode == UPPER_MODE.PRINT_QRCODE)
             {
-                File.Delete("SN" + ExpandedName);
-                excelHelper = new ExcelHelper("SN" + ExpandedName);
-                if (0 == excelHelper.DataTableToExcel(table, "Sheet1", true))
+                if (SNSave == true)
                 {
-                    myMessageBox.Show("写入失败!!", Color.Red);
+                    dataGridViewSN.Rows[rowSN].Cells["已写入"].Value = 1;
+
+                    table = (DataTable)dataGridViewSN.DataSource;
+
+                    try
+                    {
+                        File.Delete("SN" + ExpandedName);
+                        excelHelper = new ExcelHelper("SN" + ExpandedName);
+                        if (0 == excelHelper.DataTableToExcel(table, "Sheet1", true))
+                        {
+                            myMessageBox.Show("写入失败!!", Color.Red);
+                        }
+                    }
+                    catch
+                    {
+                        File.Delete("backup" + ExpandedName);
+                        excelHelper = new ExcelHelper("backup" + ExpandedName);
+                        excelHelper.DataTableToExcel(table, "Sheet1", true);
+                        myMessageBox.Show("请勿打开目录下的表格,关闭表格和软件,然后重新启动软件!!", Color.Green);
+                    }
                 }
-            }
-            catch
-            {
-                //MessageBox.Show("\"SN.xlsx\"文件被打开,另存到backup!!");
-                File.Delete("backup" + ExpandedName);
-                excelHelper = new ExcelHelper("backup" + ExpandedName);
-                excelHelper.DataTableToExcel(table, "Sheet1", true);
             }
         }
 
@@ -1080,10 +1085,13 @@ namespace MySerialPort
                     sampleImageShow(str);
 
                     if (str.Substring(4, 2).Equals("19"))   //蓝牙不提醒
-                        myMessageBox.DialogResult = DialogResult.Yes;
-
+                    {
+                        CheckMAC(dgv, str);
+                    }
                     else if (str.Substring(4, 2).Equals("24"))   //sn不提醒
-                        myMessageBox.DialogResult = DialogResult.Yes;
+                    {
+                        CheckSN(dgv, str);
+                    }
 
                     else if (str.Substring(4, 2).Equals("39"))   // ppg_ir
                     {
@@ -1116,7 +1124,6 @@ namespace MySerialPort
                         failResult(dgv, str.Substring(4, 2));
                     }
                 }
-                dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
             }
             catch (Exception ex)
             {
@@ -1126,7 +1133,6 @@ namespace MySerialPort
 
         private void btn_again_Click(object sender, EventArgs e)
         {
-            //初始化dataCommond
             if (File.Exists("主板测试" + ExpandedName))
             {
                 this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
@@ -1142,35 +1148,19 @@ namespace MySerialPort
                 this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试" + ExpandedName);
                 this.tabPage2.Text = "NIR测试";
             }
-
-            //手动输入机器码
-            GetNewSN();
+            // 读取SN号
+            if (UpperMode == UPPER_MODE.PRINT_QRCODE)
+            {
+                GetNewSN();
+            }
+            else
+            {
+                textBoxSN.Text = "";
+            }
+            textBoxSN.Focus();
 
             textBoxMAC.Text = "";
             txt_output_excel.Text = "";
-
-            string str = strSN;
-            if (str.IndexOf("\n") != -1)
-            {
-                str = str.Replace("\n", "");
-            }
-            if (str.IndexOf("\r") != -1)
-            {
-                str = str.Replace("\r", "");
-            }
-            str = asciiToHex(str);
-            str = str.Replace(" ", "");
-            foreach (DataGridViewRow dgr in dataGridViewMainBoardTest.Rows)
-            {
-                //判断关键列是否是空，空就跳过
-                Object input = dgr.Cells["名字"].EditedFormattedValue;
-                if (input == null || input.ToString() == "" || !"机器码写入".Equals(input.ToString()))
-                {
-                    continue;
-                }
-                String fins = "bc aa 23 " + str + " 0d";
-                dgr.Cells["输入命令"].Value = fins;
-            }
 
             //将buffer清空
             if (serialPort.IsOpen)
@@ -1181,6 +1171,7 @@ namespace MySerialPort
 
             btn_go.Enabled = true;
             btn_again.Enabled = false;
+            btn_print_QRCode.Enabled = false;
             btn_output_excel.Enabled = false;
         }
 
@@ -1224,23 +1215,16 @@ namespace MySerialPort
             }
             else if ("24".Equals(types))//读出机器码
             {
-                // result = "12345678910";
-                
                 result= res.Substring(8);
-                
-
                 byte[] temps = strToToHexByte(result);
                 result = Encoding.ASCII.GetString(temps);
-                //if (result.IndexOf("\n") != -1)
-                //{
-                //    result = result.Replace("\n", "");
-                //}
+
                 if (result.IndexOf("\r") != -1)
                 {
                     result = result.Replace("\r", "");
                 }
             }
-                return result;
+            return result;
         }
 
         public string[] splitAvg(String oriStr,int size)
@@ -1268,91 +1252,114 @@ namespace MySerialPort
             }
             return res;
         }
+        private void CheckSN(DataGridViewRow dgr, String str)
+        {
+            devSN = getResultInRecve(str);
+            if (devSN.Equals(strSN) || devSN.Equals(""))        // 正常流程或者生产返修
+            {
+                SNSave = true;
+                myMessageBox.DialogResult = DialogResult.Yes;
+            }
+            else if (devSN.Length == 14 && strSN.Length != 14)
+            {
+                SNSave = false;
+                strSN = devSN;
+                myMessageBox.DialogResult = DialogResult.Yes;
+            }
+            else if (devSN.Length != 14 && strSN.Length == 14)
+            {
+                SNSave = true;
+                devSN = strSN;
+                myMessageBox.DialogResult = DialogResult.Yes;
+            }
+            else
+            {
+                // 无法在表格中找到设备对应的SN码和MAC地址，不保存SN码表
+                SNSave = false;
+                strSN = devSN;
+                myMessageBox.Show("设备SN与记录不一致,以设备为主,如需要修改设备SN,请修改SN文本框后点击'手动输入SN码'按钮,在点击'机器码写入'测试行!!", Color.Red);
+                myMessageBox.DialogResult = DialogResult.No;
+            }
 
+            textBoxSN.Text = strSN;
+
+            // 更新测试表SN码
+            string strTemp = strSN;
+
+            if (strTemp.IndexOf("\n") != -1)
+            {
+                strTemp = strTemp.Replace("\n", "");
+            }
+            if (strTemp.IndexOf("\r") != -1)
+            {
+                strTemp = strTemp.Replace("\r", "");
+            }
+            strTemp = asciiToHex(strTemp);
+            strTemp = strTemp.Replace(" ", "");
+
+            foreach (DataGridViewRow dgrSN in dataGridViewMainBoardTest.Rows)
+            {
+                // 更新测试表
+                Object inputSN = dgrSN.Cells["名字"].EditedFormattedValue;
+                if (inputSN == null || inputSN.ToString() == "" || !"机器码写入".Equals(inputSN.ToString()))
+                {
+                    continue;
+                }
+                String fins = "bc aa 23 " + strTemp + " 0d";
+                dgrSN.Cells["输入命令"].Value = fins;
+            }
+
+            // 更新SN码表            待完善
+        }
+
+        private void CheckMAC(DataGridViewRow dgr, String str)
+        {
+            String finaltypes = str.Substring(8, 12);
+
+            textBoxMAC.Text = finaltypes;
+
+            if (textBoxMAC.Text.Length == 12)
+            {
+                foreach (DataGridViewRow dgr_MAC in dataGridViewSN.Rows)
+                {
+                    Object input = dgr_MAC.Cells["MAC"].EditedFormattedValue;
+                    if (textBoxMAC.Text.Equals(input.ToString()))           //  从SN码表中检测到MAC地址
+                    {
+                        SNSave = true;
+                        rowSN = dgr_MAC.Index;
+                        strSN = dgr_MAC.Cells["帧头"].Value.ToString() + dgr_MAC.Cells["序列号"].Value.ToString().PadLeft(4, '0') +
+                                dgr_MAC.Cells["产地"].Value.ToString() + dgr_MAC.Cells["年"].Value.ToString() +
+                                dgr_MAC.Cells["月"].Value.ToString() + dgr_MAC.Cells["型号"].Value.ToString();
+
+                        textBoxSN.Text = strSN;
+
+                        myMessageBox.Show("从表中找到了MAC对应的SN码", Color.Green);
+                        myMessageBox.DialogResult = DialogResult.Yes;
+
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                myMessageBox.DialogResult = DialogResult.No;
+                myMessageBox.Show("蓝牙地址不合法，请检查蓝牙模块！", Color.Red);
+            }
+        }
 
         public void yesResult(DataGridViewRow dgr,String str)
         {
             dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
             dgr.Cells["是否通过"].Value = "✔";
             dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
-            if (str.Substring(4, 2).Equals("24"))           // SN
-            {
-                String currentCode = getResultInRecve(str);
-                if (currentCode.Equals(strSN))
-                {
-                }
-                else
-                {
-                    failResult(dgr, str.Substring(4, 2));
-                }
-               
-            }
-            else if (str.Substring(4, 2).Equals("19"))//蓝牙
-            {
-                String finaltypes = str.Substring(8, 12);
-
-                textBoxMAC.Text = finaltypes;
-
-                if (textBoxMAC.Text != "")
-                {
-                    foreach (DataGridViewRow dgr_MAC in dataGridViewSN.Rows)
-                    {
-                        //检验该设备是否已经经过测试
-                        Object input = dgr_MAC.Cells["MAC"].EditedFormattedValue;
-                        if (textBoxMAC.Text.Equals(input.ToString()))
-                        {
-                            rowSN = dgr_MAC.Index;
-                            strSN = dgr_MAC.Cells["帧头"].Value.ToString() + dgr_MAC.Cells["序列号"].Value.ToString().PadLeft(4, '0') +
-                                    dgr_MAC.Cells["产地"].Value.ToString() + dgr_MAC.Cells["年"].Value.ToString() +
-                                    dgr_MAC.Cells["月"].Value.ToString() + dgr_MAC.Cells["型号"].Value.ToString();
-
-                            if (strSN == "")
-                                textBoxSN.Text = "SN获取失败!!";
-                            else
-                                textBoxSN.Text = strSN;
-
-                            string strTemp = strSN;
-
-                            if (strTemp.IndexOf("\n") != -1)
-                            {
-                                strTemp = strTemp.Replace("\n", "");
-                            }
-                            if (strTemp.IndexOf("\r") != -1)
-                            {
-                                strTemp = strTemp.Replace("\r", "");
-                            }
-                            strTemp = asciiToHex(strTemp);
-                            strTemp = strTemp.Replace(" ", "");
-
-                            foreach (DataGridViewRow dgrSN in dataGridViewMainBoardTest.Rows)
-                            {
-                                //判断关键列是否是空，空就跳过
-                                Object inputSN = dgrSN.Cells["名字"].EditedFormattedValue;
-                                if (inputSN == null || inputSN.ToString() == "" || !"机器码写入".Equals(inputSN.ToString()))
-                                {
-                                    continue;
-                                }
-                                String fins = "bc aa 23 " + strTemp + " 0d";
-                                dgrSN.Cells["输入命令"].Value = fins;
-                            }
-
-                            myMessageBox.Show("该主板已有测试报告,已经使用原来的SN码", Color.Red);
-                            break;
-                        }
-                    }
-                    dataGridViewSN.Rows[rowSN].Cells["MAC"].Value = textBoxMAC.Text.ToString();
-                }
-            }
         }
+
         public void failResult(DataGridViewRow dgr, String type)
         {
             dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
             dgr.Cells["是否通过"].Value = "✘";
             dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
             testError = false;
-            if (type.Equals("24"))
-            {
-            }
         }
 
         private void ConnectPrinter()
@@ -1387,48 +1394,96 @@ namespace MySerialPort
             Printer.Config.CopyNo((int)Num_Copy.Value);
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void btn_print_QRCode_Click(object sender, EventArgs e)
         {
-            if (textBoxMAC.Text != "" && textBoxSN.Text != "")
+            if ((tabPage2.Text == "主板测试" && strSN.Length == 14) || ((tabPage2.Text == "PPG测试" || tabPage2.Text == "NIR测试") && strSN.Length == 13))
             {
                 ConnectPrinter();
                 LabelSetup();
                 Printer.Command.Start();
 
-                int RowGap = 140;
-                int LineGap = 25;
+                int RowGap = 142;
+                //int LineGap = 25;
 
-                DateTime dateTime = DateTime.Now;
+                int PrintLineIndex = -1, PrintRowIndex = -1;
+
+                // 获取记录
+                string strSetting;
+                StreamReader fileReader = new StreamReader("setting.ini");
+
+                while (true)
+                {
+                    strSetting = fileReader.ReadLine();
+
+                    if (strSetting == null)
+                    {
+                        fileReader.Close();
+                        break;
+                    }
+
+                    if (strSetting.Substring(0, "PrintLineIndex".Length).Equals("PrintLineIndex"))
+                    {
+                        PrintLineIndex = Convert.ToInt32(Regex.Replace(strSetting, @"[^0-9]+", ""));
+                    }
+                    else if (strSetting.Substring(0, "PrintRowIndex".Length).Equals("PrintRowIndex"))
+                    {
+                        PrintRowIndex = Convert.ToInt32(Regex.Replace(strSetting, @"[^0-9]+", ""));
+                    }
+                    else
+                    {
+                        myMessageBox.Show("请关闭\"setting.ini\"文件重新打印二维码", Color.Red);
+                        fileReader.Close();
+                        return;
+                    }
+                }
+
+                if (PrintLineIndex == -1 || PrintRowIndex == -1)
+                {
+                    myMessageBox.Show("目录下缺少\"setting.ini\"文件,请核实", Color.Red);
+                    return;
+                }
                 
-                // First & Second page Print QR Code
-                Printer.Command.PrintQRCode((int)Num_QRPosX.Value, (int)Num_QRPosY.Value, 5, 2, "M", 8, (int)Num_QRSize.Value, (int)Num_QRRotation.Value, textBoxMAC.Text);
-                Printer.Command.PrintQRCode((int)Num_QRPosX.Value + RowGap, (int)Num_QRPosY.Value, 5, 2, "M", 8, (int)Num_QRSize.Value, (int)Num_QRRotation.Value, textBoxMAC.Text);
+                if (PrintLineIndex >= 5)
+                {
+                    PrintLineIndex = 0;
+                }
+                else
+                {
+                    EZioApi.sendcommand("^B12");
 
-                // Third page Print SN
-                Printer.Command.PrintText_Unicode((int)Num_QRPosX.Value + RowGap * 2, (int)Num_QRPosY.Value, 25, "Arial", "SN:");
-                Printer.Command.PrintText_Unicode((int)Num_QRPosX.Value + RowGap * 2, (int)Num_QRPosY.Value + LineGap, 25, "Arial", textBoxSN.Text.Substring(0, 7));
-                Printer.Command.PrintText_Unicode((int)Num_QRPosX.Value + RowGap * 2, (int)Num_QRPosY.Value + LineGap * 2, 25, "Arial", textBoxSN.Text.Substring(7, 7));
+                    //if (PrintRowIndex == 0)
+                    //{
+                    //    PrintRowIndex = 1;
+                    //    EZioApi.sendcommand("^B12");
+                    //}
+                    //else if (PrintRowIndex >= 1)
+                    //{
+                    //    PrintRowIndex = 0;Nirvana19CG
+                    //    EZioApi.sendcommand("^B14");
+                    //}
+                }
+                Printer.Command.PrintQRCode((int)Num_QRPosX.Value + RowGap * PrintLineIndex, (int)Num_QRPosY.Value, 5, 2, "M", 8, (int)Num_QRSize.Value, (int)Num_QRRotation.Value, textBoxSN.Text);
+                PrintLineIndex++;
 
-                // Fourth page Print MAC
-                Printer.Command.PrintText_Unicode((int)Num_QRPosX.Value + RowGap * 3, (int)Num_QRPosY.Value, LineGap, "Arial", "MAC:");
-                Printer.Command.PrintText_Unicode((int)Num_QRPosX.Value + RowGap * 3, (int)Num_QRPosY.Value + LineGap, 25, "Arial", textBoxMAC.Text.Substring(0, 6));
-                Printer.Command.PrintText_Unicode((int)Num_QRPosX.Value + RowGap * 3, (int)Num_QRPosY.Value + LineGap * 2, 25, "Arial", textBoxMAC.Text.Substring(6, 6));
-
-                // Last page Print Time
-                Printer.Command.PrintText_Unicode((int)Num_QRPosX.Value + RowGap * 4, (int)Num_QRPosY.Value, 25, "Arial", "DATE:");
-                Printer.Command.PrintText_Unicode((int)Num_QRPosX.Value + RowGap * 4, (int)Num_QRPosY.Value + LineGap, 25, "Arial", "Year:" + dateTime.ToString("yyyy"));
-                Printer.Command.PrintText_Unicode((int)Num_QRPosX.Value + RowGap * 4, (int)Num_QRPosY.Value + LineGap * 2, 25, "Arial", "Date:" + dateTime.ToString("MMdd"));
+                string[] content = File.ReadAllText("setting.ini").Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                content[0] = "PrintLineIndex = " + PrintLineIndex;
+                content[1] = "PrintRowIndex = " + PrintRowIndex;
+                File.WriteAllText("setting.ini", string.Join("\r\n", content));
 
                 Printer.Command.End();
                 DisconnectPrinter();
             }
             else
             {
-                myMessageBox.Show("无法获取蓝牙MAC地址!!", Color.Red);
+                myMessageBox.Show("SN码有误,请核实!!", Color.Red);
             }
-        }
 
-        private bool Manual_MAC_SN = false;
+            btn_go.Enabled = false;
+            btn_output_excel.Enabled = false;
+            btn_print_QRCode.Enabled = false;
+            btn_again.Enabled = true;
+        }
+        
         private void buttonManual_Click(object sender, EventArgs e)
         {
             if (!serialPort.IsOpen)
@@ -1451,7 +1506,7 @@ namespace MySerialPort
             str = str.Replace(" ", "");
             foreach (DataGridViewRow dgr in dataGridViewMainBoardTest.Rows)
             {
-                //判断关键列是否是空，空就跳过
+                // 更新测试表
                 Object input = dgr.Cells["名字"].EditedFormattedValue;
                 if (input == null || input.ToString() == "" || !"机器码写入".Equals(input.ToString()))
                 {
@@ -1461,7 +1516,7 @@ namespace MySerialPort
                 dgr.Cells["输入命令"].Value = fins;
             }
 
-            //修改后的SN码同步到SN码表            未完成
+            // 更新SN码表            待完善
         }
 
         private void timer1_Tick(object sender, EventArgs e)

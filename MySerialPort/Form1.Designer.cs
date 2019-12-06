@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -42,7 +42,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.textBoxSN = new System.Windows.Forms.TextBox();
-            this.button3 = new System.Windows.Forms.Button();
+            this.btn_print_QRCode = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.dataGridViewSN = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -52,9 +52,9 @@
             this.btn_output_excel = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.noUpDown = new System.Windows.Forms.NumericUpDown();
+            this.btn_again = new System.Windows.Forms.Button();
             this.txt_output_excel = new System.Windows.Forms.TextBox();
             this.btn_go = new System.Windows.Forms.Button();
-            this.btn_again = new System.Windows.Forms.Button();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ReceiveTbox = new System.Windows.Forms.TextBox();
@@ -65,7 +65,6 @@
             this.button2 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.buttonManual = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.Num_QRRotation = new System.Windows.Forms.NumericUpDown();
             this.Num_QRSize = new System.Windows.Forms.NumericUpDown();
@@ -94,6 +93,7 @@
             this.Num_Label_W = new System.Windows.Forms.NumericUpDown();
             this.Cbo_PaperType = new System.Windows.Forms.ComboBox();
             this.Lbl_Label_W = new System.Windows.Forms.Label();
+            this.buttonManual = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.textBoxMAC = new System.Windows.Forms.TextBox();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
@@ -215,15 +215,15 @@
             this.textBoxSN.Size = new System.Drawing.Size(223, 25);
             this.textBoxSN.TabIndex = 13;
             // 
-            // button3
+            // btn_print_QRCode
             // 
-            this.button3.Location = new System.Drawing.Point(312, 357);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(133, 38);
-            this.button3.TabIndex = 14;
-            this.button3.Text = "打印二维码";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.btn_print_QRCode.Location = new System.Drawing.Point(278, 8);
+            this.btn_print_QRCode.Name = "btn_print_QRCode";
+            this.btn_print_QRCode.Size = new System.Drawing.Size(130, 25);
+            this.btn_print_QRCode.TabIndex = 14;
+            this.btn_print_QRCode.Text = "打印二维码";
+            this.btn_print_QRCode.UseVisualStyleBackColor = true;
+            this.btn_print_QRCode.Click += new System.EventHandler(this.btn_print_QRCode_Click);
             // 
             // tabPage3
             // 
@@ -249,13 +249,14 @@
             // 
             this.tabPage2.Controls.Add(this.chart1);
             this.tabPage2.Controls.Add(this.pictureBoxShow);
+            this.tabPage2.Controls.Add(this.btn_print_QRCode);
             this.tabPage2.Controls.Add(this.dataGridViewMainBoardTest);
             this.tabPage2.Controls.Add(this.btn_output_excel);
             this.tabPage2.Controls.Add(this.label3);
             this.tabPage2.Controls.Add(this.noUpDown);
+            this.tabPage2.Controls.Add(this.btn_again);
             this.tabPage2.Controls.Add(this.txt_output_excel);
             this.tabPage2.Controls.Add(this.btn_go);
-            this.tabPage2.Controls.Add(this.btn_again);
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -266,25 +267,25 @@
             // 
             // chart1
             // 
-            chartArea1.AxisX.Maximum = 1100D;
-            chartArea1.AxisX.Minimum = 400D;
-            chartArea1.AxisX.Title = "Wavelength [nm]";
-            chartArea1.AxisY.Maximum = 0D;
-            chartArea1.AxisY.Minimum = -1000D;
-            chartArea1.AxisY.Title = "Counts";
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
-            legend1.Enabled = false;
-            legend1.Name = "Legend1";
-            legend1.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chart1.Legends.Add(legend1);
+            chartArea3.AxisX.Maximum = 1100D;
+            chartArea3.AxisX.Minimum = 400D;
+            chartArea3.AxisX.Title = "Wavelength [nm]";
+            chartArea3.AxisY.Maximum = 0D;
+            chartArea3.AxisY.Minimum = -1000D;
+            chartArea3.AxisY.Title = "Counts";
+            chartArea3.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea3);
+            legend3.Enabled = false;
+            legend3.Name = "Legend1";
+            legend3.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chart1.Legends.Add(legend3);
             this.chart1.Location = new System.Drawing.Point(554, 39);
             this.chart1.Name = "chart1";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chart1.Series.Add(series1);
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.chart1.Series.Add(series3);
             this.chart1.Size = new System.Drawing.Size(682, 415);
             this.chart1.TabIndex = 17;
             this.chart1.Text = "chart1";
@@ -314,7 +315,7 @@
             // 
             // btn_output_excel
             // 
-            this.btn_output_excel.Location = new System.Drawing.Point(278, 8);
+            this.btn_output_excel.Location = new System.Drawing.Point(142, 8);
             this.btn_output_excel.Name = "btn_output_excel";
             this.btn_output_excel.Size = new System.Drawing.Size(130, 25);
             this.btn_output_excel.TabIndex = 6;
@@ -325,7 +326,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(908, 13);
+            this.label3.Location = new System.Drawing.Point(1021, 13);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(99, 15);
             this.label3.TabIndex = 10;
@@ -333,7 +334,7 @@
             // 
             // noUpDown
             // 
-            this.noUpDown.Location = new System.Drawing.Point(1013, 8);
+            this.noUpDown.Location = new System.Drawing.Point(1126, 8);
             this.noUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -348,9 +349,19 @@
             0,
             0});
             // 
+            // btn_again
+            // 
+            this.btn_again.Location = new System.Drawing.Point(414, 8);
+            this.btn_again.Name = "btn_again";
+            this.btn_again.Size = new System.Drawing.Size(130, 25);
+            this.btn_again.TabIndex = 7;
+            this.btn_again.Text = "复位";
+            this.btn_again.UseVisualStyleBackColor = true;
+            this.btn_again.Click += new System.EventHandler(this.btn_again_Click);
+            // 
             // txt_output_excel
             // 
-            this.txt_output_excel.Location = new System.Drawing.Point(414, 8);
+            this.txt_output_excel.Location = new System.Drawing.Point(554, 8);
             this.txt_output_excel.Name = "txt_output_excel";
             this.txt_output_excel.ReadOnly = true;
             this.txt_output_excel.Size = new System.Drawing.Size(461, 25);
@@ -365,16 +376,6 @@
             this.btn_go.Text = "一键测试";
             this.btn_go.UseVisualStyleBackColor = true;
             this.btn_go.Click += new System.EventHandler(this.btn_go_Click);
-            // 
-            // btn_again
-            // 
-            this.btn_again.Location = new System.Drawing.Point(142, 8);
-            this.btn_again.Name = "btn_again";
-            this.btn_again.Size = new System.Drawing.Size(130, 25);
-            this.btn_again.TabIndex = 7;
-            this.btn_again.Text = "复位";
-            this.btn_again.UseVisualStyleBackColor = true;
-            this.btn_again.Click += new System.EventHandler(this.btn_again_Click);
             // 
             // tabPage1
             // 
@@ -485,7 +486,6 @@
             // 
             this.tabPage4.Controls.Add(this.groupBox4);
             this.tabPage4.Controls.Add(this.Grp_Label);
-            this.tabPage4.Controls.Add(this.button3);
             this.tabPage4.Location = new System.Drawing.Point(4, 25);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
@@ -493,16 +493,6 @@
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "QRCode";
             this.tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // buttonManual
-            // 
-            this.buttonManual.Location = new System.Drawing.Point(1096, 28);
-            this.buttonManual.Name = "buttonManual";
-            this.buttonManual.Size = new System.Drawing.Size(132, 29);
-            this.buttonManual.TabIndex = 35;
-            this.buttonManual.Text = "手动输入SN码";
-            this.buttonManual.UseVisualStyleBackColor = true;
-            this.buttonManual.Click += new System.EventHandler(this.buttonManual_Click);
             // 
             // groupBox4
             // 
@@ -654,9 +644,9 @@
             this.lab_QRPosX.Location = new System.Drawing.Point(18, 26);
             this.lab_QRPosX.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lab_QRPosX.Name = "lab_QRPosX";
-            this.lab_QRPosX.Size = new System.Drawing.Size(55, 15);
+            this.lab_QRPosX.Size = new System.Drawing.Size(106, 15);
             this.lab_QRPosX.TabIndex = 30;
-            this.lab_QRPosX.Text = "QRPosX";
+            this.lab_QRPosX.Text = "X轴坐标(左右)";
             // 
             // lab_QRPosY
             // 
@@ -666,9 +656,9 @@
             this.lab_QRPosY.Location = new System.Drawing.Point(18, 65);
             this.lab_QRPosY.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lab_QRPosY.Name = "lab_QRPosY";
-            this.lab_QRPosY.Size = new System.Drawing.Size(55, 15);
+            this.lab_QRPosY.Size = new System.Drawing.Size(106, 15);
             this.lab_QRPosY.TabIndex = 31;
-            this.lab_QRPosY.Text = "QRPosY";
+            this.lab_QRPosY.Text = "Y轴坐标(上下)";
             // 
             // Grp_Label
             // 
@@ -903,6 +893,16 @@
             this.Lbl_Label_W.TabIndex = 24;
             this.Lbl_Label_W.Text = "Label Width (mm)";
             // 
+            // buttonManual
+            // 
+            this.buttonManual.Location = new System.Drawing.Point(1096, 28);
+            this.buttonManual.Name = "buttonManual";
+            this.buttonManual.Size = new System.Drawing.Size(132, 29);
+            this.buttonManual.TabIndex = 35;
+            this.buttonManual.Text = "手动输入SN码";
+            this.buttonManual.UseVisualStyleBackColor = true;
+            this.buttonManual.Click += new System.EventHandler(this.buttonManual_Click);
+            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -1008,7 +1008,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox textBoxSN;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button btn_print_QRCode;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.DataGridView dataGridViewSN;
         private System.Windows.Forms.TabPage tabPage2;
