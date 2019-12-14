@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -98,6 +98,9 @@
             this.textBoxMAC = new System.Windows.Forms.TextBox();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.comboBoxTestItem = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSN)).BeginInit();
@@ -125,27 +128,30 @@
             ((System.ComponentModel.ISupportInitialize)(this.Num_GapFeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Num_Label_H)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Num_Label_W)).BeginInit();
+            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.comboBoxTestItem);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.cmbBaud);
             this.groupBox1.Controls.Add(this.cmbPort);
+            this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(13, 13);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Size = new System.Drawing.Size(492, 54);
+            this.groupBox1.Size = new System.Drawing.Size(712, 54);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "串口设置";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(378, 14);
+            this.button1.Location = new System.Drawing.Point(600, 14);
             this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(100, 29);
@@ -163,10 +169,10 @@
             "19200",
             "38400",
             "115200"});
-            this.cmbBaud.Location = new System.Drawing.Point(267, 17);
+            this.cmbBaud.Location = new System.Drawing.Point(235, 17);
             this.cmbBaud.Margin = new System.Windows.Forms.Padding(4);
             this.cmbBaud.Name = "cmbBaud";
-            this.cmbBaud.Size = new System.Drawing.Size(90, 23);
+            this.cmbBaud.Size = new System.Drawing.Size(86, 23);
             this.cmbBaud.TabIndex = 3;
             // 
             // cmbPort
@@ -175,14 +181,14 @@
             this.cmbPort.Location = new System.Drawing.Point(83, 17);
             this.cmbPort.Margin = new System.Windows.Forms.Padding(4);
             this.cmbPort.Name = "cmbPort";
-            this.cmbPort.Size = new System.Drawing.Size(90, 23);
+            this.cmbPort.Size = new System.Drawing.Size(69, 23);
             this.cmbPort.TabIndex = 2;
             this.cmbPort.DropDown += new System.EventHandler(this.cmbPort_DropDown);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(192, 21);
+            this.label2.Location = new System.Drawing.Point(160, 21);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(67, 15);
@@ -202,7 +208,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(523, 35);
+            this.label4.Location = new System.Drawing.Point(16, 21);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(38, 15);
             this.label4.TabIndex = 12;
@@ -210,9 +216,9 @@
             // 
             // textBoxSN
             // 
-            this.textBoxSN.Location = new System.Drawing.Point(567, 30);
+            this.textBoxSN.Location = new System.Drawing.Point(61, 17);
             this.textBoxSN.Name = "textBoxSN";
-            this.textBoxSN.Size = new System.Drawing.Size(223, 25);
+            this.textBoxSN.Size = new System.Drawing.Size(147, 25);
             this.textBoxSN.TabIndex = 13;
             // 
             // btn_print_QRCode
@@ -231,7 +237,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1239, 460);
+            this.tabPage3.Size = new System.Drawing.Size(1239, 559);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "SN表";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -267,25 +273,25 @@
             // 
             // chart1
             // 
-            chartArea3.AxisX.Maximum = 1100D;
-            chartArea3.AxisX.Minimum = 400D;
-            chartArea3.AxisX.Title = "Wavelength [nm]";
-            chartArea3.AxisY.Maximum = 0D;
-            chartArea3.AxisY.Minimum = -1000D;
-            chartArea3.AxisY.Title = "Counts";
-            chartArea3.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea3);
-            legend3.Enabled = false;
-            legend3.Name = "Legend1";
-            legend3.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chart1.Legends.Add(legend3);
+            chartArea1.AxisX.Maximum = 1100D;
+            chartArea1.AxisX.Minimum = 400D;
+            chartArea1.AxisX.Title = "Wavelength [nm]";
+            chartArea1.AxisY.Maximum = 0D;
+            chartArea1.AxisY.Minimum = -1000D;
+            chartArea1.AxisY.Title = "Counts";
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            legend1.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(554, 39);
             this.chart1.Name = "chart1";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.chart1.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(682, 415);
             this.chart1.TabIndex = 17;
             this.chart1.Text = "chart1";
@@ -476,7 +482,7 @@
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.tabPage4);
-            this.tabControl1.Location = new System.Drawing.Point(12, 74);
+            this.tabControl1.Location = new System.Drawing.Point(13, 74);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1247, 489);
@@ -489,7 +495,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 25);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1239, 460);
+            this.tabPage4.Size = new System.Drawing.Size(1239, 559);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "QRCode";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -895,9 +901,9 @@
             // 
             // buttonManual
             // 
-            this.buttonManual.Location = new System.Drawing.Point(1096, 28);
+            this.buttonManual.Location = new System.Drawing.Point(394, 14);
             this.buttonManual.Name = "buttonManual";
-            this.buttonManual.Size = new System.Drawing.Size(132, 29);
+            this.buttonManual.Size = new System.Drawing.Size(124, 29);
             this.buttonManual.TabIndex = 35;
             this.buttonManual.Text = "手动输入SN码";
             this.buttonManual.UseVisualStyleBackColor = true;
@@ -906,7 +912,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(812, 35);
+            this.label5.Location = new System.Drawing.Point(215, 21);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(39, 15);
             this.label5.TabIndex = 15;
@@ -914,10 +920,10 @@
             // 
             // textBoxMAC
             // 
-            this.textBoxMAC.Location = new System.Drawing.Point(857, 30);
+            this.textBoxMAC.Location = new System.Drawing.Point(261, 17);
             this.textBoxMAC.Name = "textBoxMAC";
             this.textBoxMAC.ReadOnly = true;
-            this.textBoxMAC.Size = new System.Drawing.Size(223, 25);
+            this.textBoxMAC.Size = new System.Drawing.Size(126, 25);
             this.textBoxMAC.TabIndex = 16;
             // 
             // imageList1
@@ -937,21 +943,61 @@
             this.imageList1.Images.SetKeyName(10, "nir_1050.png");
             this.imageList1.Images.SetKeyName(11, "nir_1450.png");
             this.imageList1.Images.SetKeyName(12, "nir_1550.png");
+            this.imageList1.Images.SetKeyName(13, "ppg_green1_ok.jpg");
+            this.imageList1.Images.SetKeyName(14, "ppg_green2_ok.jpg");
+            this.imageList1.Images.SetKeyName(15, "ppg_ir_ok.jpg");
+            this.imageList1.Images.SetKeyName(16, "ppg_green1_led.jpg");
+            this.imageList1.Images.SetKeyName(17, "ppg_green2_led.jpg");
+            this.imageList1.Images.SetKeyName(18, "ppg_ir_led.jpg");
             // 
             // timer1
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // comboBoxTestItem
+            // 
+            this.comboBoxTestItem.FormattingEnabled = true;
+            this.comboBoxTestItem.Items.AddRange(new object[] {
+            "主板测试",
+            "PPG PCBA测试",
+            "PPG 底座测试",
+            "NIR红率IR测试",
+            "NIR大波长测试"});
+            this.comboBoxTestItem.Location = new System.Drawing.Point(419, 17);
+            this.comboBoxTestItem.Name = "comboBoxTestItem";
+            this.comboBoxTestItem.Size = new System.Drawing.Size(173, 23);
+            this.comboBoxTestItem.TabIndex = 36;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(329, 21);
+            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(82, 15);
+            this.label6.TabIndex = 1;
+            this.label6.Text = "测试项目：";
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.label4);
+            this.groupBox5.Controls.Add(this.buttonManual);
+            this.groupBox5.Controls.Add(this.textBoxSN);
+            this.groupBox5.Controls.Add(this.textBoxMAC);
+            this.groupBox5.Controls.Add(this.label5);
+            this.groupBox5.Location = new System.Drawing.Point(732, 13);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(527, 54);
+            this.groupBox5.TabIndex = 36;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "设备标识";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1271, 575);
-            this.Controls.Add(this.buttonManual);
-            this.Controls.Add(this.textBoxMAC);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.textBoxSN);
-            this.Controls.Add(this.label4);
+            this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.groupBox1);
             this.Margin = new System.Windows.Forms.Padding(4);
@@ -992,8 +1038,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.Num_GapFeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Num_Label_H)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Num_Label_W)).EndInit();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -1064,6 +1111,9 @@
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ComboBox comboBoxTestItem;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.GroupBox groupBox5;
     }
 }
 

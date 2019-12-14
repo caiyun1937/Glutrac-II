@@ -165,27 +165,28 @@ namespace MySerialPort
 
         private void Form1_Closed(object sender, System.EventArgs e)
         {
-            if (this.tabPage2.Text != "PPG测试" && this.tabPage2.Text != "NIR测试")
-                return;
-
-            int l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
-            int l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
-
-            avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_8U2);
-            m_DeviceHandle_8U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
-
-            avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_9U2);
-            m_DeviceHandle_9U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
-
-            if (m_DeviceHandle_8U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
+            if (spectrographEnable == true)
             {
-                l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
+                int l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
+                int l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
+
+                avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_8U2);
+                m_DeviceHandle_8U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
+
+                avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_9U2);
+                m_DeviceHandle_9U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
+
+                if (m_DeviceHandle_8U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
+                {
+                    l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
+                }
+                if (m_DeviceHandle_9U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
+                {
+                    l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
+                }
+                avaspec.AVS_Done();
+                spectrographEnable = false;
             }
-            if (m_DeviceHandle_9U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
-            {
-                l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
-            }
-            avaspec.AVS_Done();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -197,6 +198,9 @@ namespace MySerialPort
             btn_print_QRCode.Enabled = false;
             btn_again.Enabled = false;
 
+            chart1.SendToBack();
+            chart1.Visible = false;
+            
             this.Location = new Point(0, 0);
 
             RegistryKey keyCom = Registry.LocalMachine.OpenSubKey("Hardware\\DeviceMap\\SerialComm");
@@ -214,135 +218,6 @@ namespace MySerialPort
             }
           
             cmbBaud.Text = "115200";
-
-            if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xls").Length > 0)
-                ExpandedName = ".xls";
-            else
-                ExpandedName = ".xlsx";
-
-            if (File.Exists("主板测试" + ExpandedName))
-            {
-                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
-                this.tabPage2.Text = "主板测试";
-            }
-            else if (File.Exists("PPG测试" + ExpandedName))
-            {
-                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
-                this.tabPage2.Text = "PPG测试";
-            }
-            else if (File.Exists("NIR测试" + ExpandedName))
-            {
-                this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试" + ExpandedName);
-                this.tabPage2.Text = "NIR测试";
-            }
-            else
-                myMessageBox.Show("请在根目录下添加测试表", Color.Red);
-
-            // 读取SN号
-            if (UpperMode == UPPER_MODE.PRINT_QRCODE)
-            {
-                GetNewSN();
-            }
-            else
-            {
-                textBoxSN.Text = "";
-            }
-
-            // 二维码
-            Cbo_PaperType.SelectedIndex = 1;
-
-            // 光谱仪
-            chart1.SendToBack();
-            chart1.Visible = false;
-
-            if (this.tabPage2.Text != "PPG测试" && this.tabPage2.Text != "NIR测试")
-               return;
-
-            int l_Port = avaspec.AVS_Init(0);
-            avaspec.AVS_Register(this.Handle);
-
-            if (l_Port == avaspec.ERR_DEVICE_NOT_FOUND)
-            {
-                avaspec.AVS_Done();
-            }
-
-            avaspec.AvsIdentityType channel_8U2 = new avaspec.AvsIdentityType();
-            avaspec.AvsIdentityType channel_9U2 = new avaspec.AvsIdentityType();
-
-            long hDevice_8U2 = 0, hDevice_9U2 = 0;
-
-            channel_8U2.m_SerialNumber = "1703018U2";
-            channel_9U2.m_SerialNumber = "1703019U2";
-
-            hDevice_8U2 = (long)avaspec.AVS_Activate(ref channel_8U2);
-            hDevice_9U2 = (long)avaspec.AVS_Activate(ref channel_9U2);
-
-            m_DeviceHandle_8U2 = hDevice_8U2;
-            if (avaspec.AVS_UseHighResAdc((IntPtr)m_DeviceHandle_8U2, true) != avaspec.ERR_SUCCESS)
-            {
-                myMessageBox.Show("PPG和NIR测试请链接光谱仪，重启软件!!", Color.Red);
-                System.Environment.Exit(0);
-            }
-
-            m_DeviceHandle_9U2 = hDevice_9U2;
-            if (avaspec.AVS_UseHighResAdc((IntPtr)m_DeviceHandle_9U2, true) != avaspec.ERR_SUCCESS)
-            {
-                myMessageBox.Show("PPG和NIR测试请链接光谱仪，重启软件!!", Color.Red);
-                System.Environment.Exit(0);
-            }
-
-            ConnectGui();
-            
-            //Prepare Measurement
-            avaspec.MeasConfigType l_PrepareMeasData_8U2 = new avaspec.MeasConfigType();
-            avaspec.MeasConfigType l_PrepareMeasData_9U2 = new avaspec.MeasConfigType();
-
-            l_PrepareMeasData_9U2.m_StartPixel = l_PrepareMeasData_8U2.m_StartPixel = 0;
-            l_PrepareMeasData_8U2.m_StopPixel = 2047;
-            l_PrepareMeasData_9U2.m_StopPixel = 511;
-
-            l_PrepareMeasData_9U2.m_IntegrationTime = l_PrepareMeasData_8U2.m_IntegrationTime = 100;
-            double l_NanoSec = 20;
-            uint l_FPGAClkCycles = (uint)(6.0 * (l_NanoSec + 20.84) / 125.0);
-            l_PrepareMeasData_9U2.m_IntegrationDelay = l_PrepareMeasData_8U2.m_IntegrationDelay = l_FPGAClkCycles;
-            l_PrepareMeasData_9U2.m_NrAverages = l_PrepareMeasData_8U2.m_NrAverages = 1;
-
-            l_FPGAClkCycles = (uint)(6.0 * l_NanoSec / 125.0);
-            l_PrepareMeasData_9U2.m_Control.m_LaserDelay = l_PrepareMeasData_8U2.m_Control.m_LaserDelay = l_FPGAClkCycles;
-            l_FPGAClkCycles = (uint)(6.0 * l_NanoSec / 125.0);
-            l_PrepareMeasData_9U2.m_Control.m_LaserWidth = l_PrepareMeasData_8U2.m_Control.m_LaserWidth = l_FPGAClkCycles;
-
-            int l_Res_8U2 = (int)avaspec.AVS_PrepareMeasure((IntPtr)m_DeviceHandle_8U2, ref l_PrepareMeasData_8U2);
-            int l_Res_9U2 = (int)avaspec.AVS_PrepareMeasure((IntPtr)m_DeviceHandle_9U2, ref l_PrepareMeasData_9U2);
-            //Get Nr Of Scans
-
-            short l_NrOfScans = -1;
-            if ((l_PrepareMeasData_8U2.m_Control.m_StoreToRam > 0) && (l_PrepareMeasData_9U2.m_Control.m_StoreToRam > 0) && (l_NrOfScans != 1))
-            {
-                l_NrOfScans = 1;
-            }
-            //Start Measurement
-
-            m_StartTicks = (ulong)Environment.TickCount;
-            m_Measurements = 0;
-            m_Failures = 0;
-            m_StartPixels_8U2 = l_PrepareMeasData_8U2.m_StartPixel;
-            m_StopPixels_8U2 = l_PrepareMeasData_8U2.m_StopPixel;
-            m_StartPixels_9U2 = l_PrepareMeasData_9U2.m_StartPixel;
-            m_StopPixels_9U2 = l_PrepareMeasData_9U2.m_StopPixel;
-
-            if (avaspec.ERR_SUCCESS == (int)avaspec.AVS_GetLambda((IntPtr)m_DeviceHandle_8U2, ref m_Lambda_8U2))
-            {
-            }
-            if (avaspec.ERR_SUCCESS == (int)avaspec.AVS_GetLambda((IntPtr)m_DeviceHandle_9U2, ref m_Lambda_9U2))
-            {
-            }
-            chart1.ChartAreas[0].AxisX.Minimum = 200;
-            chart1.ChartAreas[0].AxisX.Maximum = 1700;
-            chart1.ChartAreas[0].AxisX.LabelStyle.Format = "{0.0}";
-
-            l_Res_8U2 = (int)avaspec.AVS_Measure((IntPtr)m_DeviceHandle_8U2, this.Handle, l_NrOfScans);
-            l_Res_9U2 = (int)avaspec.AVS_Measure((IntPtr)m_DeviceHandle_9U2, this.Handle, l_NrOfScans);
         }
 
         private const int WM_APP = 0x8000;
@@ -403,8 +278,51 @@ namespace MySerialPort
         }
 
         bool isOpened = false;//串口状态标志
+        bool spectrographEnable = false;
+
         private void button1_Click(object sender, EventArgs e)
         {
+            if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xls").Length > 0)
+                ExpandedName = ".xls";
+            else if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xlsx").Length > 0)
+                ExpandedName = ".xlsx";
+            else
+                myMessageBox.Show("请在根目录下添加测试表", Color.Red);
+
+            if (comboBoxTestItem.SelectedIndex == 0 && File.Exists("主板测试" + ExpandedName))
+            {
+                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
+                this.tabPage2.Text = "主板测试";
+            }
+            else if (comboBoxTestItem.SelectedIndex == 1 && File.Exists("PPG测试" + ExpandedName))
+            {
+                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
+                this.tabPage2.Text = "PPG测试";
+                spectrographEnable = true;
+            }
+            else if (comboBoxTestItem.SelectedIndex == 2 && File.Exists("PPG测试" + ExpandedName))
+            {
+                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
+                this.tabPage2.Text = "PPG测试";
+            }
+            else if (comboBoxTestItem.SelectedIndex == 3 && File.Exists("NIR红绿IR测试" + ExpandedName))
+            {
+                this.dataGridViewMainBoardTest.DataSource = bindData("NIR红绿IR测试" + ExpandedName);
+                this.tabPage2.Text = "NIR红绿IR测试";
+                spectrographEnable = true;
+            }
+            else if (comboBoxTestItem.SelectedIndex == 4 && File.Exists("NIR1050以上测试" + ExpandedName))
+            {
+                this.dataGridViewMainBoardTest.DataSource = bindData("NIR1050以上测试" + ExpandedName);
+                this.tabPage2.Text = "NIR1050以上测试";
+                spectrographEnable = true;
+            }
+            else
+            {
+                myMessageBox.Show("请选择测试项目", Color.Red);
+                return;
+            }
+
             if (!isOpened)
             {
                 serialPort.PortName = cmbPort.Text;
@@ -417,6 +335,7 @@ namespace MySerialPort
                     cmbBaud.Enabled = false;
                     isOpened = true;
                     serialPort.DataReceived += new SerialDataReceivedEventHandler(post_DataReceived);//串口接收处理函数
+                    comboBoxTestItem.Enabled = false;
                 }
                 catch
                 {
@@ -432,12 +351,119 @@ namespace MySerialPort
                     cmbPort.Enabled = true;//打开使能
                     cmbBaud.Enabled = true;
                     isOpened = false;
+                    comboBoxTestItem.Enabled = true;
+                    return;
                 }
                 catch
                 {
                     myMessageBox.Show("串口关闭失败,请点亮屏幕再继续操作!", Color.Red);
                 }
             }
+
+            // 读取SN号
+            if (UpperMode == UPPER_MODE.PRINT_QRCODE)
+            {
+                GetNewSN();
+            }
+            else
+            {
+                textBoxSN.Text = "";
+            }
+
+            // 二维码
+            Cbo_PaperType.SelectedIndex = 1;
+
+            // 光谱仪
+            if(spectrographEnable == true)
+            {
+                int l_Port = avaspec.AVS_Init(0);
+                avaspec.AVS_Register(this.Handle);
+
+                if (l_Port == avaspec.ERR_DEVICE_NOT_FOUND)
+                {
+                    avaspec.AVS_Done();
+                }
+
+                avaspec.AvsIdentityType channel_8U2 = new avaspec.AvsIdentityType();
+                avaspec.AvsIdentityType channel_9U2 = new avaspec.AvsIdentityType();
+
+                long hDevice_8U2 = 0, hDevice_9U2 = 0;
+
+                channel_8U2.m_SerialNumber = "1703018U2";
+                channel_9U2.m_SerialNumber = "1703019U2";
+
+                hDevice_8U2 = (long)avaspec.AVS_Activate(ref channel_8U2);
+                hDevice_9U2 = (long)avaspec.AVS_Activate(ref channel_9U2);
+
+                m_DeviceHandle_8U2 = hDevice_8U2;
+                if (avaspec.AVS_UseHighResAdc((IntPtr)m_DeviceHandle_8U2, true) != avaspec.ERR_SUCCESS)
+                {
+                    myMessageBox.Show("PPG和NIR测试请链接光谱仪，重启软件!!", Color.Red);
+                    System.Environment.Exit(0);
+                }
+
+                m_DeviceHandle_9U2 = hDevice_9U2;
+                if (avaspec.AVS_UseHighResAdc((IntPtr)m_DeviceHandle_9U2, true) != avaspec.ERR_SUCCESS)
+                {
+                    myMessageBox.Show("PPG和NIR测试请链接光谱仪，重启软件!!", Color.Red);
+                    System.Environment.Exit(0);
+                }
+
+                ConnectGui();
+
+                //Prepare Measurement
+                avaspec.MeasConfigType l_PrepareMeasData_8U2 = new avaspec.MeasConfigType();
+                avaspec.MeasConfigType l_PrepareMeasData_9U2 = new avaspec.MeasConfigType();
+
+                l_PrepareMeasData_9U2.m_StartPixel = l_PrepareMeasData_8U2.m_StartPixel = 0;
+                l_PrepareMeasData_8U2.m_StopPixel = 2047;
+                l_PrepareMeasData_9U2.m_StopPixel = 511;
+
+                l_PrepareMeasData_9U2.m_IntegrationTime = l_PrepareMeasData_8U2.m_IntegrationTime = 100;
+                double l_NanoSec = 20;
+                uint l_FPGAClkCycles = (uint)(6.0 * (l_NanoSec + 20.84) / 125.0);
+                l_PrepareMeasData_9U2.m_IntegrationDelay = l_PrepareMeasData_8U2.m_IntegrationDelay = l_FPGAClkCycles;
+                l_PrepareMeasData_9U2.m_NrAverages = l_PrepareMeasData_8U2.m_NrAverages = 1;
+
+                l_FPGAClkCycles = (uint)(6.0 * l_NanoSec / 125.0);
+                l_PrepareMeasData_9U2.m_Control.m_LaserDelay = l_PrepareMeasData_8U2.m_Control.m_LaserDelay = l_FPGAClkCycles;
+                l_FPGAClkCycles = (uint)(6.0 * l_NanoSec / 125.0);
+                l_PrepareMeasData_9U2.m_Control.m_LaserWidth = l_PrepareMeasData_8U2.m_Control.m_LaserWidth = l_FPGAClkCycles;
+
+                int l_Res_8U2 = (int)avaspec.AVS_PrepareMeasure((IntPtr)m_DeviceHandle_8U2, ref l_PrepareMeasData_8U2);
+                int l_Res_9U2 = (int)avaspec.AVS_PrepareMeasure((IntPtr)m_DeviceHandle_9U2, ref l_PrepareMeasData_9U2);
+                //Get Nr Of Scans
+
+                short l_NrOfScans = -1;
+                if ((l_PrepareMeasData_8U2.m_Control.m_StoreToRam > 0) && (l_PrepareMeasData_9U2.m_Control.m_StoreToRam > 0) && (l_NrOfScans != 1))
+                {
+                    l_NrOfScans = 1;
+                }
+                //Start Measurement
+
+                m_StartTicks = (ulong)Environment.TickCount;
+                m_Measurements = 0;
+                m_Failures = 0;
+                m_StartPixels_8U2 = l_PrepareMeasData_8U2.m_StartPixel;
+                m_StopPixels_8U2 = l_PrepareMeasData_8U2.m_StopPixel;
+                m_StartPixels_9U2 = l_PrepareMeasData_9U2.m_StartPixel;
+                m_StopPixels_9U2 = l_PrepareMeasData_9U2.m_StopPixel;
+
+                if (avaspec.ERR_SUCCESS == (int)avaspec.AVS_GetLambda((IntPtr)m_DeviceHandle_8U2, ref m_Lambda_8U2))
+                {
+                }
+                if (avaspec.ERR_SUCCESS == (int)avaspec.AVS_GetLambda((IntPtr)m_DeviceHandle_9U2, ref m_Lambda_9U2))
+                {
+                }
+                chart1.ChartAreas[0].AxisX.Minimum = 200;
+                chart1.ChartAreas[0].AxisX.Maximum = 1700;
+                chart1.ChartAreas[0].AxisX.LabelStyle.Format = "{0.0}";
+
+                l_Res_8U2 = (int)avaspec.AVS_Measure((IntPtr)m_DeviceHandle_8U2, this.Handle, l_NrOfScans);
+                l_Res_9U2 = (int)avaspec.AVS_Measure((IntPtr)m_DeviceHandle_9U2, this.Handle, l_NrOfScans);
+
+            }
+            
             textBoxSN.Focus();
         }
 
@@ -708,20 +734,44 @@ namespace MySerialPort
                 pictureBoxShow.BackgroundImage = imageList1.Images[12];
                 pictureBoxShow.Visible = true;
             }
-            else if (str.Substring(4, 2).Equals("37"))   //ppg 绿灯
+            else if (str.Substring(4, 2).Equals("37"))   //ppg 绿灯1
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[4];
-                pictureBoxShow.Visible = true;
+                if(spectrographEnable == true)
+                {
+                    pictureBoxShow.BackgroundImage = imageList1.Images[16];
+                    pictureBoxShow.Visible = true;
+                }
+                else
+                {
+                    pictureBoxShow.BackgroundImage = imageList1.Images[13];         // ok or fail
+                    pictureBoxShow.Visible = true;
+                }
             }
-            else if (str.Substring(4, 2).Equals("38"))   //ppg 红灯
+            else if (str.Substring(4, 2).Equals("38"))   //ppg 红灯 or 绿灯2
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[3];
-                pictureBoxShow.Visible = true;
+                if (spectrographEnable == true)
+                {
+                    pictureBoxShow.BackgroundImage = imageList1.Images[17];
+                    pictureBoxShow.Visible = true;
+                }
+                else
+                {
+                    pictureBoxShow.BackgroundImage = imageList1.Images[14];         // ok or fail
+                    pictureBoxShow.Visible = true;
+                }
             }
             else if (str.Substring(4, 2).Equals("39"))   //ppg ir
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[5];
-                pictureBoxShow.Visible = true;
+                if (spectrographEnable == true)
+                {
+                    pictureBoxShow.BackgroundImage = imageList1.Images[18];
+                    pictureBoxShow.Visible = true;
+                }
+                else
+                {
+                    pictureBoxShow.BackgroundImage = imageList1.Images[15];         // ok or fail
+                    pictureBoxShow.Visible = true;
+                }
             }
         }
 
@@ -835,7 +885,7 @@ namespace MySerialPort
                         {
                             CheckSN(dgr, str);
                         }
-                        else if (str.Substring(4, 2).Equals("39"))   // ppg_ir
+                        else if (str.Substring(4, 2).Equals("39") && spectrographEnable == true)   // ppg_ir
                         {
                             chart1.Visible = true;
                             chart1.BringToFront();
@@ -953,18 +1003,29 @@ namespace MySerialPort
             Directory.CreateDirectory(@"D:\TestReport\Local");
             Directory.CreateDirectory(@"D:\TestReport\Server");
 
-            if (File.Exists("主板测试" + ExpandedName))
+            if (comboBoxTestItem.SelectedIndex == 0)
             {
-                if(textBoxMAC.Text.ToString().Length != 12)
+                if (textBoxMAC.Text.ToString().Length != 12)
                     commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + "###########" + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
                 else
                     commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
-            else if (File.Exists("PPG测试" + ExpandedName))
-                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
-
-            else if (File.Exists("NIR测试" + ExpandedName))
-                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+            else if (comboBoxTestItem.SelectedIndex == 1)
+            {
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_PCBA_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+            }
+            else if (comboBoxTestItem.SelectedIndex == 2)
+            {
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_SHELL_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+            }
+            else if (comboBoxTestItem.SelectedIndex == 3)
+            {
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_LOWBAND_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+            }
+            else if (comboBoxTestItem.SelectedIndex == 4)
+            {
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_HIGHBAND_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+            }
 
             if (dataGridViewMainBoardTest.DataSource == null)
             {
@@ -1133,21 +1194,47 @@ namespace MySerialPort
 
         private void btn_again_Click(object sender, EventArgs e)
         {
-            if (File.Exists("主板测试" + ExpandedName))
+            if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xls").Length > 0)
+                ExpandedName = ".xls";
+            else if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xlsx").Length > 0)
+                ExpandedName = ".xlsx";
+            else
+                myMessageBox.Show("请在根目录下添加测试表", Color.Red);
+
+            if (comboBoxTestItem.SelectedIndex == 0 && File.Exists("主板测试" + ExpandedName))
             {
                 this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
                 this.tabPage2.Text = "主板测试";
             }
-            else if (File.Exists("PPG测试" + ExpandedName))
+            else if (comboBoxTestItem.SelectedIndex == 1 && File.Exists("PPG测试" + ExpandedName))
+            {
+                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
+                this.tabPage2.Text = "PPG测试";
+                spectrographEnable = true;
+            }
+            else if (comboBoxTestItem.SelectedIndex == 2 && File.Exists("PPG测试" + ExpandedName))
             {
                 this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
                 this.tabPage2.Text = "PPG测试";
             }
-            else if (File.Exists("NIR测试" + ExpandedName))
+            else if (comboBoxTestItem.SelectedIndex == 3 && File.Exists("NIR红绿IR测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("NIR测试" + ExpandedName);
-                this.tabPage2.Text = "NIR测试";
+                this.dataGridViewMainBoardTest.DataSource = bindData("NIR红绿IR测试" + ExpandedName);
+                this.tabPage2.Text = "NIR红绿IR测试";
+                spectrographEnable = true;
             }
+            else if (comboBoxTestItem.SelectedIndex == 4 && File.Exists("NIR1050以上测试" + ExpandedName))
+            {
+                this.dataGridViewMainBoardTest.DataSource = bindData("NIR1050以上测试" + ExpandedName);
+                this.tabPage2.Text = "NIR1050以上测试";
+                spectrographEnable = true;
+            }
+            else
+            {
+                myMessageBox.Show("请选择测试项目", Color.Red);
+                return;
+            }
+            
             // 读取SN号
             if (UpperMode == UPPER_MODE.PRINT_QRCODE)
             {
@@ -1515,7 +1602,7 @@ namespace MySerialPort
                 String fins = "bc aa 23 " + str + " 0d";
                 dgr.Cells["输入命令"].Value = fins;
             }
-
+            myMessageBox.Show("编辑完SN码请手动点击机器码写入测试行。", Color.Green);
             // 更新SN码表            待完善
         }
 
