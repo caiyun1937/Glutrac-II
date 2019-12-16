@@ -29,15 +29,17 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.comboBoxTestItem = new System.Windows.Forms.ComboBox();
+            this.buttonOpenComm = new System.Windows.Forms.Button();
             this.cmbBaud = new System.Windows.Forms.ComboBox();
             this.cmbPort = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -98,9 +100,8 @@
             this.textBoxMAC = new System.Windows.Forms.TextBox();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.comboBoxTestItem = new System.Windows.Forms.ComboBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSN)).BeginInit();
@@ -134,7 +135,7 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.comboBoxTestItem);
-            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.Controls.Add(this.buttonOpenComm);
             this.groupBox1.Controls.Add(this.cmbBaud);
             this.groupBox1.Controls.Add(this.cmbPort);
             this.groupBox1.Controls.Add(this.label6);
@@ -149,16 +150,30 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "串口设置";
             // 
-            // button1
+            // comboBoxTestItem
             // 
-            this.button1.Location = new System.Drawing.Point(600, 14);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(100, 29);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "打开串口";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.comboBoxTestItem.FormattingEnabled = true;
+            this.comboBoxTestItem.Items.AddRange(new object[] {
+            "主板测试",
+            "PPG PCBA测试",
+            "PPG 底座测试",
+            "NIR红率IR测试",
+            "NIR大波长测试"});
+            this.comboBoxTestItem.Location = new System.Drawing.Point(419, 17);
+            this.comboBoxTestItem.Name = "comboBoxTestItem";
+            this.comboBoxTestItem.Size = new System.Drawing.Size(173, 23);
+            this.comboBoxTestItem.TabIndex = 36;
+            // 
+            // buttonOpenComm
+            // 
+            this.buttonOpenComm.Location = new System.Drawing.Point(600, 14);
+            this.buttonOpenComm.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonOpenComm.Name = "buttonOpenComm";
+            this.buttonOpenComm.Size = new System.Drawing.Size(100, 29);
+            this.buttonOpenComm.TabIndex = 4;
+            this.buttonOpenComm.Text = "打开串口";
+            this.buttonOpenComm.UseVisualStyleBackColor = true;
+            this.buttonOpenComm.Click += new System.EventHandler(this.button1_Click);
             // 
             // cmbBaud
             // 
@@ -184,6 +199,16 @@
             this.cmbPort.Size = new System.Drawing.Size(69, 23);
             this.cmbPort.TabIndex = 2;
             this.cmbPort.DropDown += new System.EventHandler(this.cmbPort_DropDown);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(329, 21);
+            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(82, 15);
+            this.label6.TabIndex = 1;
+            this.label6.Text = "测试项目：";
             // 
             // label2
             // 
@@ -237,7 +262,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1239, 559);
+            this.tabPage3.Size = new System.Drawing.Size(1239, 460);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "SN表";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -273,25 +298,25 @@
             // 
             // chart1
             // 
-            chartArea1.AxisX.Maximum = 1100D;
-            chartArea1.AxisX.Minimum = 400D;
-            chartArea1.AxisX.Title = "Wavelength [nm]";
-            chartArea1.AxisY.Maximum = 0D;
-            chartArea1.AxisY.Minimum = -1000D;
-            chartArea1.AxisY.Title = "Counts";
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
-            legend1.Enabled = false;
-            legend1.Name = "Legend1";
-            legend1.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chart1.Legends.Add(legend1);
+            chartArea2.AxisX.Maximum = 1100D;
+            chartArea2.AxisX.Minimum = 400D;
+            chartArea2.AxisX.Title = "Wavelength [nm]";
+            chartArea2.AxisY.Maximum = 0D;
+            chartArea2.AxisY.Minimum = -1000D;
+            chartArea2.AxisY.Title = "Counts";
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
+            legend2.Enabled = false;
+            legend2.Name = "Legend1";
+            legend2.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chart1.Legends.Add(legend2);
             this.chart1.Location = new System.Drawing.Point(554, 39);
             this.chart1.Name = "chart1";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chart1.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chart1.Series.Add(series2);
             this.chart1.Size = new System.Drawing.Size(682, 415);
             this.chart1.TabIndex = 17;
             this.chart1.Text = "chart1";
@@ -478,10 +503,10 @@
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.tabPage4);
+            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Location = new System.Drawing.Point(13, 74);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -495,7 +520,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 25);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1239, 559);
+            this.tabPage4.Size = new System.Drawing.Size(1239, 460);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "QRCode";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -946,37 +971,13 @@
             this.imageList1.Images.SetKeyName(13, "ppg_green1_ok.jpg");
             this.imageList1.Images.SetKeyName(14, "ppg_green2_ok.jpg");
             this.imageList1.Images.SetKeyName(15, "ppg_ir_ok.jpg");
-            this.imageList1.Images.SetKeyName(16, "ppg_green1_led.jpg");
-            this.imageList1.Images.SetKeyName(17, "ppg_green2_led.jpg");
-            this.imageList1.Images.SetKeyName(18, "ppg_ir_led.jpg");
+            this.imageList1.Images.SetKeyName(16, "");
+            this.imageList1.Images.SetKeyName(17, "");
+            this.imageList1.Images.SetKeyName(18, "");
             // 
             // timer1
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // comboBoxTestItem
-            // 
-            this.comboBoxTestItem.FormattingEnabled = true;
-            this.comboBoxTestItem.Items.AddRange(new object[] {
-            "主板测试",
-            "PPG PCBA测试",
-            "PPG 底座测试",
-            "NIR红率IR测试",
-            "NIR大波长测试"});
-            this.comboBoxTestItem.Location = new System.Drawing.Point(419, 17);
-            this.comboBoxTestItem.Name = "comboBoxTestItem";
-            this.comboBoxTestItem.Size = new System.Drawing.Size(173, 23);
-            this.comboBoxTestItem.TabIndex = 36;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(329, 21);
-            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(82, 15);
-            this.label6.TabIndex = 1;
-            this.label6.Text = "测试项目：";
             // 
             // groupBox5
             // 
@@ -1048,7 +1049,7 @@
 
         private System.IO.Ports.SerialPort serialPort;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonOpenComm;
         private System.Windows.Forms.ComboBox cmbBaud;
         private System.Windows.Forms.ComboBox cmbPort;
         private System.Windows.Forms.Label label2;
@@ -1114,6 +1115,7 @@
         private System.Windows.Forms.ComboBox comboBoxTestItem;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.GroupBox groupBox5;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 

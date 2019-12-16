@@ -17,12 +17,14 @@ using EzioDll;
 using C_Sharp_Application;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using ThoughtWorks.QRCode.Codec;
 
 enum UPPER_MODE
 {
     SCAN_QRCODE = 0,
     PRINT_QRCODE,
 }
+
 
 namespace MySerialPort
 {
@@ -189,10 +191,26 @@ namespace MySerialPort
             }
         }
 
+        public void QRCode(string enCodeString)
+        {
+            System.Drawing.Bitmap bt;
+            QRCodeEncoder qrCodeEncoder = new QRCodeEncoder();
+            qrCodeEncoder.QRCodeEncodeMode = QRCodeEncoder.ENCODE_MODE.BYTE;//编码方式(注意：BYTE能支持中文，ALPHA_NUMERIC扫描出来的都是数字)
+            qrCodeEncoder.QRCodeScale = 10;//大小(值越大生成的二维码图片像素越高)
+            qrCodeEncoder.QRCodeVersion = 0;//版本(注意：设置为0主要是防止编码的字符串太长时发生错误)
+            qrCodeEncoder.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.M;//错误效验、错误更正(有4个等级)
+            qrCodeEncoder.QRCodeBackgroundColor = Color.White;//背景色
+            qrCodeEncoder.QRCodeForegroundColor = Color.Black;//前景色
+            bt = qrCodeEncoder.Encode(enCodeString, Encoding.UTF8);
+
+            pictureBoxShow.Image = Image.FromHbitmap(bt.GetHbitmap());
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
-            pictureBoxShow.Visible = false;
+            //QRCode(textBoxMAC.Text);
 
+            pictureBoxShow.Visible = false;
             btn_go.Enabled = true;
             btn_output_excel.Enabled = false;
             btn_print_QRCode.Enabled = false;
@@ -330,16 +348,18 @@ namespace MySerialPort
                 try
                 {
                     serialPort.Open();     //打开串口
-                    button1.Text = "关闭串口";
+                    buttonOpenComm.Text = "关闭串口";
                     cmbPort.Enabled = false;//关闭使能
                     cmbBaud.Enabled = false;
                     isOpened = true;
                     serialPort.DataReceived += new SerialDataReceivedEventHandler(post_DataReceived);//串口接收处理函数
                     comboBoxTestItem.Enabled = false;
+                    buttonOpenComm.Enabled = false;
                 }
                 catch
                 {
                     myMessageBox.Show("串口打开失败,请点亮屏幕再继续操作!", Color.Red);
+                    return;
                 }
             }
             else
@@ -347,16 +367,41 @@ namespace MySerialPort
                 try
                 {
                     serialPort.Close();     //关闭串口
-                    button1.Text = "打开串口";
+                    buttonOpenComm.Text = "打开串口";
                     cmbPort.Enabled = true;//打开使能
                     cmbBaud.Enabled = true;
                     isOpened = false;
                     comboBoxTestItem.Enabled = true;
+
+                    if (spectrographEnable == true)
+                    {
+                        int l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
+                        int l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
+
+                        avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_8U2);
+                        m_DeviceHandle_8U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
+
+                        avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_9U2);
+                        m_DeviceHandle_9U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
+
+                        if (m_DeviceHandle_8U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
+                        {
+                            l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
+                        }
+                        if (m_DeviceHandle_9U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
+                        {
+                            l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
+                        }
+                        avaspec.AVS_Done();
+                        spectrographEnable = false;
+                    }
+                    
                     return;
                 }
                 catch
                 {
                     myMessageBox.Show("串口关闭失败,请点亮屏幕再继续操作!", Color.Red);
+                    return;
                 }
             }
 
@@ -801,7 +846,7 @@ namespace MySerialPort
                     strSN = textBoxSN.Text;
             }
                 
-            myMessageBox.Show("如果熄屏的话请先用手指点亮屏幕再关掉该对话框!!", Color.Black);
+            myMessageBox.Show("测试之前先点击一次屏幕唤醒设备!!", Color.Red);
 
             testError = true;
 
@@ -918,25 +963,54 @@ namespace MySerialPort
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.GetBaseException());
+                //Console.WriteLine(ex.GetBaseException());
+                myMessageBox.Show("请确保点亮屏幕再开始测试！！", Color.Red);
                 testError = false;
+
+                if (spectrographEnable == true)
+                {
+                    int l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
+                    int l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
+
+                    avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_8U2);
+                    m_DeviceHandle_8U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
+
+                    avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_9U2);
+                    m_DeviceHandle_9U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
+
+                    if (m_DeviceHandle_8U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
+                    {
+                        l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
+                    }
+                    if (m_DeviceHandle_9U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
+                    {
+                        l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
+                    }
+                    avaspec.AVS_Done();
+
+                    spectrographEnable = false;
+                }
+                System.Environment.Exit(0);
+                return;
             }
             if (true == testError)
             {
-                if(File.Exists("主板测试" + ExpandedName))
+                if (File.Exists("主板测试" + ExpandedName))
                     myMessageBox.Show("主板测试通过,请保存测试报告!", Color.Green);
 
-                else if(File.Exists("PPG测试" + ExpandedName))
+                else if (File.Exists("PPG测试" + ExpandedName))
                     myMessageBox.Show("PPG测试通过,请保存测试报告!", Color.Green);
 
-                else if(File.Exists("NIR测试" + ExpandedName))
+                else if (File.Exists("NIR测试" + ExpandedName))
                     myMessageBox.Show("NIR测试通过,请保存测试报告!", Color.Green);
 
                 else
                     myMessageBox.Show("测试通过,请保存测试报告!", Color.Green);
             }
             else
+            {
                 myMessageBox.Show("测试未通过,请保存测试报告,检查环境后重新测试!", Color.Red);
+            }
 
             btn_go.Enabled = false;
             btn_output_excel.Enabled = true;
