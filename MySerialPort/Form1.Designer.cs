@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -48,6 +48,7 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.dataGridViewSN = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.labelScope = new System.Windows.Forms.Label();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.pictureBoxShow = new System.Windows.Forms.PictureBox();
             this.dataGridViewMainBoardTest = new System.Windows.Forms.DataGridView();
@@ -278,6 +279,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.labelScope);
             this.tabPage2.Controls.Add(this.chart1);
             this.tabPage2.Controls.Add(this.pictureBoxShow);
             this.tabPage2.Controls.Add(this.btn_print_QRCode);
@@ -296,27 +298,36 @@
             this.tabPage2.Text = "主板测试";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // labelScope
+            // 
+            this.labelScope.AutoSize = true;
+            this.labelScope.Location = new System.Drawing.Point(889, 39);
+            this.labelScope.Name = "labelScope";
+            this.labelScope.Size = new System.Drawing.Size(87, 15);
+            this.labelScope.TabIndex = 18;
+            this.labelScope.Text = "SignalShow";
+            // 
             // chart1
             // 
-            chartArea2.AxisX.Maximum = 1100D;
-            chartArea2.AxisX.Minimum = 400D;
-            chartArea2.AxisX.Title = "Wavelength [nm]";
-            chartArea2.AxisY.Maximum = 0D;
-            chartArea2.AxisY.Minimum = -1000D;
-            chartArea2.AxisY.Title = "Counts";
-            chartArea2.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea2);
-            legend2.Enabled = false;
-            legend2.Name = "Legend1";
-            legend2.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chart1.Legends.Add(legend2);
+            chartArea3.AxisX.Maximum = 1100D;
+            chartArea3.AxisX.Minimum = 400D;
+            chartArea3.AxisX.Title = "WaveLength [nm]";
+            chartArea3.AxisY.Maximum = 0D;
+            chartArea3.AxisY.Minimum = -1000D;
+            chartArea3.AxisY.Title = "Scope [ADC Counts]";
+            chartArea3.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea3);
+            legend3.Enabled = false;
+            legend3.Name = "Legend1";
+            legend3.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chart1.Legends.Add(legend3);
             this.chart1.Location = new System.Drawing.Point(554, 39);
             this.chart1.Name = "chart1";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.chart1.Series.Add(series2);
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.chart1.Series.Add(series3);
             this.chart1.Size = new System.Drawing.Size(682, 415);
             this.chart1.TabIndex = 17;
             this.chart1.Text = "chart1";
@@ -1116,6 +1127,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.Windows.Forms.Label labelScope;
     }
 }
 

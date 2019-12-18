@@ -25,6 +25,16 @@ enum UPPER_MODE
     PRINT_QRCODE,
 }
 
+enum SIGNAL_MODE
+{
+    SIGNAL_NONE = 0,
+    PPG_IR,
+    NIR_IR,
+    NIR_1450,
+    NIR_1600,
+    NIR_1450_2,
+    NIR_1600_2,
+}
 
 namespace MySerialPort
 {
@@ -32,6 +42,7 @@ namespace MySerialPort
     {
         UPPER_MODE UpperMode = UPPER_MODE.SCAN_QRCODE;
         //UPPER_MODE UpperMode = UPPER_MODE.PRINT_QRCODE;
+        SIGNAL_MODE SignalMode = SIGNAL_MODE.SIGNAL_NONE;
 
         GodexPrinter Printer = new GodexPrinter();
 
@@ -216,8 +227,10 @@ namespace MySerialPort
             btn_print_QRCode.Enabled = false;
             btn_again.Enabled = false;
 
-            chart1.SendToBack();
             chart1.Visible = false;
+            chart1.SendToBack();
+            labelScope.Visible = false;
+            labelScope.SendToBack();
             
             this.Location = new Point(0, 0);
 
@@ -354,7 +367,7 @@ namespace MySerialPort
                     isOpened = true;
                     serialPort.DataReceived += new SerialDataReceivedEventHandler(post_DataReceived);//串口接收处理函数
                     comboBoxTestItem.Enabled = false;
-                    buttonOpenComm.Enabled = false;
+                    //buttonOpenComm.Enabled = false;
                 }
                 catch
                 {
@@ -412,7 +425,7 @@ namespace MySerialPort
             }
             else
             {
-                textBoxSN.Text = "";
+                //textBoxSN.Text = "";
             }
 
             // 二维码
@@ -758,26 +771,31 @@ namespace MySerialPort
             {
                 pictureBoxShow.BackgroundImage = imageList1.Images[8];
                 pictureBoxShow.Visible = true;
+                SignalMode = SIGNAL_MODE.NIR_IR;
             }
             else if (str.Substring(4, 2).Equals("33"))   //nir 810
             {
                 pictureBoxShow.BackgroundImage = imageList1.Images[9];
                 pictureBoxShow.Visible = true;
+                SignalMode = SIGNAL_MODE.NIR_1450;
             }
             else if (str.Substring(4, 2).Equals("34"))   //nir 1050
             {
                 pictureBoxShow.BackgroundImage = imageList1.Images[10];
                 pictureBoxShow.Visible = true;
+                SignalMode = SIGNAL_MODE.NIR_1600;
             }
             else if (str.Substring(4, 2).Equals("35"))   //nir 1450
             {
                 pictureBoxShow.BackgroundImage = imageList1.Images[11];
                 pictureBoxShow.Visible = true;
+                SignalMode = SIGNAL_MODE.NIR_1450_2;
             }
             else if (str.Substring(4, 2).Equals("36"))   //nir 1550
             {
                 pictureBoxShow.BackgroundImage = imageList1.Images[12];
                 pictureBoxShow.Visible = true;
+                SignalMode = SIGNAL_MODE.NIR_1600_2;
             }
             else if (str.Substring(4, 2).Equals("37"))   //ppg 绿灯1
             {
@@ -811,6 +829,7 @@ namespace MySerialPort
                 {
                     pictureBoxShow.BackgroundImage = imageList1.Images[18];
                     pictureBoxShow.Visible = true;
+                    SignalMode = SIGNAL_MODE.PPG_IR;
                 }
                 else
                 {
@@ -934,12 +953,25 @@ namespace MySerialPort
                         {
                             chart1.Visible = true;
                             chart1.BringToFront();
+
+                            labelScope.Visible = true;
+                            labelScope.BringToFront();
+
+                            axisyMax = 0.0;
+                            waveLength = 0;
                             myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                         }
                         else if (str.Substring(4, 2).Equals("32") || str.Substring(4, 2).Equals("33") || str.Substring(4, 2).Equals("34") || str.Substring(4, 2).Equals("35") || str.Substring(4, 2).Equals("36"))   // nir
                         {
                             chart1.Visible = true;
                             chart1.BringToFront();
+
+                            labelScope.Visible = true;
+                            labelScope.BringToFront();
+
+                            axisyMax = 0.0;
+                            waveLength = 0;
+
                             myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                         }
                         else
@@ -948,6 +980,8 @@ namespace MySerialPort
                         pictureBoxShow.Visible = false;
                         chart1.Visible = false;
                         chart1.SendToBack();
+                        labelScope.Visible = false;
+                        labelScope.SendToBack();
 
                         if (myMessageBox.DialogResult == DialogResult.Yes)
                         {
@@ -963,7 +997,7 @@ namespace MySerialPort
             }
             catch (Exception ex)
             {
-                //Console.WriteLine(ex.GetBaseException());
+                Console.WriteLine(ex.GetBaseException());
                 myMessageBox.Show("请确保点亮屏幕再开始测试！！", Color.Red);
                 testError = false;
 
@@ -1198,12 +1232,14 @@ namespace MySerialPort
                 String result = str.Substring(6, 2);
                 if (result != null && "00".Equals(result))
                 {
+                    dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                     dgv.Cells["是否通过"].Value = "✔";
                     dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
                     dgv.Cells["数值显示"].Value = getResultInRecve(str);
                     //判断温湿度命令
                     if (str.Substring(4, 2).Equals("17") && str.Substring(8, 2).Equals("01"))  //判断hdtc2是否通过
                     {
+                        dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                         dgv.Cells["是否通过"].Value = "✘";
                         dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
                         testError = false;
@@ -1211,6 +1247,7 @@ namespace MySerialPort
                 }
                 else if ("01".Equals(result))
                 {
+                    dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                     dgv.Cells["是否通过"].Value = "✘";
                     dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
                     testError = false;
@@ -1232,6 +1269,13 @@ namespace MySerialPort
                     {
                         chart1.Visible = true;
                         chart1.BringToFront();
+
+                        labelScope.Visible = true;
+                        labelScope.BringToFront();
+
+                        axisyMax = 0.0;
+                        waveLength = 0;
+
                         myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                     }
 
@@ -1240,6 +1284,13 @@ namespace MySerialPort
                     {
                         chart1.Visible = true;
                         chart1.BringToFront();
+
+                        labelScope.Visible = true;
+                        labelScope.BringToFront();
+
+                        axisyMax = 0.0;
+                        waveLength = 0;
+
                         myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                     }
 
@@ -1249,6 +1300,8 @@ namespace MySerialPort
                     pictureBoxShow.Visible = false;
                     chart1.Visible = false;
                     chart1.SendToBack();
+                    labelScope.Visible = false;
+                    labelScope.SendToBack();
 
                     if (myMessageBox.DialogResult == DialogResult.Yes)
                     {
@@ -1334,6 +1387,9 @@ namespace MySerialPort
             btn_again.Enabled = false;
             btn_print_QRCode.Enabled = false;
             btn_output_excel.Enabled = false;
+
+            axisyMax = 0.0;
+            waveLength = 0;
         }
 
         //将参数获取出来然后判断是否存在参数
@@ -1680,10 +1736,14 @@ namespace MySerialPort
             // 更新SN码表            待完善
         }
 
+        public double axisyMax = 0.0;
+        public int waveLength = 0;
+        public int signalCnt = 0;
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             int pixel;
-            double axisyMax = 0.0;
+            
             timer1.Stop();
             chart1.Series["Series1"].Points.Clear();
             chart1.Series.SuspendUpdates();
@@ -1692,17 +1752,64 @@ namespace MySerialPort
             {
                 chart1.Series["Series1"].Points.AddXY(m_Lambda_8U2.Value[pixel], m_Spectrum_8U2.Value[pixel]);
                 if (m_Spectrum_8U2.Value[pixel] > axisyMax)
+                {
                     axisyMax = m_Spectrum_8U2.Value[pixel];
+                    waveLength = Convert.ToInt32(m_Lambda_8U2.Value[pixel]);
+                }
             }
 
             for (pixel = 0; pixel <= m_NrPixels_9U2 - 1; pixel++)
             {
                 chart1.Series["Series1"].Points.AddXY(m_Lambda_9U2.Value[pixel], m_Spectrum_9U2.Value[pixel]);
                 if (m_Spectrum_9U2.Value[pixel] > axisyMax)
+                {
                     axisyMax = m_Spectrum_9U2.Value[pixel];
+                    waveLength = Convert.ToInt32(m_Lambda_8U2.Value[pixel]);
+                }
             }
-
+            
             chart1.ChartAreas[0].AxisY.Maximum = axisyMax;
+            labelScope.Text = '(' + waveLength.ToString() + ", " + axisyMax.ToString() + ')';
+
+            if (SignalMode == SIGNAL_MODE.PPG_IR)
+            {
+                if ((waveLength >= 950 - 50) && (waveLength <= 950 + 50))
+                    signalCnt++;
+            }
+            else if (SignalMode == SIGNAL_MODE.NIR_IR)
+            {
+                if ((waveLength >= 950 - 50) && (waveLength <= 950 + 50))
+                    signalCnt++;
+            }
+            else if (SignalMode == SIGNAL_MODE.NIR_1450)
+            {
+                if ((waveLength >= 1420 - 50) && (waveLength <= 1420 + 50))
+                    signalCnt++;
+            }
+            else if (SignalMode == SIGNAL_MODE.NIR_1600)
+            {
+                if ((waveLength >= 1560 - 20) && (waveLength <= 1560 + 20))
+                    signalCnt++;
+            }
+            else if (SignalMode == SIGNAL_MODE.NIR_1450_2)
+            {
+                if ((waveLength >= 1420 - 50) && (waveLength <= 1420 + 50))
+                    signalCnt++;
+            }
+            else if (SignalMode == SIGNAL_MODE.NIR_1600_2)
+            {
+                if ((waveLength >= 1560 - 20) && (waveLength <= 1560 + 20))
+                    signalCnt++;
+            }
+            else
+                signalCnt = 0;
+
+            if (signalCnt >= 200)
+            {
+                SignalMode = SIGNAL_MODE.SIGNAL_NONE;
+                myMessageBox.DialogResult = DialogResult.Yes;
+                myMessageBox.Close();
+            }
 
             chart1.Series.ResumeUpdates();
             chart1.Series.Invalidate();

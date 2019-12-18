@@ -22,7 +22,7 @@ namespace MySerialPort
             DialogResult = DialogResult.Yes;
         }
 
-        private void buttonNo_Click(object sender, EventArgs e)
+    private void buttonNo_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.No;
         }
