@@ -129,7 +129,7 @@ namespace MySerialPort
                         str = asciiToHex(str);
                         str = str.Replace(" ", "");
 
-                        foreach (DataGridViewRow dgrSN in dataGridViewMainBoardTest.Rows)
+                        foreach (DataGridViewRow dgrSN in dataGridViewMain.Rows)
                         {
                             //更新测试表
                             Object inputSN = dgrSN.Cells["名字"].EditedFormattedValue;
@@ -220,7 +220,7 @@ namespace MySerialPort
         private void Form1_Load(object sender, EventArgs e)
         {
             //QRCode(textBoxMAC.Text);
-
+            
             pictureBoxShow.Visible = false;
             btn_go.Enabled = true;
             btn_output_excel.Enabled = false;
@@ -322,29 +322,29 @@ namespace MySerialPort
 
             if (comboBoxTestItem.SelectedIndex == 0 && File.Exists("主板测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
+                this.dataGridViewMain.DataSource = bindData("主板测试" + ExpandedName);
                 this.tabPage2.Text = "主板测试";
             }
             else if (comboBoxTestItem.SelectedIndex == 1 && File.Exists("PPG测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
+                this.dataGridViewMain.DataSource = bindData("PPG测试" + ExpandedName);
                 this.tabPage2.Text = "PPG测试";
                 spectrographEnable = true;
             }
             else if (comboBoxTestItem.SelectedIndex == 2 && File.Exists("PPG测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
+                this.dataGridViewMain.DataSource = bindData("PPG测试" + ExpandedName);
                 this.tabPage2.Text = "PPG测试";
             }
             else if (comboBoxTestItem.SelectedIndex == 3 && File.Exists("NIR红绿IR测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("NIR红绿IR测试" + ExpandedName);
+                this.dataGridViewMain.DataSource = bindData("NIR红绿IR测试" + ExpandedName);
                 this.tabPage2.Text = "NIR红绿IR测试";
                 spectrographEnable = true;
             }
             else if (comboBoxTestItem.SelectedIndex == 4 && File.Exists("NIR1050以上测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("NIR1050以上测试" + ExpandedName);
+                this.dataGridViewMain.DataSource = bindData("NIR1050以上测试" + ExpandedName);
                 this.tabPage2.Text = "NIR1050以上测试";
                 spectrographEnable = true;
             }
@@ -846,7 +846,7 @@ namespace MySerialPort
                 myMessageBox.Show("串口未打开", Color.Black);
                 return;
             }
-            if (dataGridViewMainBoardTest.DataSource == null)
+            if (dataGridViewMain.DataSource == null)
             {
                 myMessageBox.Show("目标数据源为空,请确认目录下存在测试表!", Color.Black);
                 return;
@@ -864,8 +864,6 @@ namespace MySerialPort
                 else
                     strSN = textBoxSN.Text;
             }
-                
-            myMessageBox.Show("测试之前先点击一次屏幕唤醒设备!!", Color.Red);
 
             testError = true;
 
@@ -873,7 +871,7 @@ namespace MySerialPort
             receive = 0; //解除绑定函数
             try
             {
-                foreach (DataGridViewRow dgr in dataGridViewMainBoardTest.Rows)
+                foreach (DataGridViewRow dgr in dataGridViewMain.Rows)
                 {
                     //判断关键列是否是空，空就跳过
                     Object input = dgr.Cells["输入命令"].EditedFormattedValue;
@@ -1030,8 +1028,9 @@ namespace MySerialPort
             if (true == testError)
             {
                 if (File.Exists("主板测试" + ExpandedName))
+                {
                     myMessageBox.Show("主板测试通过,请保存测试报告!", Color.Green);
-
+                }
                 else if (File.Exists("PPG测试" + ExpandedName))
                     myMessageBox.Show("PPG测试通过,请保存测试报告!", Color.Green);
 
@@ -1044,6 +1043,38 @@ namespace MySerialPort
             else
             {
                 myMessageBox.Show("测试未通过,请保存测试报告,检查环境后重新测试!", Color.Red);
+            }
+
+            if (File.Exists("主板测试" + ExpandedName))
+            {
+                myMessageBox.Show("如需要继续测试ECG心率,点击\"是\"并使用APP扫描二维码,否则点\"否\"", Color.Green);
+                if (myMessageBox.DialogResult == DialogResult.Yes)
+                {
+                    foreach (DataGridViewRow dgr_ECG in dataGridViewMain.Rows)
+                    {
+                        Object input = dgr_ECG.Cells["名字"].EditedFormattedValue;
+                        if (input.Equals("ECG心率测试"))           //  从SN码表中检测到MAC地址
+                        {
+                            myMessageBox.Show("请对比APP和仪器的心率值是否一致", Color.Black);
+                            if (myMessageBox.DialogResult == DialogResult.Yes)
+                            {
+                                dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr_ECG.Cells["是否通过"].Value = "✔";
+                                dgr_ECG.Cells["是否通过"].Style.ForeColor = Color.Green;
+                            }
+                            else
+                            {
+                                dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr_ECG.Cells["是否通过"].Value = "✘";
+                                dgr_ECG.Cells["是否通过"].Style.ForeColor = Color.Red;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+
+                }
             }
 
             btn_go.Enabled = false;
@@ -1135,12 +1166,12 @@ namespace MySerialPort
                 commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_HIGHBAND_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
 
-            if (dataGridViewMainBoardTest.DataSource == null)
+            if (dataGridViewMain.DataSource == null)
             {
                 myMessageBox.Show("测试表格没有数据,无法保存,请关闭测试表重新测试!", Color.Red);
                 return;
             }
-            DataTable table = (DataTable)dataGridViewMainBoardTest.DataSource;
+            DataTable table = (DataTable)dataGridViewMain.DataSource;
 
             ExcelHelper excelHelper = new ExcelHelper(commandFile);
             int count = excelHelper.DataTableToExcel(table, "Sheet1", true);
@@ -1185,7 +1216,7 @@ namespace MySerialPort
                 myMessageBox.Show("请先打开串口!", Color.Red);
                 return;
             }
-            DataGridViewSelectedRowCollection drc= dataGridViewMainBoardTest.SelectedRows;
+            DataGridViewSelectedRowCollection drc= dataGridViewMain.SelectedRows;
             if (drc.Count == 0)
             {
                 myMessageBox.Show("无效行!", Color.Red);
@@ -1197,7 +1228,7 @@ namespace MySerialPort
                 serialPort.DataReceived -= new SerialDataReceivedEventHandler(post_DataReceived);
                 receive = 0; //解除绑定函数
 
-                DataGridViewRow dgv = dataGridViewMainBoardTest.SelectedRows[0];
+                DataGridViewRow dgv = dataGridViewMain.SelectedRows[0];
                 String sts = dgv.Cells["输入命令"].EditedFormattedValue.ToString();
                 dgv.Cells["返回参数"].Value = "";
                 dgv.Cells["是否通过"].Value = "";
@@ -1330,29 +1361,29 @@ namespace MySerialPort
 
             if (comboBoxTestItem.SelectedIndex == 0 && File.Exists("主板测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("主板测试" + ExpandedName);
+                this.dataGridViewMain.DataSource = bindData("主板测试" + ExpandedName);
                 this.tabPage2.Text = "主板测试";
             }
             else if (comboBoxTestItem.SelectedIndex == 1 && File.Exists("PPG测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
+                this.dataGridViewMain.DataSource = bindData("PPG测试" + ExpandedName);
                 this.tabPage2.Text = "PPG测试";
                 spectrographEnable = true;
             }
             else if (comboBoxTestItem.SelectedIndex == 2 && File.Exists("PPG测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("PPG测试" + ExpandedName);
+                this.dataGridViewMain.DataSource = bindData("PPG测试" + ExpandedName);
                 this.tabPage2.Text = "PPG测试";
             }
             else if (comboBoxTestItem.SelectedIndex == 3 && File.Exists("NIR红绿IR测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("NIR红绿IR测试" + ExpandedName);
+                this.dataGridViewMain.DataSource = bindData("NIR红绿IR测试" + ExpandedName);
                 this.tabPage2.Text = "NIR红绿IR测试";
                 spectrographEnable = true;
             }
             else if (comboBoxTestItem.SelectedIndex == 4 && File.Exists("NIR1050以上测试" + ExpandedName))
             {
-                this.dataGridViewMainBoardTest.DataSource = bindData("NIR1050以上测试" + ExpandedName);
+                this.dataGridViewMain.DataSource = bindData("NIR1050以上测试" + ExpandedName);
                 this.tabPage2.Text = "NIR1050以上测试";
                 spectrographEnable = true;
             }
@@ -1514,7 +1545,7 @@ namespace MySerialPort
             strTemp = asciiToHex(strTemp);
             strTemp = strTemp.Replace(" ", "");
 
-            foreach (DataGridViewRow dgrSN in dataGridViewMainBoardTest.Rows)
+            foreach (DataGridViewRow dgrSN in dataGridViewMain.Rows)
             {
                 // 更新测试表
                 Object inputSN = dgrSN.Cells["名字"].EditedFormattedValue;
@@ -1721,7 +1752,7 @@ namespace MySerialPort
             }
             str = asciiToHex(str);
             str = str.Replace(" ", "");
-            foreach (DataGridViewRow dgr in dataGridViewMainBoardTest.Rows)
+            foreach (DataGridViewRow dgr in dataGridViewMain.Rows)
             {
                 // 更新测试表
                 Object input = dgr.Cells["名字"].EditedFormattedValue;

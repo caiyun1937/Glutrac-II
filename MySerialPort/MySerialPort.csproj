@@ -35,7 +35,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>2</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -79,8 +79,21 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\ThoughtWorks.QRCode.dll</HintPath>
     </Reference>
+    <Reference Include="ZedGraph, Version=5.1.4.31904, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\ZedGraph.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AECG001\AECG100.cs" />
+    <Compile Include="AECG001\ECGPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AECG001\ECGPage.Designer.cs">
+      <DependentUpon>ECGPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AECG001\PageControl.cs" />
+    <Compile Include="AECG001\UtilConfig.cs" />
     <Compile Include="avaspec.cs" />
     <Compile Include="ExcelHelper.cs" />
     <Compile Include="EZioApi.cs" />
@@ -100,6 +113,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AECG001\ECGPage.resx">
+      <DependentUpon>ECGPage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
       <SubType>Designer</SubType>

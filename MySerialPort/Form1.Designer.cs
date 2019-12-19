@@ -51,7 +51,7 @@
             this.labelScope = new System.Windows.Forms.Label();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.pictureBoxShow = new System.Windows.Forms.PictureBox();
-            this.dataGridViewMainBoardTest = new System.Windows.Forms.DataGridView();
+            this.dataGridViewMain = new System.Windows.Forms.DataGridView();
             this.btn_output_excel = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.noUpDown = new System.Windows.Forms.NumericUpDown();
@@ -67,6 +67,7 @@
             this.SendTbox = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.Num_QRRotation = new System.Windows.Forms.NumericUpDown();
@@ -109,7 +110,7 @@
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxShow)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMainBoardTest)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMain)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.noUpDown)).BeginInit();
             this.tabPage1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -158,8 +159,8 @@
             "主板测试",
             "PPG PCBA测试",
             "PPG 底座测试",
-            "NIR红率IR测试",
-            "NIR大波长测试"});
+            "NIR 红绿IR测试",
+            "NIR 大波长测试"});
             this.comboBoxTestItem.Location = new System.Drawing.Point(419, 17);
             this.comboBoxTestItem.Name = "comboBoxTestItem";
             this.comboBoxTestItem.Size = new System.Drawing.Size(173, 23);
@@ -283,7 +284,7 @@
             this.tabPage2.Controls.Add(this.chart1);
             this.tabPage2.Controls.Add(this.pictureBoxShow);
             this.tabPage2.Controls.Add(this.btn_print_QRCode);
-            this.tabPage2.Controls.Add(this.dataGridViewMainBoardTest);
+            this.tabPage2.Controls.Add(this.dataGridViewMain);
             this.tabPage2.Controls.Add(this.btn_output_excel);
             this.tabPage2.Controls.Add(this.label3);
             this.tabPage2.Controls.Add(this.noUpDown);
@@ -340,20 +341,20 @@
             this.pictureBoxShow.TabIndex = 11;
             this.pictureBoxShow.TabStop = false;
             // 
-            // dataGridViewMainBoardTest
+            // dataGridViewMain
             // 
-            this.dataGridViewMainBoardTest.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.dataGridViewMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewMainBoardTest.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this.dataGridViewMainBoardTest.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewMainBoardTest.Location = new System.Drawing.Point(6, 39);
-            this.dataGridViewMainBoardTest.Name = "dataGridViewMainBoardTest";
-            this.dataGridViewMainBoardTest.ReadOnly = true;
-            this.dataGridViewMainBoardTest.RowTemplate.Height = 27;
-            this.dataGridViewMainBoardTest.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewMainBoardTest.Size = new System.Drawing.Size(1227, 415);
-            this.dataGridViewMainBoardTest.TabIndex = 3;
-            this.dataGridViewMainBoardTest.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dataGridView1_MouseClick);
+            this.dataGridViewMain.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridViewMain.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewMain.Location = new System.Drawing.Point(6, 39);
+            this.dataGridViewMain.Name = "dataGridViewMain";
+            this.dataGridViewMain.ReadOnly = true;
+            this.dataGridViewMain.RowTemplate.Height = 27;
+            this.dataGridViewMain.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridViewMain.Size = new System.Drawing.Size(1227, 415);
+            this.dataGridViewMain.TabIndex = 3;
+            this.dataGridViewMain.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dataGridView1_MouseClick);
             // 
             // btn_output_excel
             // 
@@ -515,6 +516,7 @@
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage1);
@@ -523,6 +525,16 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1247, 489);
             this.tabControl1.TabIndex = 11;
+            // 
+            // tabPage5
+            // 
+            this.tabPage5.Location = new System.Drawing.Point(4, 25);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage5.Size = new System.Drawing.Size(1239, 460);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "AECG001";
+            this.tabPage5.UseVisualStyleBackColor = true;
             // 
             // tabPage4
             // 
@@ -1025,7 +1037,7 @@
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxShow)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMainBoardTest)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMain)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.noUpDown)).EndInit();
             this.tabPage1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
@@ -1071,7 +1083,7 @@
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.DataGridView dataGridViewSN;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.DataGridView dataGridViewMainBoardTest;
+        private System.Windows.Forms.DataGridView dataGridViewMain;
         private System.Windows.Forms.Button btn_output_excel;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown noUpDown;
@@ -1128,6 +1140,7 @@
         private System.Windows.Forms.GroupBox groupBox5;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Label labelScope;
+        private System.Windows.Forms.TabPage tabPage5;
     }
 }
 
