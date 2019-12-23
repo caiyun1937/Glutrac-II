@@ -15,8 +15,7 @@ namespace AECG100Demo
         {
             get
             {
-                return "";
-                //return ledText[MainForm.Instance.PPGModelInfo.LEDType1];             
+                return ledText[MainForm.Instance.PPGModelInfo.LEDType1];             
             }
         }
 
@@ -24,8 +23,7 @@ namespace AECG100Demo
         {
             get
             {
-                return "";
-                //return ledTextShort[MainForm.Instance.PPGModelInfo.LEDType1];                
+                return ledTextShort[MainForm.Instance.PPGModelInfo.LEDType1];                
             }
         }
 
@@ -33,8 +31,7 @@ namespace AECG100Demo
         {
             get
             {
-                return "";
-                //return ledText[MainForm.Instance.PPGModelInfo.LEDType2];
+                return ledText[MainForm.Instance.PPGModelInfo.LEDType2];
             }
         }
 
@@ -42,8 +39,7 @@ namespace AECG100Demo
         {
             get
             {
-                return "";
-                //return ledTextShort[MainForm.Instance.PPGModelInfo.LEDType2];
+                return ledTextShort[MainForm.Instance.PPGModelInfo.LEDType2];
             }
         }
 

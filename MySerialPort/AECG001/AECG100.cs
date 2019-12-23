@@ -260,7 +260,8 @@ namespace WhaleTeqSDK
 #if (_WIN64)
         private const string DllFilePath = @"AECG100x64.dll";
 #else
-        private const string DllFilePath = @"AECG100x86.dll";
+        //private const string DllFilePath = @"AECG100x86.dll";
+        private const string DllFilePath = @"AECG100x64.dll";
 #endif
 
         [DllImport (DllFilePath, EntryPoint = "WTQInit", CallingConvention = CallingConvention.Cdecl)]

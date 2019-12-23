@@ -18,6 +18,7 @@ using C_Sharp_Application;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using ThoughtWorks.QRCode.Codec;
+using AECG100Demo;
 
 enum UPPER_MODE
 {
@@ -32,8 +33,7 @@ enum SIGNAL_MODE
     NIR_IR,
     NIR_1450,
     NIR_1600,
-    NIR_1450_2,
-    NIR_1600_2,
+    NIR_1650,
 }
 
 namespace MySerialPort
@@ -110,8 +110,18 @@ namespace MySerialPort
                             dgr.Cells["产地"].Value.ToString() + dgr.Cells["年"].Value.ToString() +
                             dgr.Cells["月"].Value.ToString() + dgr.Cells["型号"].Value.ToString();
 
-                    if ((tabPage2.Text == "主板测试" && strSN.Length != 14) || ((tabPage2.Text == "PPG测试" || tabPage2.Text == "NIR测试") && strSN.Length != 13))
-                        textBoxSN.Text = "SN获取失败!!";
+                    if (comboBoxTestItem.SelectedIndex == 0 && strSN.Length != 14)
+                    {
+                        myMessageBox.Show("主板SN码有误，请核实!!", Color.Red);
+                    }
+                    else if ((comboBoxTestItem.SelectedIndex == 1 || comboBoxTestItem.SelectedIndex == 2) && strSN.Length != 13)
+                    {
+                        myMessageBox.Show("PPG SN码有误，请核实!!", Color.Red);
+                    }
+                    else if ((comboBoxTestItem.SelectedIndex == 3 || comboBoxTestItem.SelectedIndex == 4) && strSN.Length != 13)
+                    {
+                        myMessageBox.Show("NIR SN码有误，请核实!!", Color.Red);
+                    }
                     else
                     {
                         textBoxSN.Text = strSN;
@@ -204,23 +214,44 @@ namespace MySerialPort
 
         public void QRCode(string enCodeString)
         {
+            string QRCodeSting = "";
+            if (enCodeString.Equals(""))
+            {
+                myMessageBox.Show("MAC地址为空", Color.Red);
+                myMessageBox.DialogResult = DialogResult.No;
+                return;
+            }
+            else
+            {
+                myMessageBox.DialogResult = DialogResult.Yes;
+            }
+
             System.Drawing.Bitmap bt;
             QRCodeEncoder qrCodeEncoder = new QRCodeEncoder();
             qrCodeEncoder.QRCodeEncodeMode = QRCodeEncoder.ENCODE_MODE.BYTE;//编码方式(注意：BYTE能支持中文，ALPHA_NUMERIC扫描出来的都是数字)
-            qrCodeEncoder.QRCodeScale = 10;//大小(值越大生成的二维码图片像素越高)
+            qrCodeEncoder.QRCodeScale = 14;//大小(值越大生成的二维码图片像素越高)
             qrCodeEncoder.QRCodeVersion = 0;//版本(注意：设置为0主要是防止编码的字符串太长时发生错误)
             qrCodeEncoder.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.M;//错误效验、错误更正(有4个等级)
             qrCodeEncoder.QRCodeBackgroundColor = Color.White;//背景色
             qrCodeEncoder.QRCodeForegroundColor = Color.Black;//前景色
-            bt = qrCodeEncoder.Encode(enCodeString, Encoding.UTF8);
 
+            QRCodeSting = enCodeString.Substring(0, 2) + ":" + enCodeString.Substring(2, 2) + ":" +
+                enCodeString.Substring(4, 2) + ":" + enCodeString.Substring(6, 2) + ":" +
+                enCodeString.Substring(8, 2) + ":" + enCodeString.Substring(10, 2);
+
+            bt = qrCodeEncoder.Encode(QRCodeSting, Encoding.UTF8);
             pictureBoxShow.Image = Image.FromHbitmap(bt.GetHbitmap());
+            pictureBoxShow.Visible = true;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //QRCode(textBoxMAC.Text);
-            
+            MainForm mainForm = new MainForm();
+            mainForm.TopLevel = false;
+            mainForm.FormBorderStyle = FormBorderStyle.None;
+            this.signal_generator.Controls.Add(mainForm);
+            mainForm.Show();
+
             pictureBoxShow.Visible = false;
             btn_go.Enabled = true;
             btn_output_excel.Enabled = false;
@@ -277,6 +308,8 @@ namespace MySerialPort
                             {
                                 m_PreviousTimeStamp_9U2 = l_Time_9U2;
                             }
+                            chart1.Series["Series1"].Points.Clear();
+                            chart1.Series.SuspendUpdates();
                             timer1.Start();
                         }
                         m_Measurements++;
@@ -311,7 +344,7 @@ namespace MySerialPort
         bool isOpened = false;//串口状态标志
         bool spectrographEnable = false;
 
-        private void button1_Click(object sender, EventArgs e)
+        private void getTestCase()
         {
             if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xls").Length > 0)
                 ExpandedName = ".xls";
@@ -353,6 +386,11 @@ namespace MySerialPort
                 myMessageBox.Show("请选择测试项目", Color.Red);
                 return;
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            getTestCase();
 
             if (!isOpened)
             {
@@ -367,7 +405,6 @@ namespace MySerialPort
                     isOpened = true;
                     serialPort.DataReceived += new SerialDataReceivedEventHandler(post_DataReceived);//串口接收处理函数
                     comboBoxTestItem.Enabled = false;
-                    //buttonOpenComm.Enabled = false;
                 }
                 catch
                 {
@@ -589,8 +626,7 @@ namespace MySerialPort
                 myMessageBox.Show("串口未打开", Color.Black);
             }
         }
-
-
+        
         private void checkbox_16show_CheckedChanged(object sender, EventArgs e)
         {
             string str = "";
@@ -744,69 +780,71 @@ namespace MySerialPort
         {
             if (str.Substring(4, 2).Equals("0E"))   //背灯关
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[0];
+                pictureBoxShow.Image = imageList1.Images[0];
                 pictureBoxShow.Visible = true;
             }
             else if (str.Substring(4, 2).Equals("0D"))   //背灯开
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[1];
+                pictureBoxShow.Image = imageList1.Images[1];
                 pictureBoxShow.Visible = true;
             }
             else if (str.Substring(4, 2).Equals("0F"))   //白场
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[2];
+                pictureBoxShow.Image = imageList1.Images[2];
                 pictureBoxShow.Visible = true;
             }
             else if (str.Substring(4, 2).Equals("30"))   //nir 绿灯
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[6];
+                pictureBoxShow.Image = imageList1.Images[6];
                 pictureBoxShow.Visible = true;
             }
             else if (str.Substring(4, 2).Equals("31"))   //nir 红灯
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[7];
+                pictureBoxShow.Image = imageList1.Images[7];
                 pictureBoxShow.Visible = true;
             }
             else if (str.Substring(4, 2).Equals("32"))   //nir ir
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[8];
+                pictureBoxShow.Image = imageList1.Images[8];
                 pictureBoxShow.Visible = true;
                 SignalMode = SIGNAL_MODE.NIR_IR;
             }
-            else if (str.Substring(4, 2).Equals("33"))   //nir 810
+            else if (str.Substring(4, 2).Equals("33"))   //nir 1650
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[9];
+                pictureBoxShow.Image = imageList1.Images[9];
                 pictureBoxShow.Visible = true;
-                SignalMode = SIGNAL_MODE.NIR_1450;
+                //SignalMode = SIGNAL_MODE.NIR_1600;
+                SignalMode = SIGNAL_MODE.NIR_1650;
             }
             else if (str.Substring(4, 2).Equals("34"))   //nir 1050
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[10];
+                pictureBoxShow.Image = imageList1.Images[10];
                 pictureBoxShow.Visible = true;
-                SignalMode = SIGNAL_MODE.NIR_1600;
+                SignalMode = SIGNAL_MODE.NIR_1450;
             }
             else if (str.Substring(4, 2).Equals("35"))   //nir 1450
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[11];
+                pictureBoxShow.Image = imageList1.Images[11];
                 pictureBoxShow.Visible = true;
-                SignalMode = SIGNAL_MODE.NIR_1450_2;
+                SignalMode = SIGNAL_MODE.NIR_1450;
             }
             else if (str.Substring(4, 2).Equals("36"))   //nir 1550
             {
-                pictureBoxShow.BackgroundImage = imageList1.Images[12];
+                pictureBoxShow.Image = imageList1.Images[12];
                 pictureBoxShow.Visible = true;
-                SignalMode = SIGNAL_MODE.NIR_1600_2;
+                //SignalMode = SIGNAL_MODE.NIR_1600;
+                SignalMode = SIGNAL_MODE.NIR_1650;
             }
             else if (str.Substring(4, 2).Equals("37"))   //ppg 绿灯1
             {
                 if(spectrographEnable == true)
                 {
-                    pictureBoxShow.BackgroundImage = imageList1.Images[16];
+                    pictureBoxShow.Image = imageList1.Images[16];
                     pictureBoxShow.Visible = true;
                 }
                 else
                 {
-                    pictureBoxShow.BackgroundImage = imageList1.Images[13];         // ok or fail
+                    pictureBoxShow.Image = imageList1.Images[13];         // ok or fail
                     pictureBoxShow.Visible = true;
                 }
             }
@@ -814,12 +852,12 @@ namespace MySerialPort
             {
                 if (spectrographEnable == true)
                 {
-                    pictureBoxShow.BackgroundImage = imageList1.Images[17];
+                    pictureBoxShow.Image = imageList1.Images[17];
                     pictureBoxShow.Visible = true;
                 }
                 else
                 {
-                    pictureBoxShow.BackgroundImage = imageList1.Images[14];         // ok or fail
+                    pictureBoxShow.Image = imageList1.Images[14];         // ok or fail
                     pictureBoxShow.Visible = true;
                 }
             }
@@ -827,13 +865,13 @@ namespace MySerialPort
             {
                 if (spectrographEnable == true)
                 {
-                    pictureBoxShow.BackgroundImage = imageList1.Images[18];
+                    pictureBoxShow.Image = imageList1.Images[18];
                     pictureBoxShow.Visible = true;
                     SignalMode = SIGNAL_MODE.PPG_IR;
                 }
                 else
                 {
-                    pictureBoxShow.BackgroundImage = imageList1.Images[15];         // ok or fail
+                    pictureBoxShow.Image = imageList1.Images[15];         // ok or fail
                     pictureBoxShow.Visible = true;
                 }
             }
@@ -841,11 +879,6 @@ namespace MySerialPort
 
         private void btn_go_Click(object sender, EventArgs e)
         {
-            if (!serialPort.IsOpen)
-            {
-                myMessageBox.Show("串口未打开", Color.Black);
-                return;
-            }
             if (dataGridViewMain.DataSource == null)
             {
                 myMessageBox.Show("目标数据源为空,请确认目录下存在测试表!", Color.Black);
@@ -854,11 +887,11 @@ namespace MySerialPort
 
             if (UpperMode == UPPER_MODE.SCAN_QRCODE)
             {
-                if ((tabPage2.Text == "主板测试" && textBoxSN.Text.Length != 14) || ((tabPage2.Text == "NIR测试" || tabPage2.Text == "PPG测试") && textBoxSN.Text.Length != 13))
+                if ((comboBoxTestItem.SelectedIndex == 0 && textBoxSN.Text.Length != 14) || ((comboBoxTestItem.SelectedIndex >= 1 && comboBoxTestItem.SelectedIndex <= 4) && textBoxSN.Text.Length != 13))
                 {
                     textBoxSN.Text = "";
                     textBoxSN.Focus();
-                    myMessageBox.Show("请在英文输入法环境下使用扫码枪扫描二维码!!", Color.Green);
+                    myMessageBox.Show("请在英文输入法环境下使用扫码枪扫描二维码!!", Color.Red);
                     return;
                 }
                 else
@@ -879,10 +912,8 @@ namespace MySerialPort
                     {
                         continue;
                     }
-                    //SendTbox.Text=input.ToString();
 
                     //发送数据
-
                     if ("充电电流" == dgr.Cells["名字"].Value.ToString())
                     {
                         myMessageBox.Show("请观察万用表" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否在100~450mA之间？", Color.Black);
@@ -912,7 +943,6 @@ namespace MySerialPort
                     String result = str.Substring(6, 2);
 
                     //判断是否需要弹出框
-
                     if (result != null && "00".Equals(result))
                     {
                         dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
@@ -938,6 +968,7 @@ namespace MySerialPort
                     else if ("02".Equals(result))
                     {
                         sampleImageShow(str);
+                        signalCnt = 0;
 
                         if (str.Substring(4, 2).Equals("19"))   //蓝牙不提醒
                         {
@@ -955,8 +986,6 @@ namespace MySerialPort
                             labelScope.Visible = true;
                             labelScope.BringToFront();
 
-                            axisyMax = 0.0;
-                            waveLength = 0;
                             myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                         }
                         else if (str.Substring(4, 2).Equals("32") || str.Substring(4, 2).Equals("33") || str.Substring(4, 2).Equals("34") || str.Substring(4, 2).Equals("35") || str.Substring(4, 2).Equals("36"))   // nir
@@ -966,9 +995,6 @@ namespace MySerialPort
 
                             labelScope.Visible = true;
                             labelScope.BringToFront();
-
-                            axisyMax = 0.0;
-                            waveLength = 0;
 
                             myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                         }
@@ -990,69 +1016,55 @@ namespace MySerialPort
                             failResult(dgr, str.Substring(4, 2));
                         }
                     }
-                    Thread.Sleep(500);
+
+                    if (result != null && "02".Equals(str.Substring(4, 2)))     //  测试结束
+                    {
+                        break;
+                    }
+
+                    Thread.Sleep(200);
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.GetBaseException());
                 myMessageBox.Show("请确保点亮屏幕再开始测试！！", Color.Red);
-                testError = false;
-
-                if (spectrographEnable == true)
-                {
-                    int l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
-                    int l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
-
-                    avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_8U2);
-                    m_DeviceHandle_8U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
-
-                    avaspec.AVS_Deactivate((IntPtr)m_DeviceHandle_9U2);
-                    m_DeviceHandle_9U2 = avaspec.INVALID_AVS_HANDLE_VALUE;
-
-                    if (m_DeviceHandle_8U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
-                    {
-                        l_Res_8U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_8U2);
-                    }
-                    if (m_DeviceHandle_9U2 != avaspec.INVALID_AVS_HANDLE_VALUE)
-                    {
-                        l_Res_9U2 = (int)avaspec.AVS_StopMeasure((IntPtr)m_DeviceHandle_9U2);
-                    }
-                    avaspec.AVS_Done();
-
-                    spectrographEnable = false;
-                }
-                System.Environment.Exit(0);
                 return;
             }
-            if (true == testError)
-            {
-                if (File.Exists("主板测试" + ExpandedName))
-                {
-                    myMessageBox.Show("主板测试通过,请保存测试报告!", Color.Green);
-                }
-                else if (File.Exists("PPG测试" + ExpandedName))
-                    myMessageBox.Show("PPG测试通过,请保存测试报告!", Color.Green);
 
-                else if (File.Exists("NIR测试" + ExpandedName))
-                    myMessageBox.Show("NIR测试通过,请保存测试报告!", Color.Green);
-
-                else
-                    myMessageBox.Show("测试通过,请保存测试报告!", Color.Green);
-            }
-            else
+            if (comboBoxTestItem.SelectedIndex == 0)
             {
-                myMessageBox.Show("测试未通过,请保存测试报告,检查环境后重新测试!", Color.Red);
-            }
-
-            if (File.Exists("主板测试" + ExpandedName))
-            {
-                myMessageBox.Show("如需要继续测试ECG心率,点击\"是\"并使用APP扫描二维码,否则点\"否\"", Color.Green);
+                myMessageBox.Show("是否需要测试ECG心率", Color.Red);
                 if (myMessageBox.DialogResult == DialogResult.Yes)
                 {
+                    QRCode(textBoxMAC.Text);
+                    myMessageBox.Show("请用APP击【主板蓝牙连接 + ECG功能测试】扫描二维码进行测试",Color.Black);
+
                     foreach (DataGridViewRow dgr_ECG in dataGridViewMain.Rows)
                     {
                         Object input = dgr_ECG.Cells["名字"].EditedFormattedValue;
+
+                        if (input.Equals("蓝牙连接测试"))           //  从SN码表中检测到MAC地址
+                        {
+                            myMessageBox.Show("蓝牙测试是否通过", Color.Black);
+                            if (myMessageBox.DialogResult == DialogResult.Yes)
+                            {
+                                dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr_ECG.Cells["是否通过"].Value = "✔";
+                                dgr_ECG.Cells["是否通过"].Style.ForeColor = Color.Green;
+                                pictureBoxShow.Visible = false;
+                            }
+                            else
+                            {
+                                dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr_ECG.Cells["是否通过"].Value = "✘";
+                                dgr_ECG.Cells["是否通过"].Style.ForeColor = Color.Red;
+                                pictureBoxShow.Visible = false;
+                                testError = false;
+                                break;
+                            }
+                        }
+
                         if (input.Equals("ECG心率测试"))           //  从SN码表中检测到MAC地址
                         {
                             myMessageBox.Show("请对比APP和仪器的心率值是否一致", Color.Black);
@@ -1067,6 +1079,7 @@ namespace MySerialPort
                                 dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                                 dgr_ECG.Cells["是否通过"].Value = "✘";
                                 dgr_ECG.Cells["是否通过"].Style.ForeColor = Color.Red;
+                                testError = false;
                             }
                         }
                     }
@@ -1075,6 +1088,15 @@ namespace MySerialPort
                 {
 
                 }
+            }
+
+            if (true == testError)
+            {
+                myMessageBox.Show("测试通过,请保存测试报告!", Color.Green);
+            }
+            else
+            {
+                myMessageBox.Show("测试未通过,请保存测试报告,或者检查环境后重新测试!", Color.Red);
             }
 
             btn_go.Enabled = false;
@@ -1087,13 +1109,6 @@ namespace MySerialPort
         //同步读取数据并返回
         private byte[] ReadPort(byte[] sendData,String stt)
         {
-            if (serialPort == null)
-            {
-                serialPort = new SerialPort("COM1", 9600, Parity.None, 8, StopBits.One);
-                serialPort.ReadBufferSize = 1024;
-                serialPort.WriteBufferSize = 1024;
-            }
-
             if (!serialPort.IsOpen)
             {
                 serialPort.Open();
@@ -1101,7 +1116,6 @@ namespace MySerialPort
 
             //发送数据
             serialPort.Write(sendData, 0, sendData.Length);
-            // serialPort.WriteLine(sendData);
 
             //读取返回数据
             DateTime dt = DateTime.Now;
@@ -1246,7 +1260,7 @@ namespace MySerialPort
                         dgv.Cells["是否通过"].Value = "✔";
                         dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
                     }
-                    else if(myMessageBox.DialogResult == DialogResult.No)
+                    else if (myMessageBox.DialogResult == DialogResult.No)
                     {
                         dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                         dgv.Cells["是否通过"].Value = "✘";
@@ -1254,6 +1268,49 @@ namespace MySerialPort
                         testError = false;
                     }
                     return;
+                }
+                else if ("蓝牙连接测试" == dgv.Cells["名字"].Value.ToString())
+                {
+                    QRCode(textBoxMAC.Text);
+                    if (myMessageBox.DialogResult == DialogResult.No)
+                    {
+                        return;
+                    }
+                    myMessageBox.Show("请用APP击【主板蓝牙连接 + ECG功能测试】扫描二维码进行测试", Color.Black);
+
+                    myMessageBox.Show("蓝牙测试是否通过", Color.Black);
+                    if (myMessageBox.DialogResult == DialogResult.Yes)
+                    {
+                        dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                        dgv.Cells["是否通过"].Value = "✔";
+                        dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
+                        pictureBoxShow.Visible = false;
+                    }
+                    else
+                    {
+                        dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                        dgv.Cells["是否通过"].Value = "✘";
+                        dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
+                        pictureBoxShow.Visible = false;
+                        testError = false;
+                    }
+                }
+                else if ("ECG心率测试" == dgv.Cells["名字"].Value.ToString())
+                {
+                    myMessageBox.Show("请对比APP和仪器的心率值是否一致", Color.Black);
+                    if (myMessageBox.DialogResult == DialogResult.Yes)
+                    {
+                        dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                        dgv.Cells["是否通过"].Value = "✔";
+                        dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
+                    }
+                    else
+                    {
+                        dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                        dgv.Cells["是否通过"].Value = "✘";
+                        dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
+                        testError = false;
+                    }
                 }
 
                 //接受发送
@@ -1304,9 +1361,6 @@ namespace MySerialPort
                         labelScope.Visible = true;
                         labelScope.BringToFront();
 
-                        axisyMax = 0.0;
-                        waveLength = 0;
-
                         myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                     }
 
@@ -1318,9 +1372,6 @@ namespace MySerialPort
 
                         labelScope.Visible = true;
                         labelScope.BringToFront();
-
-                        axisyMax = 0.0;
-                        waveLength = 0;
 
                         myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                     }
@@ -1352,47 +1403,8 @@ namespace MySerialPort
 
         private void btn_again_Click(object sender, EventArgs e)
         {
-            if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xls").Length > 0)
-                ExpandedName = ".xls";
-            else if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xlsx").Length > 0)
-                ExpandedName = ".xlsx";
-            else
-                myMessageBox.Show("请在根目录下添加测试表", Color.Red);
+            getTestCase();
 
-            if (comboBoxTestItem.SelectedIndex == 0 && File.Exists("主板测试" + ExpandedName))
-            {
-                this.dataGridViewMain.DataSource = bindData("主板测试" + ExpandedName);
-                this.tabPage2.Text = "主板测试";
-            }
-            else if (comboBoxTestItem.SelectedIndex == 1 && File.Exists("PPG测试" + ExpandedName))
-            {
-                this.dataGridViewMain.DataSource = bindData("PPG测试" + ExpandedName);
-                this.tabPage2.Text = "PPG测试";
-                spectrographEnable = true;
-            }
-            else if (comboBoxTestItem.SelectedIndex == 2 && File.Exists("PPG测试" + ExpandedName))
-            {
-                this.dataGridViewMain.DataSource = bindData("PPG测试" + ExpandedName);
-                this.tabPage2.Text = "PPG测试";
-            }
-            else if (comboBoxTestItem.SelectedIndex == 3 && File.Exists("NIR红绿IR测试" + ExpandedName))
-            {
-                this.dataGridViewMain.DataSource = bindData("NIR红绿IR测试" + ExpandedName);
-                this.tabPage2.Text = "NIR红绿IR测试";
-                spectrographEnable = true;
-            }
-            else if (comboBoxTestItem.SelectedIndex == 4 && File.Exists("NIR1050以上测试" + ExpandedName))
-            {
-                this.dataGridViewMain.DataSource = bindData("NIR1050以上测试" + ExpandedName);
-                this.tabPage2.Text = "NIR1050以上测试";
-                spectrographEnable = true;
-            }
-            else
-            {
-                myMessageBox.Show("请选择测试项目", Color.Red);
-                return;
-            }
-            
             // 读取SN号
             if (UpperMode == UPPER_MODE.PRINT_QRCODE)
             {
@@ -1418,9 +1430,6 @@ namespace MySerialPort
             btn_again.Enabled = false;
             btn_print_QRCode.Enabled = false;
             btn_output_excel.Enabled = false;
-
-            axisyMax = 0.0;
-            waveLength = 0;
         }
 
         //将参数获取出来然后判断是否存在参数
@@ -1503,9 +1512,10 @@ namespace MySerialPort
         private void CheckSN(DataGridViewRow dgr, String str)
         {
             devSN = getResultInRecve(str);
-            if (devSN.Equals(strSN) || devSN.Equals(""))        // 正常流程或者生产返修
+            if (devSN.Equals(strSN) || !(devSN.Substring(0, 4).Equals("BBFF")))          // 正常流程或者生产返修
             {
                 SNSave = true;
+                devSN = strSN;
                 myMessageBox.DialogResult = DialogResult.Yes;
             }
             else if (devSN.Length == 14 && strSN.Length != 14)
@@ -1568,24 +1578,32 @@ namespace MySerialPort
 
             if (textBoxMAC.Text.Length == 12)
             {
-                foreach (DataGridViewRow dgr_MAC in dataGridViewSN.Rows)
+                if (UpperMode == UPPER_MODE.PRINT_QRCODE)
                 {
-                    Object input = dgr_MAC.Cells["MAC"].EditedFormattedValue;
-                    if (textBoxMAC.Text.Equals(input.ToString()))           //  从SN码表中检测到MAC地址
+                    foreach (DataGridViewRow dgr_MAC in dataGridViewSN.Rows)
                     {
-                        SNSave = true;
-                        rowSN = dgr_MAC.Index;
-                        strSN = dgr_MAC.Cells["帧头"].Value.ToString() + dgr_MAC.Cells["序列号"].Value.ToString().PadLeft(4, '0') +
-                                dgr_MAC.Cells["产地"].Value.ToString() + dgr_MAC.Cells["年"].Value.ToString() +
-                                dgr_MAC.Cells["月"].Value.ToString() + dgr_MAC.Cells["型号"].Value.ToString();
+                        Object input = dgr_MAC.Cells["MAC"].EditedFormattedValue;
+                        if (textBoxMAC.Text.Equals(input.ToString()))           //  从SN码表中检测到MAC地址
+                        {
+                            SNSave = true;
+                            rowSN = dgr_MAC.Index;
+                            strSN = dgr_MAC.Cells["帧头"].Value.ToString() + dgr_MAC.Cells["序列号"].Value.ToString().PadLeft(4, '0') +
+                                    dgr_MAC.Cells["产地"].Value.ToString() + dgr_MAC.Cells["年"].Value.ToString() +
+                                    dgr_MAC.Cells["月"].Value.ToString() + dgr_MAC.Cells["型号"].Value.ToString();
 
-                        textBoxSN.Text = strSN;
+                            textBoxSN.Text = strSN;
 
-                        myMessageBox.Show("从表中找到了MAC对应的SN码", Color.Green);
-                        myMessageBox.DialogResult = DialogResult.Yes;
+                            myMessageBox.Show("从SN表中找到了MAC对应的SN码", Color.Green);
+                            myMessageBox.DialogResult = DialogResult.Yes;
 
-                        return;
+                            return;
+                        }
                     }
+                    myMessageBox.DialogResult = DialogResult.No;
+                }
+                else
+                {
+                    myMessageBox.DialogResult = DialogResult.Yes;
                 }
             }
             else
@@ -1699,7 +1717,7 @@ namespace MySerialPort
                 {
                     EZioApi.sendcommand("^B12");
 
-                    //if (PrintRowIndex == 0)
+                    //if (PrintRowIndex == 0)           // 调整打印机
                     //{
                     //    PrintRowIndex = 1;
                     //    EZioApi.sendcommand("^B12");
@@ -1771,21 +1789,32 @@ namespace MySerialPort
         public int waveLength = 0;
         public int signalCnt = 0;
 
+        //1450，波长范围 1420±50nm
+        //1600，波长范围,1560±20nm
+        //1650，波长范围,1600±20nm
+        //1450(1400)
+        //1650(1550)
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             int pixel;
-            
+            int maxPixel = 0;
+
             timer1.Stop();
             chart1.Series["Series1"].Points.Clear();
             chart1.Series.SuspendUpdates();
+            axisyMax = 0;
+            waveLength = 0;
+            
 
-            for (pixel = 0; pixel <= 1550 - 1; pixel++)
+            for (pixel = 0; pixel <= 1520 - 1; pixel++)
             {
                 chart1.Series["Series1"].Points.AddXY(m_Lambda_8U2.Value[pixel], m_Spectrum_8U2.Value[pixel]);
                 if (m_Spectrum_8U2.Value[pixel] > axisyMax)
                 {
                     axisyMax = m_Spectrum_8U2.Value[pixel];
                     waveLength = Convert.ToInt32(m_Lambda_8U2.Value[pixel]);
+                    maxPixel = pixel;
                 }
             }
 
@@ -1795,7 +1824,8 @@ namespace MySerialPort
                 if (m_Spectrum_9U2.Value[pixel] > axisyMax)
                 {
                     axisyMax = m_Spectrum_9U2.Value[pixel];
-                    waveLength = Convert.ToInt32(m_Lambda_8U2.Value[pixel]);
+                    waveLength = Convert.ToInt32(m_Lambda_9U2.Value[pixel]);
+                    maxPixel = pixel;
                 }
             }
             
@@ -1822,21 +1852,19 @@ namespace MySerialPort
                 if ((waveLength >= 1560 - 20) && (waveLength <= 1560 + 20))
                     signalCnt++;
             }
-            else if (SignalMode == SIGNAL_MODE.NIR_1450_2)
+            else if (SignalMode == SIGNAL_MODE.NIR_1650)
             {
-                if ((waveLength >= 1420 - 50) && (waveLength <= 1420 + 50))
-                    signalCnt++;
-            }
-            else if (SignalMode == SIGNAL_MODE.NIR_1600_2)
-            {
-                if ((waveLength >= 1560 - 20) && (waveLength <= 1560 + 20))
+                if ((waveLength >= 1600 - 20) && (waveLength <= 1600 + 20))
                     signalCnt++;
             }
             else
-                signalCnt = 0;
-
-            if (signalCnt >= 200)
             {
+                signalCnt = 0;
+            }
+
+            if (signalCnt >= 10)
+            {
+                signalCnt = 0;
                 SignalMode = SIGNAL_MODE.SIGNAL_NONE;
                 myMessageBox.DialogResult = DialogResult.Yes;
                 myMessageBox.Close();

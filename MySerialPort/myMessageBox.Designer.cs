@@ -89,7 +89,6 @@
             this.Name = "myMsgBox";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "提示";
-            this.Load += new System.EventHandler(this.myMsgBox_Load);
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 

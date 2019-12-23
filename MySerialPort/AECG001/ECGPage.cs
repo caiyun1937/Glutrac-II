@@ -42,13 +42,13 @@ namespace AECG100Demo
         {
             ecgOutputWaveform = ecgWaveform;
 
-            //MainForm.Instance.GraphSetYAxisScale (0, -5, 5);
-            //MainForm.Instance.GraphSetYAxisScale (1, -5, 5);
+            MainForm.Instance.GraphSetYAxisScale (0, -5, 5);
+            MainForm.Instance.GraphSetYAxisScale (1, -5, 5);
             OutputCounter = 0;
 
             bool result = AECG100.OutputECG (ref ecgOutputWaveform, outputCB);
             if (result) {
-                //MainForm.Instance.OutputStarted ();
+                MainForm.Instance.OutputStarted ();
             } else {
                 MessageBox.Show ("Error: output waveform failed", "WhaleTeq", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -57,12 +57,12 @@ namespace AECG100Demo
         private void AECGOutputSignal (double time, int ac, int dc)
         {
             if (ac == int.MinValue) {
-                //MainForm.Instance.BeginInvoke (new MethodInvoker (MainForm.Instance.OutputStopped));
+                MainForm.Instance.BeginInvoke (new MethodInvoker (MainForm.Instance.OutputStopped));
                 return;
             }
 
             uint counter = OutputCounter++;
-            //MainForm.Instance.GraphAddPoint (0, time, ac / 1000.0, (counter % 200) == 0);
+            MainForm.Instance.GraphAddPoint (0, time, ac / 1000.0, (counter % 200) == 0);
         }
 
         private uint OutputCounter

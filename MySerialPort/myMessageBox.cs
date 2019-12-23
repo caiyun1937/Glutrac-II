@@ -38,11 +38,7 @@ namespace MySerialPort
 
         private void myMsgBox_Load(object sender, EventArgs e)
         {
-            int xWidth = SystemInformation.PrimaryMonitorSize.Width;//获取显示器屏幕宽度
 
-            int yHeight = SystemInformation.PrimaryMonitorSize.Height;//获取显示器屏幕高度
-
-            this.Location = new Point(xWidth / 2, yHeight / 2);//两个参数，一个是距离屏幕左边的高度，一个是距离上方的高度
         }
     }
 }

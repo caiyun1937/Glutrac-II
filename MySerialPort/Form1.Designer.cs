@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -48,26 +48,31 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.dataGridViewSN = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.panel4 = new System.Windows.Forms.Panel();
             this.labelScope = new System.Windows.Forms.Label();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.pictureBoxShow = new System.Windows.Forms.PictureBox();
             this.dataGridViewMain = new System.Windows.Forms.DataGridView();
-            this.btn_output_excel = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.noUpDown = new System.Windows.Forms.NumericUpDown();
-            this.btn_again = new System.Windows.Forms.Button();
-            this.txt_output_excel = new System.Windows.Forms.TextBox();
+            this.panel3 = new System.Windows.Forms.Panel();
             this.btn_go = new System.Windows.Forms.Button();
+            this.txt_output_excel = new System.Windows.Forms.TextBox();
+            this.btn_again = new System.Windows.Forms.Button();
+            this.noUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            this.btn_output_excel = new System.Windows.Forms.Button();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ReceiveTbox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.checkbox_16show = new System.Windows.Forms.CheckBox();
-            this.checkbox_16send = new System.Windows.Forms.CheckBox();
             this.SendTbox = new System.Windows.Forms.TextBox();
+            this.panel5 = new System.Windows.Forms.Panel();
+            this.panel8 = new System.Windows.Forms.Panel();
+            this.checkbox_16send = new System.Windows.Forms.CheckBox();
+            this.panel7 = new System.Windows.Forms.Panel();
+            this.checkbox_16show = new System.Windows.Forms.CheckBox();
+            this.panel6 = new System.Windows.Forms.Panel();
             this.button2 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage5 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.Num_QRRotation = new System.Windows.Forms.NumericUpDown();
@@ -97,6 +102,7 @@
             this.Num_Label_W = new System.Windows.Forms.NumericUpDown();
             this.Cbo_PaperType = new System.Windows.Forms.ComboBox();
             this.Lbl_Label_W = new System.Windows.Forms.Label();
+            this.signal_generator = new System.Windows.Forms.TabPage();
             this.buttonManual = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.textBoxMAC = new System.Windows.Forms.TextBox();
@@ -104,17 +110,25 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSN)).BeginInit();
             this.tabPage2.SuspendLayout();
+            this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxShow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMain)).BeginInit();
+            this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.noUpDown)).BeginInit();
             this.tabPage1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.panel5.SuspendLayout();
+            this.panel8.SuspendLayout();
+            this.panel7.SuspendLayout();
+            this.panel6.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -132,6 +146,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.Num_Label_H)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Num_Label_W)).BeginInit();
             this.groupBox5.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -143,7 +159,7 @@
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(13, 13);
+            this.groupBox1.Location = new System.Drawing.Point(4, 4);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
@@ -250,7 +266,7 @@
             // 
             // btn_print_QRCode
             // 
-            this.btn_print_QRCode.Location = new System.Drawing.Point(278, 8);
+            this.btn_print_QRCode.Location = new System.Drawing.Point(275, 5);
             this.btn_print_QRCode.Name = "btn_print_QRCode";
             this.btn_print_QRCode.Size = new System.Drawing.Size(130, 25);
             this.btn_print_QRCode.TabIndex = 14;
@@ -264,7 +280,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1239, 460);
+            this.tabPage3.Size = new System.Drawing.Size(1291, 489);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "SN表";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -272,37 +288,41 @@
             // dataGridViewSN
             // 
             this.dataGridViewSN.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewSN.Location = new System.Drawing.Point(6, 6);
+            this.dataGridViewSN.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridViewSN.Location = new System.Drawing.Point(3, 3);
             this.dataGridViewSN.Name = "dataGridViewSN";
             this.dataGridViewSN.RowTemplate.Height = 27;
-            this.dataGridViewSN.Size = new System.Drawing.Size(1227, 448);
+            this.dataGridViewSN.Size = new System.Drawing.Size(1285, 483);
             this.dataGridViewSN.TabIndex = 0;
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.labelScope);
-            this.tabPage2.Controls.Add(this.chart1);
-            this.tabPage2.Controls.Add(this.pictureBoxShow);
-            this.tabPage2.Controls.Add(this.btn_print_QRCode);
-            this.tabPage2.Controls.Add(this.dataGridViewMain);
-            this.tabPage2.Controls.Add(this.btn_output_excel);
-            this.tabPage2.Controls.Add(this.label3);
-            this.tabPage2.Controls.Add(this.noUpDown);
-            this.tabPage2.Controls.Add(this.btn_again);
-            this.tabPage2.Controls.Add(this.txt_output_excel);
-            this.tabPage2.Controls.Add(this.btn_go);
+            this.tabPage2.Controls.Add(this.panel4);
+            this.tabPage2.Controls.Add(this.panel3);
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1239, 460);
+            this.tabPage2.Size = new System.Drawing.Size(1291, 489);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "主板测试";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.labelScope);
+            this.panel4.Controls.Add(this.chart1);
+            this.panel4.Controls.Add(this.pictureBoxShow);
+            this.panel4.Controls.Add(this.dataGridViewMain);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel4.Location = new System.Drawing.Point(3, 40);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(1285, 446);
+            this.panel4.TabIndex = 20;
+            // 
             // labelScope
             // 
             this.labelScope.AutoSize = true;
-            this.labelScope.Location = new System.Drawing.Point(889, 39);
+            this.labelScope.Location = new System.Drawing.Point(925, 3);
             this.labelScope.Name = "labelScope";
             this.labelScope.Size = new System.Drawing.Size(87, 15);
             this.labelScope.TabIndex = 18;
@@ -310,74 +330,102 @@
             // 
             // chart1
             // 
-            chartArea3.AxisX.Maximum = 1100D;
-            chartArea3.AxisX.Minimum = 400D;
-            chartArea3.AxisX.Title = "WaveLength [nm]";
-            chartArea3.AxisY.Maximum = 0D;
-            chartArea3.AxisY.Minimum = -1000D;
-            chartArea3.AxisY.Title = "Scope [ADC Counts]";
-            chartArea3.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea3);
-            legend3.Enabled = false;
-            legend3.Name = "Legend1";
-            legend3.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chart1.Legends.Add(legend3);
-            this.chart1.Location = new System.Drawing.Point(554, 39);
+            chartArea1.AxisX.Interval = 100D;
+            chartArea1.AxisX.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
+            chartArea1.AxisX.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.DashDotDot;
+            chartArea1.AxisX.Maximum = 1700D;
+            chartArea1.AxisX.Minimum = 200D;
+            chartArea1.AxisX.Title = "WaveLength [nm]";
+            chartArea1.AxisY.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.DashDotDot;
+            chartArea1.AxisY.Maximum = 65535D;
+            chartArea1.AxisY.Minimum = 0D;
+            chartArea1.AxisY.Title = "Scope [ADC Counts]";
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            legend1.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chart1.Legends.Add(legend1);
+            this.chart1.Location = new System.Drawing.Point(603, 3);
             this.chart1.Name = "chart1";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.chart1.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(682, 415);
             this.chart1.TabIndex = 17;
             this.chart1.Text = "chart1";
             // 
             // pictureBoxShow
             // 
-            this.pictureBoxShow.Location = new System.Drawing.Point(6, 39);
+            this.pictureBoxShow.Location = new System.Drawing.Point(3, 3);
             this.pictureBoxShow.Name = "pictureBoxShow";
-            this.pictureBoxShow.Size = new System.Drawing.Size(400, 400);
+            this.pictureBoxShow.Size = new System.Drawing.Size(320, 320);
+            this.pictureBoxShow.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxShow.TabIndex = 11;
             this.pictureBoxShow.TabStop = false;
             // 
             // dataGridViewMain
             // 
-            this.dataGridViewMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridViewMain.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridViewMain.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewMain.Location = new System.Drawing.Point(6, 39);
+            this.dataGridViewMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridViewMain.Location = new System.Drawing.Point(0, 0);
             this.dataGridViewMain.Name = "dataGridViewMain";
             this.dataGridViewMain.ReadOnly = true;
             this.dataGridViewMain.RowTemplate.Height = 27;
             this.dataGridViewMain.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewMain.Size = new System.Drawing.Size(1227, 415);
+            this.dataGridViewMain.Size = new System.Drawing.Size(1285, 446);
             this.dataGridViewMain.TabIndex = 3;
             this.dataGridViewMain.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dataGridView1_MouseClick);
             // 
-            // btn_output_excel
+            // panel3
             // 
-            this.btn_output_excel.Location = new System.Drawing.Point(142, 8);
-            this.btn_output_excel.Name = "btn_output_excel";
-            this.btn_output_excel.Size = new System.Drawing.Size(130, 25);
-            this.btn_output_excel.TabIndex = 6;
-            this.btn_output_excel.Text = "保存测试报告";
-            this.btn_output_excel.UseVisualStyleBackColor = true;
-            this.btn_output_excel.Click += new System.EventHandler(this.btn_output_excel_Click);
+            this.panel3.Controls.Add(this.btn_go);
+            this.panel3.Controls.Add(this.txt_output_excel);
+            this.panel3.Controls.Add(this.btn_again);
+            this.panel3.Controls.Add(this.noUpDown);
+            this.panel3.Controls.Add(this.btn_print_QRCode);
+            this.panel3.Controls.Add(this.label3);
+            this.panel3.Controls.Add(this.btn_output_excel);
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel3.Location = new System.Drawing.Point(3, 3);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(1285, 37);
+            this.panel3.TabIndex = 19;
             // 
-            // label3
+            // btn_go
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(1021, 13);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(99, 15);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "超时时间(S):";
+            this.btn_go.Location = new System.Drawing.Point(3, 5);
+            this.btn_go.Name = "btn_go";
+            this.btn_go.Size = new System.Drawing.Size(130, 25);
+            this.btn_go.TabIndex = 4;
+            this.btn_go.Text = "一键测试";
+            this.btn_go.UseVisualStyleBackColor = true;
+            this.btn_go.Click += new System.EventHandler(this.btn_go_Click);
+            // 
+            // txt_output_excel
+            // 
+            this.txt_output_excel.Location = new System.Drawing.Point(551, 5);
+            this.txt_output_excel.Name = "txt_output_excel";
+            this.txt_output_excel.ReadOnly = true;
+            this.txt_output_excel.Size = new System.Drawing.Size(461, 25);
+            this.txt_output_excel.TabIndex = 5;
+            // 
+            // btn_again
+            // 
+            this.btn_again.Location = new System.Drawing.Point(411, 5);
+            this.btn_again.Name = "btn_again";
+            this.btn_again.Size = new System.Drawing.Size(130, 25);
+            this.btn_again.TabIndex = 7;
+            this.btn_again.Text = "复位";
+            this.btn_again.UseVisualStyleBackColor = true;
+            this.btn_again.Click += new System.EventHandler(this.btn_again_Click);
             // 
             // noUpDown
             // 
-            this.noUpDown.Location = new System.Drawing.Point(1126, 8);
+            this.noUpDown.Location = new System.Drawing.Point(1123, 5);
             this.noUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -392,33 +440,24 @@
             0,
             0});
             // 
-            // btn_again
+            // label3
             // 
-            this.btn_again.Location = new System.Drawing.Point(414, 8);
-            this.btn_again.Name = "btn_again";
-            this.btn_again.Size = new System.Drawing.Size(130, 25);
-            this.btn_again.TabIndex = 7;
-            this.btn_again.Text = "复位";
-            this.btn_again.UseVisualStyleBackColor = true;
-            this.btn_again.Click += new System.EventHandler(this.btn_again_Click);
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(1018, 10);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(99, 15);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "超时时间(S):";
             // 
-            // txt_output_excel
+            // btn_output_excel
             // 
-            this.txt_output_excel.Location = new System.Drawing.Point(554, 8);
-            this.txt_output_excel.Name = "txt_output_excel";
-            this.txt_output_excel.ReadOnly = true;
-            this.txt_output_excel.Size = new System.Drawing.Size(461, 25);
-            this.txt_output_excel.TabIndex = 5;
-            // 
-            // btn_go
-            // 
-            this.btn_go.Location = new System.Drawing.Point(6, 8);
-            this.btn_go.Name = "btn_go";
-            this.btn_go.Size = new System.Drawing.Size(130, 25);
-            this.btn_go.TabIndex = 4;
-            this.btn_go.Text = "一键测试";
-            this.btn_go.UseVisualStyleBackColor = true;
-            this.btn_go.Click += new System.EventHandler(this.btn_go_Click);
+            this.btn_output_excel.Location = new System.Drawing.Point(139, 5);
+            this.btn_output_excel.Name = "btn_output_excel";
+            this.btn_output_excel.Size = new System.Drawing.Size(130, 25);
+            this.btn_output_excel.TabIndex = 6;
+            this.btn_output_excel.Text = "保存测试报告";
+            this.btn_output_excel.UseVisualStyleBackColor = true;
+            this.btn_output_excel.Click += new System.EventHandler(this.btn_output_excel_Click);
             // 
             // tabPage1
             // 
@@ -427,7 +466,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1239, 460);
+            this.tabPage1.Size = new System.Drawing.Size(1291, 489);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "串口通讯";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -435,56 +474,77 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.ReceiveTbox);
-            this.groupBox2.Location = new System.Drawing.Point(8, 7);
+            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox2.Location = new System.Drawing.Point(3, 3);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox2.Size = new System.Drawing.Size(1224, 360);
+            this.groupBox2.Size = new System.Drawing.Size(1285, 404);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "接收数据";
             // 
             // ReceiveTbox
             // 
-            this.ReceiveTbox.Location = new System.Drawing.Point(8, 26);
+            this.ReceiveTbox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ReceiveTbox.Location = new System.Drawing.Point(4, 22);
             this.ReceiveTbox.Margin = new System.Windows.Forms.Padding(4);
             this.ReceiveTbox.Multiline = true;
             this.ReceiveTbox.Name = "ReceiveTbox";
             this.ReceiveTbox.ReadOnly = true;
             this.ReceiveTbox.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ReceiveTbox.Size = new System.Drawing.Size(1208, 326);
+            this.ReceiveTbox.Size = new System.Drawing.Size(1277, 378);
             this.ReceiveTbox.TabIndex = 0;
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.checkbox_16show);
-            this.groupBox3.Controls.Add(this.checkbox_16send);
             this.groupBox3.Controls.Add(this.SendTbox);
-            this.groupBox3.Controls.Add(this.button2);
-            this.groupBox3.Location = new System.Drawing.Point(7, 375);
+            this.groupBox3.Controls.Add(this.panel5);
+            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.groupBox3.Location = new System.Drawing.Point(3, 407);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox3.Size = new System.Drawing.Size(1225, 78);
+            this.groupBox3.Size = new System.Drawing.Size(1285, 79);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "发送数据";
             // 
-            // checkbox_16show
+            // SendTbox
             // 
-            this.checkbox_16show.AutoSize = true;
-            this.checkbox_16show.Location = new System.Drawing.Point(1098, 25);
-            this.checkbox_16show.Name = "checkbox_16show";
-            this.checkbox_16show.Size = new System.Drawing.Size(119, 19);
-            this.checkbox_16show.TabIndex = 6;
-            this.checkbox_16show.Text = "十六进制显示";
-            this.checkbox_16show.UseVisualStyleBackColor = true;
-            this.checkbox_16show.CheckedChanged += new System.EventHandler(this.checkbox_16show_CheckedChanged);
+            this.SendTbox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SendTbox.Location = new System.Drawing.Point(4, 22);
+            this.SendTbox.Margin = new System.Windows.Forms.Padding(4);
+            this.SendTbox.Multiline = true;
+            this.SendTbox.Name = "SendTbox";
+            this.SendTbox.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
+            this.SendTbox.Size = new System.Drawing.Size(1045, 53);
+            this.SendTbox.TabIndex = 1;
+            // 
+            // panel5
+            // 
+            this.panel5.Controls.Add(this.panel8);
+            this.panel5.Controls.Add(this.panel7);
+            this.panel5.Controls.Add(this.panel6);
+            this.panel5.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panel5.Location = new System.Drawing.Point(1049, 22);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(232, 53);
+            this.panel5.TabIndex = 3;
+            // 
+            // panel8
+            // 
+            this.panel8.Controls.Add(this.checkbox_16send);
+            this.panel8.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel8.Location = new System.Drawing.Point(104, 25);
+            this.panel8.Name = "panel8";
+            this.panel8.Size = new System.Drawing.Size(128, 25);
+            this.panel8.TabIndex = 2;
             // 
             // checkbox_16send
             // 
             this.checkbox_16send.AutoSize = true;
-            this.checkbox_16send.Location = new System.Drawing.Point(1098, 50);
+            this.checkbox_16send.Location = new System.Drawing.Point(3, 3);
             this.checkbox_16send.Name = "checkbox_16send";
             this.checkbox_16send.Size = new System.Drawing.Size(119, 19);
             this.checkbox_16send.TabIndex = 6;
@@ -492,22 +552,41 @@
             this.checkbox_16send.UseVisualStyleBackColor = true;
             this.checkbox_16send.CheckedChanged += new System.EventHandler(this.checkbox_16send_CheckedChanged);
             // 
-            // SendTbox
+            // panel7
             // 
-            this.SendTbox.Location = new System.Drawing.Point(8, 26);
-            this.SendTbox.Margin = new System.Windows.Forms.Padding(4);
-            this.SendTbox.Multiline = true;
-            this.SendTbox.Name = "SendTbox";
-            this.SendTbox.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.SendTbox.Size = new System.Drawing.Size(975, 43);
-            this.SendTbox.TabIndex = 1;
+            this.panel7.Controls.Add(this.checkbox_16show);
+            this.panel7.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel7.Location = new System.Drawing.Point(104, 0);
+            this.panel7.Name = "panel7";
+            this.panel7.Size = new System.Drawing.Size(128, 25);
+            this.panel7.TabIndex = 1;
+            // 
+            // checkbox_16show
+            // 
+            this.checkbox_16show.AutoSize = true;
+            this.checkbox_16show.Location = new System.Drawing.Point(3, 3);
+            this.checkbox_16show.Name = "checkbox_16show";
+            this.checkbox_16show.Size = new System.Drawing.Size(119, 19);
+            this.checkbox_16show.TabIndex = 6;
+            this.checkbox_16show.Text = "十六进制显示";
+            this.checkbox_16show.UseVisualStyleBackColor = true;
+            this.checkbox_16show.CheckedChanged += new System.EventHandler(this.checkbox_16show_CheckedChanged);
+            // 
+            // panel6
+            // 
+            this.panel6.Controls.Add(this.button2);
+            this.panel6.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel6.Location = new System.Drawing.Point(0, 0);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(104, 53);
+            this.panel6.TabIndex = 0;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(991, 25);
+            this.button2.Location = new System.Drawing.Point(0, 0);
             this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(100, 43);
+            this.button2.Size = new System.Drawing.Size(100, 53);
             this.button2.TabIndex = 5;
             this.button2.Text = "发送";
             this.button2.UseVisualStyleBackColor = true;
@@ -516,25 +595,16 @@
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Location = new System.Drawing.Point(13, 74);
+            this.tabControl1.Controls.Add(this.signal_generator);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1247, 489);
+            this.tabControl1.Size = new System.Drawing.Size(1299, 518);
             this.tabControl1.TabIndex = 11;
-            // 
-            // tabPage5
-            // 
-            this.tabPage5.Location = new System.Drawing.Point(4, 25);
-            this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(1239, 460);
-            this.tabPage5.TabIndex = 4;
-            this.tabPage5.Text = "AECG001";
-            this.tabPage5.UseVisualStyleBackColor = true;
             // 
             // tabPage4
             // 
@@ -543,7 +613,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 25);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1239, 460);
+            this.tabPage4.Size = new System.Drawing.Size(1291, 489);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "QRCode";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -716,8 +786,6 @@
             // 
             // Grp_Label
             // 
-            this.Grp_Label.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.Grp_Label.Controls.Add(this.Lbl_Page);
             this.Grp_Label.Controls.Add(this.Num_Page);
             this.Grp_Label.Controls.Add(this.Num_Speed);
@@ -738,7 +806,7 @@
             this.Grp_Label.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Grp_Label.Name = "Grp_Label";
             this.Grp_Label.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.Grp_Label.Size = new System.Drawing.Size(548, 180);
+            this.Grp_Label.Size = new System.Drawing.Size(600, 180);
             this.Grp_Label.TabIndex = 20;
             this.Grp_Label.TabStop = false;
             this.Grp_Label.Text = " Label Setup ";
@@ -947,6 +1015,16 @@
             this.Lbl_Label_W.TabIndex = 24;
             this.Lbl_Label_W.Text = "Label Width (mm)";
             // 
+            // signal_generator
+            // 
+            this.signal_generator.Location = new System.Drawing.Point(4, 25);
+            this.signal_generator.Name = "signal_generator";
+            this.signal_generator.Padding = new System.Windows.Forms.Padding(3);
+            this.signal_generator.Size = new System.Drawing.Size(1291, 489);
+            this.signal_generator.TabIndex = 4;
+            this.signal_generator.Text = "鲸杨信号发生器";
+            this.signal_generator.UseVisualStyleBackColor = true;
+            // 
             // buttonManual
             // 
             this.buttonManual.Location = new System.Drawing.Point(394, 14);
@@ -1009,24 +1087,44 @@
             this.groupBox5.Controls.Add(this.textBoxSN);
             this.groupBox5.Controls.Add(this.textBoxMAC);
             this.groupBox5.Controls.Add(this.label5);
-            this.groupBox5.Location = new System.Drawing.Point(732, 13);
+            this.groupBox5.Location = new System.Drawing.Point(723, 4);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(527, 54);
             this.groupBox5.TabIndex = 36;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "设备标识";
             // 
+            // panel1
+            // 
+            this.panel1.AutoSize = true;
+            this.panel1.Controls.Add(this.groupBox1);
+            this.panel1.Controls.Add(this.groupBox5);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(1299, 62);
+            this.panel1.TabIndex = 0;
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.tabControl1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(0, 62);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(1299, 518);
+            this.panel2.TabIndex = 12;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1271, 575);
-            this.Controls.Add(this.groupBox5);
-            this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(1299, 580);
+            this.Controls.Add(this.panel2);
+            this.Controls.Add(this.panel1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
-            this.Text = "串口测试工具";
+            this.Text = "Glutrac上位机";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Closed += new System.EventHandler(this.Form1_Closed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
@@ -1034,16 +1132,25 @@
             this.tabPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSN)).EndInit();
             this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
+            this.panel4.ResumeLayout(false);
+            this.panel4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxShow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMain)).EndInit();
+            this.panel3.ResumeLayout(false);
+            this.panel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.noUpDown)).EndInit();
             this.tabPage1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.panel5.ResumeLayout(false);
+            this.panel8.ResumeLayout(false);
+            this.panel8.PerformLayout();
+            this.panel7.ResumeLayout(false);
+            this.panel7.PerformLayout();
+            this.panel6.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
@@ -1064,7 +1171,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.Num_Label_W)).EndInit();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -1140,7 +1250,15 @@
         private System.Windows.Forms.GroupBox groupBox5;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Label labelScope;
-        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Panel panel5;
+        private System.Windows.Forms.Panel panel8;
+        private System.Windows.Forms.Panel panel7;
+        private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.TabPage signal_generator;
+        private System.Windows.Forms.Panel panel4;
     }
 }
 

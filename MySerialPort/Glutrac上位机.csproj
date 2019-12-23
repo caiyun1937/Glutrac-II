@@ -46,6 +46,48 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>2</WarningLevel>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>2</WarningLevel>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib, Version=1.0.0.999, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.1.0.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -92,7 +134,31 @@
     <Compile Include="AECG001\ECGPage.Designer.cs">
       <DependentUpon>ECGPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="AECG001\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AECG001\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="AECG001\PageControl.cs" />
+    <Compile Include="AECG001\PPGPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AECG001\PPGPage.Designer.cs">
+      <DependentUpon>PPGPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AECG001\PWVPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AECG001\PWVPage.Designer.cs">
+      <DependentUpon>PWVPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AECG001\SPO2Page.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AECG001\SPO2Page.Designer.cs">
+      <DependentUpon>SPO2Page.cs</DependentUpon>
+    </Compile>
     <Compile Include="AECG001\UtilConfig.cs" />
     <Compile Include="avaspec.cs" />
     <Compile Include="ExcelHelper.cs" />
@@ -115,6 +181,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="AECG001\ECGPage.resx">
       <DependentUpon>ECGPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AECG001\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AECG001\PPGPage.resx">
+      <DependentUpon>PPGPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AECG001\PWVPage.resx">
+      <DependentUpon>PWVPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AECG001\SPO2Page.resx">
+      <DependentUpon>SPO2Page.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

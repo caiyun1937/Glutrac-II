@@ -34,7 +34,7 @@ namespace AECG100Demo
             }
         }
 
-        private MainForm ()
+        public MainForm ()
         {
             InitializeComponent ();
 
@@ -316,6 +316,7 @@ namespace AECG100Demo
             } else {
                 GraphReset ();
                 (tabMain.TabPages[tabMain.SelectedIndex].Controls[0] as IPageControl).onStartOutput ();
+                btnOutput.Enabled = false;
             }
             
         }
