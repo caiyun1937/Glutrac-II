@@ -344,7 +344,7 @@ namespace MySerialPort
         bool isOpened = false;//串口状态标志
         bool spectrographEnable = false;
 
-        private void getTestCase()
+        private bool getTestCase()
         {
             if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xls").Length > 0)
                 ExpandedName = ".xls";
@@ -384,13 +384,23 @@ namespace MySerialPort
             else
             {
                 myMessageBox.Show("请选择测试项目", Color.Red);
-                return;
+                return false;
             }
+            return true;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            getTestCase();
+            if (cmbPort.Text == "")
+            {
+                myMessageBox.Show("检测不到串口!!", Color.Red);
+                return;
+            }
+
+            if (false == getTestCase())
+            {
+                return;
+            }
 
             if (!isOpened)
             {
@@ -877,6 +887,8 @@ namespace MySerialPort
             }
         }
 
+        ECGPage ecgPage = new ECGPage();
+
         private void btn_go_Click(object sender, EventArgs e)
         {
             if (dataGridViewMain.DataSource == null)
@@ -998,6 +1010,10 @@ namespace MySerialPort
 
                             myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
                         }
+                        else if (str.Substring(4, 2).Equals("50"))      // ECG心率
+                        {
+                            ecgPage.numBPM.Value.Equals("");
+                        }
                         else
                             myMessageBox.Show("对比示例图,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
 
@@ -1034,11 +1050,11 @@ namespace MySerialPort
 
             if (comboBoxTestItem.SelectedIndex == 0)
             {
-                myMessageBox.Show("是否需要测试ECG心率", Color.Red);
+                myMessageBox.Show("是否需要测试蓝牙连接+ECG心率", Color.Red);
                 if (myMessageBox.DialogResult == DialogResult.Yes)
                 {
                     QRCode(textBoxMAC.Text);
-                    myMessageBox.Show("请用APP击【主板蓝牙连接 + ECG功能测试】扫描二维码进行测试",Color.Black);
+                    myMessageBox.Show("请用APP点击【主板蓝牙连接 + ECG功能测试】扫描二维码进行测试",Color.Black);
 
                     foreach (DataGridViewRow dgr_ECG in dataGridViewMain.Rows)
                     {
@@ -1046,7 +1062,7 @@ namespace MySerialPort
 
                         if (input.Equals("蓝牙连接测试"))           //  从SN码表中检测到MAC地址
                         {
-                            myMessageBox.Show("蓝牙测试是否通过", Color.Black);
+                            myMessageBox.Show("蓝牙连接是否成功", Color.Black);
                             if (myMessageBox.DialogResult == DialogResult.Yes)
                             {
                                 dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
@@ -1067,7 +1083,7 @@ namespace MySerialPort
 
                         if (input.Equals("ECG心率测试"))           //  从SN码表中检测到MAC地址
                         {
-                            myMessageBox.Show("请对比APP和仪器的心率值是否一致", Color.Black);
+                            myMessageBox.Show("请观察APP的ECG心率测试是否通过", Color.Black);
                             if (myMessageBox.DialogResult == DialogResult.Yes)
                             {
                                 dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
@@ -1107,7 +1123,7 @@ namespace MySerialPort
 
         public static object _lock = new object();
         //同步读取数据并返回
-        private byte[] ReadPort(byte[] sendData,String stt)
+        private byte[] ReadPort(byte[] sendData, String stt)
         {
             if (!serialPort.IsOpen)
             {
@@ -1115,7 +1131,8 @@ namespace MySerialPort
             }
 
             //发送数据
-            serialPort.Write(sendData, 0, sendData.Length);
+            if(sendData[2] != 0x50)
+                serialPort.Write(sendData, 0, sendData.Length);
 
             //读取返回数据
             DateTime dt = DateTime.Now;
@@ -1123,6 +1140,10 @@ namespace MySerialPort
 
             if (sendData[2] == 0x22)            // nir时钟矫正需要等待反馈
                 noresponse = 30;
+            else if (sendData[2] == 0x50)
+            {
+                noresponse = 40;
+            }
             else
                 noresponse = Convert.ToInt32(noUpDown.Value);
 
@@ -1403,7 +1424,10 @@ namespace MySerialPort
 
         private void btn_again_Click(object sender, EventArgs e)
         {
-            getTestCase();
+            if (false == getTestCase())
+            {
+                return;
+            }
 
             // 读取SN号
             if (UpperMode == UPPER_MODE.PRINT_QRCODE)
@@ -1512,7 +1536,7 @@ namespace MySerialPort
         private void CheckSN(DataGridViewRow dgr, String str)
         {
             devSN = getResultInRecve(str);
-            if (devSN.Equals(strSN) || !(devSN.Substring(0, 4).Equals("BBFF")))          // 正常流程或者生产返修
+            if (devSN.Equals(strSN) || !(devSN.Substring(0, 4).Equals("BBF")))          // 正常流程或者生产返修
             {
                 SNSave = true;
                 devSN = strSN;
@@ -1792,8 +1816,6 @@ namespace MySerialPort
         //1450，波长范围 1420±50nm
         //1600，波长范围,1560±20nm
         //1650，波长范围,1600±20nm
-        //1450(1400)
-        //1650(1550)
 
         private void timer1_Tick(object sender, EventArgs e)
         {

@@ -119,7 +119,7 @@
             0,
             -2147418112});
             this.numVoltageRWave.Name = "numVoltageRWave";
-            this.numVoltageRWave.Size = new System.Drawing.Size(80, 23);
+            this.numVoltageRWave.Size = new System.Drawing.Size(80, 27);
             this.numVoltageRWave.TabIndex = 43;
             this.numVoltageRWave.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numVoltageRWave.Value = new decimal(new int[] {
@@ -167,7 +167,7 @@
             0,
             -2147483648});
             this.numVoltageSTSegment.Name = "numVoltageSTSegment";
-            this.numVoltageSTSegment.Size = new System.Drawing.Size(80, 23);
+            this.numVoltageSTSegment.Size = new System.Drawing.Size(80, 27);
             this.numVoltageSTSegment.TabIndex = 40;
             this.numVoltageSTSegment.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numVoltageSTSegment.ValueChanged += new System.EventHandler(this.onVoltageSTSegmentValueChanged);
@@ -205,7 +205,7 @@
             0,
             0});
             this.numVoltagePWave.Name = "numVoltagePWave";
-            this.numVoltagePWave.Size = new System.Drawing.Size(80, 23);
+            this.numVoltagePWave.Size = new System.Drawing.Size(80, 27);
             this.numVoltagePWave.TabIndex = 37;
             this.numVoltagePWave.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numVoltagePWave.Value = new decimal(new int[] {
@@ -257,7 +257,7 @@
             0,
             0});
             this.numVoltageTWave.Name = "numVoltageTWave";
-            this.numVoltageTWave.Size = new System.Drawing.Size(80, 23);
+            this.numVoltageTWave.Size = new System.Drawing.Size(80, 27);
             this.numVoltageTWave.TabIndex = 34;
             this.numVoltageTWave.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numVoltageTWave.Value = new decimal(new int[] {
@@ -287,7 +287,7 @@
             0,
             -2147352576});
             this.numVoltageAmplitude.Name = "numVoltageAmplitude";
-            this.numVoltageAmplitude.Size = new System.Drawing.Size(80, 23);
+            this.numVoltageAmplitude.Size = new System.Drawing.Size(80, 27);
             this.numVoltageAmplitude.TabIndex = 31;
             this.numVoltageAmplitude.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numVoltageAmplitude.Value = new decimal(new int[] {
@@ -335,7 +335,7 @@
             0,
             -2147483648});
             this.numVoltageAmplitude2.Name = "numVoltageAmplitude2";
-            this.numVoltageAmplitude2.Size = new System.Drawing.Size(80, 23);
+            this.numVoltageAmplitude2.Size = new System.Drawing.Size(80, 27);
             this.numVoltageAmplitude2.TabIndex = 45;
             this.numVoltageAmplitude2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numVoltageAmplitude2.Value = new decimal(new int[] {
@@ -376,7 +376,7 @@
             this._radioElectrodeLeftArm.AutoSize = true;
             this._radioElectrodeLeftArm.Location = new System.Drawing.Point(31, 47);
             this._radioElectrodeLeftArm.Name = "_radioElectrodeLeftArm";
-            this._radioElectrodeLeftArm.Size = new System.Drawing.Size(50, 19);
+            this._radioElectrodeLeftArm.Size = new System.Drawing.Size(60, 24);
             this._radioElectrodeLeftArm.TabIndex = 52;
             this._radioElectrodeLeftArm.Text = "LA/L";
             this._radioElectrodeLeftArm.UseVisualStyleBackColor = true;
@@ -386,7 +386,7 @@
             this._radioElectrodeRightArm.AutoSize = true;
             this._radioElectrodeRightArm.Location = new System.Drawing.Point(31, 19);
             this._radioElectrodeRightArm.Name = "_radioElectrodeRightArm";
-            this._radioElectrodeRightArm.Size = new System.Drawing.Size(52, 19);
+            this._radioElectrodeRightArm.Size = new System.Drawing.Size(64, 24);
             this._radioElectrodeRightArm.TabIndex = 53;
             this._radioElectrodeRightArm.Text = "RA/R";
             this._radioElectrodeRightArm.UseVisualStyleBackColor = true;
@@ -415,7 +415,7 @@
             0,
             0});
             this.numWaveformPulseWidth.Name = "numWaveformPulseWidth";
-            this.numWaveformPulseWidth.Size = new System.Drawing.Size(80, 23);
+            this.numWaveformPulseWidth.Size = new System.Drawing.Size(80, 27);
             this.numWaveformPulseWidth.TabIndex = 50;
             this.numWaveformPulseWidth.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numWaveformPulseWidth.Value = new decimal(new int[] {
@@ -439,7 +439,7 @@
             "ECG"});
             this.comboWaveform.Location = new System.Drawing.Point(269, 5);
             this.comboWaveform.Name = "comboWaveform";
-            this.comboWaveform.Size = new System.Drawing.Size(93, 23);
+            this.comboWaveform.Size = new System.Drawing.Size(93, 28);
             this.comboWaveform.TabIndex = 47;
             this.comboWaveform.SelectedIndexChanged += new System.EventHandler(this.onWaveformSelectedIndexChanged);
             // 
@@ -480,7 +480,7 @@
             0,
             0});
             this.numTimeQTInterval.Name = "numTimeQTInterval";
-            this.numTimeQTInterval.Size = new System.Drawing.Size(80, 23);
+            this.numTimeQTInterval.Size = new System.Drawing.Size(80, 27);
             this.numTimeQTInterval.TabIndex = 63;
             this.numTimeQTInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numTimeQTInterval.Value = new decimal(new int[] {
@@ -527,7 +527,7 @@
             0,
             0});
             this.numTimePRInterval.Name = "numTimePRInterval";
-            this.numTimePRInterval.Size = new System.Drawing.Size(80, 23);
+            this.numTimePRInterval.Size = new System.Drawing.Size(80, 27);
             this.numTimePRInterval.TabIndex = 60;
             this.numTimePRInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numTimePRInterval.Value = new decimal(new int[] {
@@ -592,7 +592,7 @@
             0,
             0});
             this.numTimeQRSDuration.Name = "numTimeQRSDuration";
-            this.numTimeQRSDuration.Size = new System.Drawing.Size(80, 23);
+            this.numTimeQRSDuration.Size = new System.Drawing.Size(80, 27);
             this.numTimeQRSDuration.TabIndex = 56;
             this.numTimeQRSDuration.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numTimeQRSDuration.Value = new decimal(new int[] {
@@ -625,7 +625,7 @@
             this.checkDCOffsetVariable.AutoSize = true;
             this.checkDCOffsetVariable.Location = new System.Drawing.Point(30, 52);
             this.checkDCOffsetVariable.Name = "checkDCOffsetVariable";
-            this.checkDCOffsetVariable.Size = new System.Drawing.Size(67, 19);
+            this.checkDCOffsetVariable.Size = new System.Drawing.Size(85, 24);
             this.checkDCOffsetVariable.TabIndex = 69;
             this.checkDCOffsetVariable.Text = "Variable";
             this.checkDCOffsetVariable.UseVisualStyleBackColor = true;
@@ -658,7 +658,7 @@
             0,
             -2147483648});
             this.numDCOffset.Name = "numDCOffset";
-            this.numDCOffset.Size = new System.Drawing.Size(80, 23);
+            this.numDCOffset.Size = new System.Drawing.Size(80, 27);
             this.numDCOffset.TabIndex = 67;
             this.numDCOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numDCOffset.ValueChanged += new System.EventHandler(this.onDCOffsetValueChanged);
@@ -690,7 +690,7 @@
             this.checkImpedanceTest.AutoSize = true;
             this.checkImpedanceTest.Location = new System.Drawing.Point(17, 19);
             this.checkImpedanceTest.Name = "checkImpedanceTest";
-            this.checkImpedanceTest.Size = new System.Drawing.Size(165, 19);
+            this.checkImpedanceTest.Size = new System.Drawing.Size(204, 24);
             this.checkImpedanceTest.TabIndex = 71;
             this.checkImpedanceTest.Text = "620kΩ/4.7nF (on=shorted)";
             this.checkImpedanceTest.UseVisualStyleBackColor = true;
@@ -726,7 +726,7 @@
             0,
             0});
             this.numBPM.Name = "numBPM";
-            this.numBPM.Size = new System.Drawing.Size(70, 23);
+            this.numBPM.Size = new System.Drawing.Size(70, 27);
             this.numBPM.TabIndex = 74;
             this.numBPM.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numBPM.Value = new decimal(new int[] {
@@ -758,7 +758,7 @@
             // 
             // ECGPage
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.groupElectrode);
             this.Controls.Add(this.numBPM);
@@ -843,8 +843,8 @@
         private System.Windows.Forms.GroupBox groupDCOffset;
         private System.Windows.Forms.CheckBox checkImpedanceTest;
         private System.Windows.Forms.GroupBox groupImpedance;
-        private System.Windows.Forms.NumericUpDown numBPM;
         private System.Windows.Forms.Label labelPreviewBPM;
         private System.Windows.Forms.GroupBox groupElectrode;
+        public System.Windows.Forms.NumericUpDown numBPM;
     }
 }

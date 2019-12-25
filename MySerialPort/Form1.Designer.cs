@@ -634,7 +634,7 @@
             this.groupBox4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.groupBox4.Size = new System.Drawing.Size(548, 139);
+            this.groupBox4.Size = new System.Drawing.Size(600, 139);
             this.groupBox4.TabIndex = 34;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "QRCode Setup";
@@ -1022,7 +1022,7 @@
             this.signal_generator.Padding = new System.Windows.Forms.Padding(3);
             this.signal_generator.Size = new System.Drawing.Size(1291, 489);
             this.signal_generator.TabIndex = 4;
-            this.signal_generator.Text = "鲸杨信号发生器";
+            this.signal_generator.Text = "AECG100";
             this.signal_generator.UseVisualStyleBackColor = true;
             // 
             // buttonManual
