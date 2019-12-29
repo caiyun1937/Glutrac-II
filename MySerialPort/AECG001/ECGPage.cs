@@ -10,6 +10,8 @@ using WhaleTeqSDK;
 
 namespace AECG100Demo
 {
+    public delegate void setnumBMPValue(string textValue);
+
     public partial class ECGPage: UserControl, IPageControl
     {
         private ECG_WAVEFORM ecgWaveform;
@@ -83,14 +85,13 @@ namespace AECG100Demo
         {
             if ((ecgWaveform.WaveformType > (int)ECGWaveformType.Square) && (numBPM.Value > 300)) {
                 numBPM.Value = 300;
-                return;
             }
 
-            if ((ecgWaveform.WaveformType > (int)ECGWaveformType.Square) && (numBPM.Value < 30)) {
+            else if ((ecgWaveform.WaveformType > (int)ECGWaveformType.Square) && (numBPM.Value < 30)) {
                 numBPM.Value = 30;
-                return;
             }
-
+            Form form1 = new Form();
+            
             ecgWaveform.Frequency = (double)numBPM.Value / 60.0;
             ecgWaveform.TimePeriod = (int)(60000m / numBPM.Value);
         }

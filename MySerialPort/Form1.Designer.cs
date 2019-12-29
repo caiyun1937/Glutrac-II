@@ -57,8 +57,6 @@
             this.btn_go = new System.Windows.Forms.Button();
             this.txt_output_excel = new System.Windows.Forms.TextBox();
             this.btn_again = new System.Windows.Forms.Button();
-            this.noUpDown = new System.Windows.Forms.NumericUpDown();
-            this.label3 = new System.Windows.Forms.Label();
             this.btn_output_excel = new System.Windows.Forms.Button();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -109,7 +107,6 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.groupBox1.SuspendLayout();
@@ -121,7 +118,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxShow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMain)).BeginInit();
             this.panel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.noUpDown)).BeginInit();
             this.tabPage1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -175,8 +171,11 @@
             "主板测试",
             "PPG PCBA测试",
             "PPG 底座测试",
-            "NIR 红绿IR测试",
-            "NIR 大波长测试"});
+            "NIR 短波段测试",
+            "NIR 长波段测试",
+            "整机测试",
+            "整机NIR",
+            "NIR PCBA测试"});
             this.comboBoxTestItem.Location = new System.Drawing.Point(419, 17);
             this.comboBoxTestItem.Name = "comboBoxTestItem";
             this.comboBoxTestItem.Size = new System.Drawing.Size(173, 23);
@@ -385,9 +384,7 @@
             this.panel3.Controls.Add(this.btn_go);
             this.panel3.Controls.Add(this.txt_output_excel);
             this.panel3.Controls.Add(this.btn_again);
-            this.panel3.Controls.Add(this.noUpDown);
             this.panel3.Controls.Add(this.btn_print_QRCode);
-            this.panel3.Controls.Add(this.label3);
             this.panel3.Controls.Add(this.btn_output_excel);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel3.Location = new System.Drawing.Point(3, 3);
@@ -401,7 +398,7 @@
             this.btn_go.Name = "btn_go";
             this.btn_go.Size = new System.Drawing.Size(130, 25);
             this.btn_go.TabIndex = 4;
-            this.btn_go.Text = "一键测试";
+            this.btn_go.Text = "开始测试";
             this.btn_go.UseVisualStyleBackColor = true;
             this.btn_go.Click += new System.EventHandler(this.btn_go_Click);
             // 
@@ -410,7 +407,7 @@
             this.txt_output_excel.Location = new System.Drawing.Point(551, 5);
             this.txt_output_excel.Name = "txt_output_excel";
             this.txt_output_excel.ReadOnly = true;
-            this.txt_output_excel.Size = new System.Drawing.Size(461, 25);
+            this.txt_output_excel.Size = new System.Drawing.Size(683, 25);
             this.txt_output_excel.TabIndex = 5;
             // 
             // btn_again
@@ -422,32 +419,6 @@
             this.btn_again.Text = "复位";
             this.btn_again.UseVisualStyleBackColor = true;
             this.btn_again.Click += new System.EventHandler(this.btn_again_Click);
-            // 
-            // noUpDown
-            // 
-            this.noUpDown.Location = new System.Drawing.Point(1123, 5);
-            this.noUpDown.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.noUpDown.Name = "noUpDown";
-            this.noUpDown.Size = new System.Drawing.Size(84, 25);
-            this.noUpDown.TabIndex = 9;
-            this.noUpDown.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(1018, 10);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(99, 15);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "超时时间(S):";
             // 
             // btn_output_excel
             // 
@@ -1031,7 +1002,7 @@
             this.buttonManual.Name = "buttonManual";
             this.buttonManual.Size = new System.Drawing.Size(124, 29);
             this.buttonManual.TabIndex = 35;
-            this.buttonManual.Text = "手动输入SN码";
+            this.buttonManual.Text = "自定义SN码";
             this.buttonManual.UseVisualStyleBackColor = true;
             this.buttonManual.Click += new System.EventHandler(this.buttonManual_Click);
             // 
@@ -1139,7 +1110,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMain)).EndInit();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.noUpDown)).EndInit();
             this.tabPage1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
@@ -1193,10 +1163,7 @@
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.DataGridView dataGridViewSN;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.DataGridView dataGridViewMain;
         private System.Windows.Forms.Button btn_output_excel;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.NumericUpDown noUpDown;
         private System.Windows.Forms.TextBox txt_output_excel;
         private System.Windows.Forms.Button btn_go;
         private System.Windows.Forms.Button btn_again;
@@ -1248,7 +1215,6 @@
         private System.Windows.Forms.ComboBox comboBoxTestItem;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.GroupBox groupBox5;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Label labelScope;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
@@ -1259,6 +1225,7 @@
         private System.Windows.Forms.Panel panel6;
         private System.Windows.Forms.TabPage signal_generator;
         private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.DataGridView dataGridViewMain;
     }
 }
 

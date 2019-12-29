@@ -29,7 +29,11 @@ enum UPPER_MODE
 enum SIGNAL_MODE
 {
     SIGNAL_NONE = 0,
+    PPG_GREEN,
+    PPG_RED,
     PPG_IR,
+    NIR_GREEN,
+    NIR_RED,
     NIR_IR,
     NIR_1450,
     NIR_1600,
@@ -79,6 +83,7 @@ namespace MySerialPort
         private string ExpandedName = "";
 
         private myMsgBox myMessageBox = new myMsgBox();
+        private ECGPage ecgPage = new ECGPage();
 
         private void GetNewSN()
         {
@@ -142,8 +147,8 @@ namespace MySerialPort
                         foreach (DataGridViewRow dgrSN in dataGridViewMain.Rows)
                         {
                             //更新测试表
-                            Object inputSN = dgrSN.Cells["名字"].EditedFormattedValue;
-                            if (inputSN == null || inputSN.ToString() == "" || !"机器码写入".Equals(inputSN.ToString()))
+                            Object inputSN = dgrSN.Cells["输入命令"].EditedFormattedValue;
+                            if (inputSN == null || inputSN.ToString() == "" || !inputSN.ToString().Substring(6, 2).Equals("23"))
                             {
                                 continue;
                             }
@@ -341,8 +346,8 @@ namespace MySerialPort
             }
         }
 
-        bool isOpened = false;//串口状态标志
-        bool spectrographEnable = false;
+        bool isOpened = false;                      //串口状态标志
+        bool spectrographEnable = false;            //是否需要连接光谱仪
 
         private bool getTestCase()
         {
@@ -369,16 +374,27 @@ namespace MySerialPort
                 this.dataGridViewMain.DataSource = bindData("PPG测试" + ExpandedName);
                 this.tabPage2.Text = "PPG测试";
             }
-            else if (comboBoxTestItem.SelectedIndex == 3 && File.Exists("NIR红绿IR测试" + ExpandedName))
+            else if (comboBoxTestItem.SelectedIndex == 3 && File.Exists("NIR短波段测试" + ExpandedName))
             {
-                this.dataGridViewMain.DataSource = bindData("NIR红绿IR测试" + ExpandedName);
-                this.tabPage2.Text = "NIR红绿IR测试";
+                this.dataGridViewMain.DataSource = bindData("NIR短波段测试" + ExpandedName);
+                this.tabPage2.Text = "NIR短波段测试";
                 spectrographEnable = true;
             }
-            else if (comboBoxTestItem.SelectedIndex == 4 && File.Exists("NIR1050以上测试" + ExpandedName))
+            else if (comboBoxTestItem.SelectedIndex == 4 && File.Exists("NIR长波段测试" + ExpandedName))
             {
-                this.dataGridViewMain.DataSource = bindData("NIR1050以上测试" + ExpandedName);
-                this.tabPage2.Text = "NIR1050以上测试";
+                this.dataGridViewMain.DataSource = bindData("NIR长波段测试" + ExpandedName);
+                this.tabPage2.Text = "NIR长波段测试";
+                spectrographEnable = true;
+            }
+            else if (comboBoxTestItem.SelectedIndex == 5 && File.Exists("整机测试" + ExpandedName))
+            {
+                this.dataGridViewMain.DataSource = bindData("整机测试" + ExpandedName);
+                this.tabPage2.Text = "整机测试";
+            }
+            else if (comboBoxTestItem.SelectedIndex == 7 && File.Exists("NIR测试" + ExpandedName))
+            {
+                this.dataGridViewMain.DataSource = bindData("NIR测试" + ExpandedName);
+                this.tabPage2.Text = "NIR测试";
                 spectrographEnable = true;
             }
             else
@@ -396,7 +412,7 @@ namespace MySerialPort
                 myMessageBox.Show("检测不到串口!!", Color.Red);
                 return;
             }
-
+            
             if (false == getTestCase())
             {
                 return;
@@ -503,14 +519,14 @@ namespace MySerialPort
                 m_DeviceHandle_8U2 = hDevice_8U2;
                 if (avaspec.AVS_UseHighResAdc((IntPtr)m_DeviceHandle_8U2, true) != avaspec.ERR_SUCCESS)
                 {
-                    myMessageBox.Show("PPG和NIR测试请链接光谱仪，重启软件!!", Color.Red);
+                    myMessageBox.Show("PPG和NIR的PCBA测试请连接光谱仪，重启软件!!", Color.Red);
                     System.Environment.Exit(0);
                 }
 
                 m_DeviceHandle_9U2 = hDevice_9U2;
                 if (avaspec.AVS_UseHighResAdc((IntPtr)m_DeviceHandle_9U2, true) != avaspec.ERR_SUCCESS)
                 {
-                    myMessageBox.Show("PPG和NIR测试请链接光谱仪，重启软件!!", Color.Red);
+                    myMessageBox.Show("PPG和NIR的PCBA测试请连接光谱仪，重启软件!!", Color.Red);
                     System.Environment.Exit(0);
                 }
 
@@ -788,69 +804,72 @@ namespace MySerialPort
         }
         private void sampleImageShow(String str)            //显示示例图
         {
-            if (str.Substring(4, 2).Equals("0E"))   //背灯关
+            if (str.Equals("0E"))   //背灯关
             {
                 pictureBoxShow.Image = imageList1.Images[0];
                 pictureBoxShow.Visible = true;
             }
-            else if (str.Substring(4, 2).Equals("0D"))   //背灯开
+            else if (str.Equals("0D"))   //背灯开
             {
                 pictureBoxShow.Image = imageList1.Images[1];
                 pictureBoxShow.Visible = true;
             }
-            else if (str.Substring(4, 2).Equals("0F"))   //白场
+            else if (str.Equals("0F"))   //白场
             {
                 pictureBoxShow.Image = imageList1.Images[2];
                 pictureBoxShow.Visible = true;
             }
-            else if (str.Substring(4, 2).Equals("30"))   //nir 绿灯
+            else if (str.Equals("30"))   //nir 绿灯
             {
                 pictureBoxShow.Image = imageList1.Images[6];
                 pictureBoxShow.Visible = true;
+                SignalMode = SIGNAL_MODE.NIR_GREEN;
             }
-            else if (str.Substring(4, 2).Equals("31"))   //nir 红灯
+            else if (str.Equals("31"))   //nir 红灯
             {
                 pictureBoxShow.Image = imageList1.Images[7];
                 pictureBoxShow.Visible = true;
+                SignalMode = SIGNAL_MODE.NIR_RED;
             }
-            else if (str.Substring(4, 2).Equals("32"))   //nir ir
+            else if (str.Equals("32"))   //nir ir
             {
                 pictureBoxShow.Image = imageList1.Images[8];
                 pictureBoxShow.Visible = true;
                 SignalMode = SIGNAL_MODE.NIR_IR;
             }
-            else if (str.Substring(4, 2).Equals("33"))   //nir 1650
+            else if (str.Equals("33"))   //nir 1650
             {
                 pictureBoxShow.Image = imageList1.Images[9];
                 pictureBoxShow.Visible = true;
-                //SignalMode = SIGNAL_MODE.NIR_1600;
-                SignalMode = SIGNAL_MODE.NIR_1650;
+                SignalMode = SIGNAL_MODE.NIR_1600;
+                //SignalMode = SIGNAL_MODE.NIR_1650;
             }
-            else if (str.Substring(4, 2).Equals("34"))   //nir 1050
+            else if (str.Equals("34"))   //nir 1050
             {
                 pictureBoxShow.Image = imageList1.Images[10];
                 pictureBoxShow.Visible = true;
                 SignalMode = SIGNAL_MODE.NIR_1450;
             }
-            else if (str.Substring(4, 2).Equals("35"))   //nir 1450
+            else if (str.Equals("35"))   //nir 1450
             {
                 pictureBoxShow.Image = imageList1.Images[11];
                 pictureBoxShow.Visible = true;
                 SignalMode = SIGNAL_MODE.NIR_1450;
             }
-            else if (str.Substring(4, 2).Equals("36"))   //nir 1550
+            else if (str.Equals("36"))   //nir 1550
             {
                 pictureBoxShow.Image = imageList1.Images[12];
                 pictureBoxShow.Visible = true;
-                //SignalMode = SIGNAL_MODE.NIR_1600;
-                SignalMode = SIGNAL_MODE.NIR_1650;
+                SignalMode = SIGNAL_MODE.NIR_1600;
+                //SignalMode = SIGNAL_MODE.NIR_1650;
             }
-            else if (str.Substring(4, 2).Equals("37"))   //ppg 绿灯1
+            else if (str.Equals("37"))   //ppg 绿灯1
             {
                 if(spectrographEnable == true)
                 {
                     pictureBoxShow.Image = imageList1.Images[16];
                     pictureBoxShow.Visible = true;
+                    SignalMode = SIGNAL_MODE.PPG_GREEN;
                 }
                 else
                 {
@@ -858,12 +877,13 @@ namespace MySerialPort
                     pictureBoxShow.Visible = true;
                 }
             }
-            else if (str.Substring(4, 2).Equals("38"))   //ppg 红灯 or 绿灯2
+            else if (str.Equals("38"))   //ppg 红灯 or 绿灯2
             {
                 if (spectrographEnable == true)
                 {
                     pictureBoxShow.Image = imageList1.Images[17];
                     pictureBoxShow.Visible = true;
+                    SignalMode = SIGNAL_MODE.PPG_GREEN;
                 }
                 else
                 {
@@ -871,7 +891,7 @@ namespace MySerialPort
                     pictureBoxShow.Visible = true;
                 }
             }
-            else if (str.Substring(4, 2).Equals("39"))   //ppg ir
+            else if (str.Equals("39"))   //ppg ir
             {
                 if (spectrographEnable == true)
                 {
@@ -887,10 +907,35 @@ namespace MySerialPort
             }
         }
 
-        ECGPage ecgPage = new ECGPage();
+        private void CheckECGHR()
+        {
+            DateTime dt = DateTime.Now;
+
+            while (serialPort.BytesToRead == 0)
+            {
+                Thread.Sleep(1);
+            }
+            Thread.Sleep(50); //50毫秒内数据接收完毕，可根据实际情况调整
+            byte[] recData = new byte[serialPort.BytesToRead];
+            serialPort.Read(recData, 0, recData.Length);
+
+            byte[] temp = recData;
+            string str = byteToHexStr(temp);
+
+            if(ecgPage.numBPM.Value.Equals(str.Substring(4, 2)))
+            {
+                myMessageBox.DialogResult = DialogResult.Yes;
+                myMessageBox.Close();
+            }
+        }
+
+        bool gBTLinkStatus = false;
 
         private void btn_go_Click(object sender, EventArgs e)
         {
+            ecgPage.Show();
+
+            
             if (dataGridViewMain.DataSource == null)
             {
                 myMessageBox.Show("目标数据源为空,请确认目录下存在测试表!", Color.Black);
@@ -899,15 +944,20 @@ namespace MySerialPort
 
             if (UpperMode == UPPER_MODE.SCAN_QRCODE)
             {
-                if ((comboBoxTestItem.SelectedIndex == 0 && textBoxSN.Text.Length != 14) || ((comboBoxTestItem.SelectedIndex >= 1 && comboBoxTestItem.SelectedIndex <= 4) && textBoxSN.Text.Length != 13))
+                if (textBoxSN.Text != "" && ((comboBoxTestItem.SelectedIndex == 0 && textBoxSN.Text.Length == 14 && textBoxSN.Text.Substring(0, 3).Equals("BBF")) ||                            // 主板测试
+                    ((comboBoxTestItem.SelectedIndex == 1 || comboBoxTestItem.SelectedIndex == 2) && textBoxSN.Text.Length == 13 && textBoxSN.Text.Substring(0, 3).Equals("PPG")) ||            // PPG_PCBA || PPG底座测试
+                    ((comboBoxTestItem.SelectedIndex == 3 || comboBoxTestItem.SelectedIndex == 4 || comboBoxTestItem.SelectedIndex == 7) && textBoxSN.Text.Length == 13 && textBoxSN.Text.Substring(0, 3).Equals("NIR")) ||            // NIR短波段 || 长波段测试 || NIR模组测试
+                    ((comboBoxTestItem.SelectedIndex == 5 || comboBoxTestItem.SelectedIndex == 6) && textBoxSN.Text.Length == 12)))                                                             // 整机测试扫MAC地址二维码
+                {
+                    strSN = textBoxSN.Text;
+                }
+                else
                 {
                     textBoxSN.Text = "";
                     textBoxSN.Focus();
                     myMessageBox.Show("请在英文输入法环境下使用扫码枪扫描二维码!!", Color.Red);
                     return;
                 }
-                else
-                    strSN = textBoxSN.Text;
             }
 
             testError = true;
@@ -919,40 +969,207 @@ namespace MySerialPort
                 foreach (DataGridViewRow dgr in dataGridViewMain.Rows)
                 {
                     //判断关键列是否是空，空就跳过
-                    Object input = dgr.Cells["输入命令"].EditedFormattedValue;
-                    if (input == null || input.ToString() == "")
-                    {
+
+                    String inputName = dgr.Cells["名字"].EditedFormattedValue.ToString();
+                    String inputCommand = dgr.Cells["输入命令"].EditedFormattedValue.ToString();
+
+                    if (inputName == "")
                         continue;
-                    }
 
                     //发送数据
-                    if ("充电电流" == dgr.Cells["名字"].Value.ToString())
+                    if ("充电电流" == inputName)             //  没有输入命令的测试项
                     {
-                        myMessageBox.Show("请观察万用表" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否在100~450mA之间？", Color.Black);
+                        myMessageBox.Show("请观察万用表" + inputName + "是否在100~450mA之间？", Color.Black);
                         if (myMessageBox.DialogResult == DialogResult.Yes)
                         {
                             dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                             dgr.Cells["是否通过"].Value = "✔";
                             dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
                         }
-                        else if(myMessageBox.DialogResult == DialogResult.No)
+                        else if (myMessageBox.DialogResult == DialogResult.No)
                         {
                             dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                             dgr.Cells["是否通过"].Value = "✘";
                             dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
                             testError = false;
                         }
+                        continue;
+                    }
+                    else if (("SN码写入" == inputName || "SN码读出" == inputName || "SN码校验" == inputName) && comboBoxTestItem.SelectedIndex == 5)               // 实际是MAC地址
+                    {
+                        continue;
+                    }
+                    else if ("蓝牙连接测试" == inputName)
+                    {
+                        myMessageBox.Show("是否需要测试蓝牙连接+ECG心率", Color.Red);
+                        if (myMessageBox.DialogResult == DialogResult.Yes)
+                        {
+                            QRCode(textBoxMAC.Text);
+                            myMessageBox.Show("请用APP点击【主板蓝牙连接 + ECG功能测试】扫描二维码进行测试", Color.Black);
 
+                            myMessageBox.Show("蓝牙连接是否成功", Color.Black);
+                            if (myMessageBox.DialogResult == DialogResult.Yes)
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✔";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
+                                pictureBoxShow.Visible = false;
+                                gBTLinkStatus = true;
+                            }
+                            else if (myMessageBox.DialogResult == DialogResult.No)
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✘";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
+                                pictureBoxShow.Visible = false;
+                                testError = false;
+                                gBTLinkStatus = false;
+                            }
+                            continue;
+                        }
+                        else
+                        {
+                            gBTLinkStatus = false;
+                            continue;
+                        }
+                    }
+                    else if ("ECG心率测试" == inputName)
+                    {
+                        if (gBTLinkStatus == true)
+                        {
+                            myMessageBox.Show("请观察APP的ECG心率测试是否通过", Color.Black);
+                            if (myMessageBox.DialogResult == DialogResult.Yes)
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✔";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
+                            }
+                            else if (myMessageBox.DialogResult == DialogResult.No)
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✘";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
+                                testError = false;
+                            }
+                        }
                         continue;
                     }
 
-                    byte[] temps = strToToHexByte(input.ToString());
+                    byte[] temps = strToToHexByte(inputCommand);
+                    byte[] temp;
+                    string str;
 
                     //接受发送
-                    byte[] temp = ReadPort(temps, input.ToString());
-                    string str = byteToHexStr(temp);
+                    WritePort(temps, inputCommand);
+
+                    if (comboBoxTestItem.SelectedIndex == 1 || comboBoxTestItem.SelectedIndex == 3 || comboBoxTestItem.SelectedIndex == 4 || comboBoxTestItem.SelectedIndex == 7)       // ggp nir pcba测试以光谱仪为准
+                    {
+                        if ((inputCommand.Substring(6, 2).Equals("30") || inputCommand.Substring(6, 2).Equals("31") ||
+                            inputCommand.Substring(6, 2).Equals("32") || inputCommand.Substring(6, 2).Equals("33") ||
+                            inputCommand.Substring(6, 2).Equals("34") || inputCommand.Substring(6, 2).Equals("35") ||
+                            inputCommand.Substring(6, 2).Equals("36") || inputCommand.Substring(6, 2).Equals("37") ||
+                            inputCommand.Substring(6, 2).Equals("38") || inputCommand.Substring(6, 2).Equals("39")) &&
+                            "SI1171测试" != inputName && "ADPD105测试" != inputName)                             // SI1171 || ADPD105测试
+                        {
+                            sampleImageShow(inputCommand.Substring(6, 2));
+                            signalCnt = 0;
+
+                            chart1.Visible = true;
+                            chart1.BringToFront();
+
+                            labelScope.Visible = true;
+                            labelScope.BringToFront();
+
+                            myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+
+                            pictureBoxShow.Visible = false;
+                            chart1.Visible = false;
+                            chart1.SendToBack();
+                            labelScope.Visible = false;
+                            labelScope.SendToBack();
+
+                            if (myMessageBox.DialogResult == DialogResult.Yes)
+                            {
+                                yesResult(dgr, inputCommand);
+                            }
+                            else if (myMessageBox.DialogResult == DialogResult.No)
+                            {
+                                failResult(dgr, inputCommand.Substring(4, 2));
+                            }
+
+                            if (serialPort.BytesToRead != 0)
+                            {
+                                temp = ReadPort(temps, inputCommand);
+                                str = byteToHexStr(temp);
+                                dgr.Cells["返回参数"].Value = str;
+                            }
+
+                            continue;
+                        }
+                    }
+
+                    temp = ReadPort(temps, inputCommand);
+                    str = byteToHexStr(temp);
                     dgr.Cells["返回参数"].Value = str;
                     String result = str.Substring(6, 2);
+
+                    //判断温湿度命令
+                    if (str.Substring(4, 2).Equals("17"))  //判断PPG温湿度是否通过
+                    {
+                        if ((comboBoxTestItem.SelectedIndex == 1 || comboBoxTestItem.SelectedIndex == 2))
+                        {
+                            if (str.Substring(6, 2).Equals("00"))
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✔";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
+                                dgr.Cells["数值显示"].Value = getResultInRecve(str);
+                            }
+                            else
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✘";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
+                                testError = false;
+                            }
+                        }
+                        else if (comboBoxTestItem.SelectedIndex == 7)
+                        {
+                            if (str.Substring(8, 2).Equals("00"))  //判断NIR温湿度是否通过
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✔";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
+                                dgr.Cells["数值显示"].Value = getResultInRecve(str);
+                            }
+                            else
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✘";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
+                                testError = false;
+                            }
+                        }
+                        else if (comboBoxTestItem.SelectedIndex == 5)
+                        {
+                            if (str.Substring(6, 2).Equals("00") && str.Substring(8, 2).Equals("00"))
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✔";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
+                                dgr.Cells["数值显示"].Value = getResultInRecve(str);
+                            }
+                            else
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✘";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
+                                testError = false;
+                            }
+                        }
+
+                        continue;
+                    }
 
                     //判断是否需要弹出框
                     if (result != null && "00".Equals(result))
@@ -961,14 +1178,6 @@ namespace MySerialPort
                         dgr.Cells["是否通过"].Value = "✔";
                         dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
                         dgr.Cells["数值显示"].Value = getResultInRecve(str);
-                        //判断温湿度命令
-                        if (str.Substring(4, 2).Equals("17") && str.Substring(8, 2).Equals("01"))  //判断hdtc2是否通过
-                        {
-                            dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
-                            dgr.Cells["是否通过"].Value = "✘";
-                            dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
-                            testError = false;
-                        }
                     }
                     else if ("01".Equals(result))
                     {
@@ -979,7 +1188,7 @@ namespace MySerialPort
                     }
                     else if ("02".Equals(result))
                     {
-                        sampleImageShow(str);
+                        sampleImageShow(str.Substring(4, 2));
                         signalCnt = 0;
 
                         if (str.Substring(4, 2).Equals("19"))   //蓝牙不提醒
@@ -989,30 +1198,6 @@ namespace MySerialPort
                         else if (str.Substring(4, 2).Equals("24"))   //sn不提醒
                         {
                             CheckSN(dgr, str);
-                        }
-                        else if (str.Substring(4, 2).Equals("39") && spectrographEnable == true)   // ppg_ir
-                        {
-                            chart1.Visible = true;
-                            chart1.BringToFront();
-
-                            labelScope.Visible = true;
-                            labelScope.BringToFront();
-
-                            myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
-                        }
-                        else if (str.Substring(4, 2).Equals("32") || str.Substring(4, 2).Equals("33") || str.Substring(4, 2).Equals("34") || str.Substring(4, 2).Equals("35") || str.Substring(4, 2).Equals("36"))   // nir
-                        {
-                            chart1.Visible = true;
-                            chart1.BringToFront();
-
-                            labelScope.Visible = true;
-                            labelScope.BringToFront();
-
-                            myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
-                        }
-                        else if (str.Substring(4, 2).Equals("50"))      // ECG心率
-                        {
-                            ecgPage.numBPM.Value.Equals("");
                         }
                         else
                             myMessageBox.Show("对比示例图,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
@@ -1033,77 +1218,14 @@ namespace MySerialPort
                         }
                     }
 
-                    if (result != null && "02".Equals(str.Substring(4, 2)))     //  测试结束
-                    {
-                        break;
-                    }
-
                     Thread.Sleep(200);
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.GetBaseException());
-                myMessageBox.Show("请确保点亮屏幕再开始测试！！", Color.Red);
+                myMessageBox.Show("检测不到模块或者熄屏导致通信异常,请检测环境重新测试！！", Color.Red);
                 return;
-            }
-
-            if (comboBoxTestItem.SelectedIndex == 0)
-            {
-                myMessageBox.Show("是否需要测试蓝牙连接+ECG心率", Color.Red);
-                if (myMessageBox.DialogResult == DialogResult.Yes)
-                {
-                    QRCode(textBoxMAC.Text);
-                    myMessageBox.Show("请用APP点击【主板蓝牙连接 + ECG功能测试】扫描二维码进行测试",Color.Black);
-
-                    foreach (DataGridViewRow dgr_ECG in dataGridViewMain.Rows)
-                    {
-                        Object input = dgr_ECG.Cells["名字"].EditedFormattedValue;
-
-                        if (input.Equals("蓝牙连接测试"))           //  从SN码表中检测到MAC地址
-                        {
-                            myMessageBox.Show("蓝牙连接是否成功", Color.Black);
-                            if (myMessageBox.DialogResult == DialogResult.Yes)
-                            {
-                                dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
-                                dgr_ECG.Cells["是否通过"].Value = "✔";
-                                dgr_ECG.Cells["是否通过"].Style.ForeColor = Color.Green;
-                                pictureBoxShow.Visible = false;
-                            }
-                            else
-                            {
-                                dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
-                                dgr_ECG.Cells["是否通过"].Value = "✘";
-                                dgr_ECG.Cells["是否通过"].Style.ForeColor = Color.Red;
-                                pictureBoxShow.Visible = false;
-                                testError = false;
-                                break;
-                            }
-                        }
-
-                        if (input.Equals("ECG心率测试"))           //  从SN码表中检测到MAC地址
-                        {
-                            myMessageBox.Show("请观察APP的ECG心率测试是否通过", Color.Black);
-                            if (myMessageBox.DialogResult == DialogResult.Yes)
-                            {
-                                dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
-                                dgr_ECG.Cells["是否通过"].Value = "✔";
-                                dgr_ECG.Cells["是否通过"].Style.ForeColor = Color.Green;
-                            }
-                            else
-                            {
-                                dgr_ECG.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
-                                dgr_ECG.Cells["是否通过"].Value = "✘";
-                                dgr_ECG.Cells["是否通过"].Style.ForeColor = Color.Red;
-                                testError = false;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-
-                }
             }
 
             if (true == testError)
@@ -1122,6 +1244,17 @@ namespace MySerialPort
         }
 
         public static object _lock = new object();
+
+        private void WritePort(byte[] sendData, String stt)
+        {
+            if (!serialPort.IsOpen)
+            {
+                serialPort.Open();
+            }
+
+            //发送数据
+            serialPort.Write(sendData, 0, sendData.Length);
+        }
         //同步读取数据并返回
         private byte[] ReadPort(byte[] sendData, String stt)
         {
@@ -1130,22 +1263,28 @@ namespace MySerialPort
                 serialPort.Open();
             }
 
-            //发送数据
-            if(sendData[2] != 0x50)
-                serialPort.Write(sendData, 0, sendData.Length);
-
             //读取返回数据
             DateTime dt = DateTime.Now;
             int noresponse = 0;
 
             if (sendData[2] == 0x22)            // nir时钟矫正需要等待反馈
+            {
                 noresponse = 30;
-            else if (sendData[2] == 0x50)
+            }
+            else if (sendData[2] == 0x50)       // ECG心率
             {
                 noresponse = 40;
             }
+            else if (sendData[2] == 0x39)       // SI1171测试 PPG IR
+            {
+                noresponse = 30;
+            }
+            else if (sendData[2] == 0x32)       // ADPD105测试 NIR IR
+            {
+                noresponse = 30;
+            }
             else
-                noresponse = Convert.ToInt32(noUpDown.Value);
+                noresponse = 6;
 
             while (serialPort.BytesToRead == 0)
             {
@@ -1167,6 +1306,12 @@ namespace MySerialPort
             // 保存测试报告
             DateTime dt = DateTime.Now;
             String commandFile = "";
+
+            if (dataGridViewMain.DataSource == null)
+            {
+                myMessageBox.Show("测试表格没有数据,无法保存,请关闭测试表重新测试!", Color.Red);
+                return;
+            }
 
             btn_go.Enabled = false;
             btn_output_excel.Enabled = false;
@@ -1200,12 +1345,15 @@ namespace MySerialPort
             {
                 commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_HIGHBAND_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
-
-            if (dataGridViewMain.DataSource == null)
+            else if (comboBoxTestItem.SelectedIndex == 5)
             {
-                myMessageBox.Show("测试表格没有数据,无法保存,请关闭测试表重新测试!", Color.Red);
-                return;
+                commandFile = @"D:\TestReport\Local\" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
+            else if (comboBoxTestItem.SelectedIndex == 7)
+            {
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_PCBA_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+            }
+
             DataTable table = (DataTable)dataGridViewMain.DataSource;
 
             ExcelHelper excelHelper = new ExcelHelper(commandFile);
@@ -1257,24 +1405,23 @@ namespace MySerialPort
                 myMessageBox.Show("无效行!", Color.Red);
                 return;
             }
-            
+
+            serialPort.DataReceived -= new SerialDataReceivedEventHandler(post_DataReceived);
+            receive = 0; //解除绑定函数
+
             try
             {
-                serialPort.DataReceived -= new SerialDataReceivedEventHandler(post_DataReceived);
-                receive = 0; //解除绑定函数
-
                 DataGridViewRow dgv = dataGridViewMain.SelectedRows[0];
-                String sts = dgv.Cells["输入命令"].EditedFormattedValue.ToString();
+
+                String inputName = dgv.Cells["名字"].EditedFormattedValue.ToString();
+                String inputCommand = dgv.Cells["输入命令"].EditedFormattedValue.ToString();
+
                 dgv.Cells["返回参数"].Value = "";
                 dgv.Cells["是否通过"].Value = "";
 
-                /*checkbox_16send.Checked = true;
-                SendTbox.Text = sts; **/
-                byte[] temps = strToToHexByte(sts);
-
-                if ("充电电流" == dgv.Cells["名字"].Value.ToString())
+                if ("充电电流" == inputName)             //  没有输入命令的测试项
                 {
-                    myMessageBox.Show("请观察万用表" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否在200~600mA之间？", Color.Black);
+                    myMessageBox.Show("请观察万用表" + inputName + "是否在100~450mA之间？", Color.Black);
                     if (myMessageBox.DialogResult == DialogResult.Yes)
                     {
                         dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
@@ -1290,7 +1437,11 @@ namespace MySerialPort
                     }
                     return;
                 }
-                else if ("蓝牙连接测试" == dgv.Cells["名字"].Value.ToString())
+                else if ("SN码写入" == inputName && comboBoxTestItem.SelectedIndex == 5)               // 实际是MAC地址
+                {
+                    return;
+                }
+                else if ("蓝牙连接测试" == inputName)
                 {
                     QRCode(textBoxMAC.Text);
                     if (myMessageBox.DialogResult == DialogResult.No)
@@ -1306,6 +1457,7 @@ namespace MySerialPort
                         dgv.Cells["是否通过"].Value = "✔";
                         dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
                         pictureBoxShow.Visible = false;
+                        gBTLinkStatus = true;
                     }
                     else
                     {
@@ -1314,31 +1466,148 @@ namespace MySerialPort
                         dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
                         pictureBoxShow.Visible = false;
                         testError = false;
+                        gBTLinkStatus = false;
                     }
+                    return;
                 }
-                else if ("ECG心率测试" == dgv.Cells["名字"].Value.ToString())
+                else if ("ECG心率测试" == inputName)
                 {
-                    myMessageBox.Show("请对比APP和仪器的心率值是否一致", Color.Black);
-                    if (myMessageBox.DialogResult == DialogResult.Yes)
+                    if (gBTLinkStatus == true)
                     {
-                        dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
-                        dgv.Cells["是否通过"].Value = "✔";
-                        dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
+                        myMessageBox.Show("请对比APP和仪器的心率值是否一致", Color.Black);
+                        if (myMessageBox.DialogResult == DialogResult.Yes)
+                        {
+                            dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                            dgv.Cells["是否通过"].Value = "✔";
+                            dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
+                        }
+                        else
+                        {
+                            dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                            dgv.Cells["是否通过"].Value = "✘";
+                            dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
+                            testError = false;
+                        }
                     }
-                    else
+                    return;
+                }
+
+                byte[] temps = strToToHexByte(inputCommand);
+                byte[] temp;
+                string str;
+
+                //接受发送
+                WritePort(temps, inputName);
+
+                if (comboBoxTestItem.SelectedIndex == 1 || comboBoxTestItem.SelectedIndex == 3 || comboBoxTestItem.SelectedIndex == 4 || comboBoxTestItem.SelectedIndex == 7)       // ggp nir pcba测试以光谱仪为准
+                {
+                    if ((inputCommand.Substring(6, 2).Equals("30") || inputCommand.Substring(6, 2).Equals("31") ||
+                        inputCommand.Substring(6, 2).Equals("32") || inputCommand.Substring(6, 2).Equals("33") ||
+                        inputCommand.Substring(6, 2).Equals("34") || inputCommand.Substring(6, 2).Equals("35") ||
+                        inputCommand.Substring(6, 2).Equals("36") || inputCommand.Substring(6, 2).Equals("37") ||
+                        inputCommand.Substring(6, 2).Equals("38") || inputCommand.Substring(6, 2).Equals("39")) &&
+                        "SI1171测试" != inputName && "ADPD105测试" != inputName)                             // SI1171 || ADPD105测试
                     {
-                        dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
-                        dgv.Cells["是否通过"].Value = "✘";
-                        dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
-                        testError = false;
+                        sampleImageShow(inputCommand.Substring(6, 2));
+                        signalCnt = 0;
+
+                        chart1.Visible = true;
+                        chart1.BringToFront();
+
+                        labelScope.Visible = true;
+                        labelScope.BringToFront();
+                        
+                        myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" +inputName + "是否正常？", Color.Black);
+
+                        pictureBoxShow.Visible = false;
+                        chart1.Visible = false;
+                        chart1.SendToBack();
+                        labelScope.Visible = false;
+                        labelScope.SendToBack();
+
+                        if (myMessageBox.DialogResult == DialogResult.Yes)
+                        {
+                            yesResult(dgv, inputCommand);
+                        }
+                        else if (myMessageBox.DialogResult == DialogResult.No)
+                        {
+                            failResult(dgv, inputCommand.Substring(4, 2));
+                        }
+
+                        if (serialPort.BytesToRead != 0)
+                        {
+                            temp = ReadPort(temps, inputCommand);
+                            str = byteToHexStr(temp);
+                            dgv.Cells["返回参数"].Value = str;
+                        }
+
+                        return ;
                     }
                 }
 
-                //接受发送
-                byte[] temp = ReadPort(temps, sts);
-                string str = byteToHexStr(temp);
+                temp = ReadPort(temps, inputName);
+                str = byteToHexStr(temp);
                 dgv.Cells["返回参数"].Value = str;
                 String result = str.Substring(6, 2);
+
+                //判断温湿度命令
+                if (str.Substring(4, 2).Equals("17"))  //判断PPG温湿度是否通过
+                {
+                    if ((comboBoxTestItem.SelectedIndex == 1 || comboBoxTestItem.SelectedIndex == 2))
+                    {
+                        if (str.Substring(6, 2).Equals("00"))
+                        {
+                            dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                            dgv.Cells["是否通过"].Value = "✔";
+                            dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
+                            dgv.Cells["数值显示"].Value = getResultInRecve(str);
+                        }
+                        else
+                        {
+                            dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                            dgv.Cells["是否通过"].Value = "✘";
+                            dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
+                            testError = false;
+                        }
+                    }
+                    else if (comboBoxTestItem.SelectedIndex == 7)
+                    {
+                        if (str.Substring(8, 2).Equals("00"))  //判断NIR温湿度是否通过
+                        {
+                            dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                            dgv.Cells["是否通过"].Value = "✔";
+                            dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
+                            dgv.Cells["数值显示"].Value = getResultInRecve(str);
+                        }
+                        else
+                        {
+                            dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                            dgv.Cells["是否通过"].Value = "✘";
+                            dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
+                            testError = false;
+                        }
+                    }
+                    else if (comboBoxTestItem.SelectedIndex == 5)
+                    {
+                        if (str.Substring(6, 2).Equals("00") && str.Substring(8, 2).Equals("00"))
+                        {
+                            dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                            dgv.Cells["是否通过"].Value = "✔";
+                            dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
+                            dgv.Cells["数值显示"].Value = getResultInRecve(str);
+                        }
+                        else
+                        {
+                            dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                            dgv.Cells["是否通过"].Value = "✘";
+                            dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
+                            testError = false;
+                        }
+                    }
+
+                    return;
+                }
+
                 if (result != null && "00".Equals(result))
                 {
                     dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
@@ -1363,7 +1632,7 @@ namespace MySerialPort
                 }
                 else if ("02".Equals(result))
                 {
-                    sampleImageShow(str);
+                    sampleImageShow(str.Substring(4, 2));
 
                     if (str.Substring(4, 2).Equals("19"))   //蓝牙不提醒
                     {
@@ -1373,30 +1642,6 @@ namespace MySerialPort
                     {
                         CheckSN(dgv, str);
                     }
-
-                    else if (str.Substring(4, 2).Equals("39"))   // ppg_ir
-                    {
-                        chart1.Visible = true;
-                        chart1.BringToFront();
-
-                        labelScope.Visible = true;
-                        labelScope.BringToFront();
-
-                        myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
-                    }
-
-                    else if (str.Substring(4, 2).Equals("32") || str.Substring(4, 2).Equals("33")
-                            || str.Substring(4, 2).Equals("34") || str.Substring(4, 2).Equals("35") || str.Substring(4, 2).Equals("36"))   // nir
-                    {
-                        chart1.Visible = true;
-                        chart1.BringToFront();
-
-                        labelScope.Visible = true;
-                        labelScope.BringToFront();
-
-                        myMessageBox.Show("光谱仪探头对准示例图所示位置,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
-                    }
-
                     else
                         myMessageBox.Show("对比示例图,请观察" + dgv.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
 
@@ -1443,6 +1688,9 @@ namespace MySerialPort
             textBoxMAC.Text = "";
             txt_output_excel.Text = "";
 
+            strSN = "";
+            devSN = "";
+
             //将buffer清空
             if (serialPort.IsOpen)
             {
@@ -1472,8 +1720,7 @@ namespace MySerialPort
                 String finaltypes = res.Substring(10, 16);
                 String hdcp1 = res.Substring(6, 2).Equals("00") ? "成功" : "失败";
                 String hdcp2 = res.Substring(8, 2).Equals("00") ? "成功" : "失败";
-
-
+                
                 string[] finalResult = splitAvg(finaltypes, 4);
                 result = "HDCP1:" + hdcp1 + "；HDPC2:" + hdcp2 + "；温度1：" + finalResult[0] + "；湿度1：" + finalResult[1] + "；温度2：" + finalResult[2] + "；湿度2：" + finalResult[3];
             }
@@ -1536,19 +1783,7 @@ namespace MySerialPort
         private void CheckSN(DataGridViewRow dgr, String str)
         {
             devSN = getResultInRecve(str);
-            if (devSN.Equals(strSN) || !(devSN.Substring(0, 4).Equals("BBF")))          // 正常流程或者生产返修
-            {
-                SNSave = true;
-                devSN = strSN;
-                myMessageBox.DialogResult = DialogResult.Yes;
-            }
-            else if (devSN.Length == 14 && strSN.Length != 14)
-            {
-                SNSave = false;
-                strSN = devSN;
-                myMessageBox.DialogResult = DialogResult.Yes;
-            }
-            else if (devSN.Length != 14 && strSN.Length == 14)
+            if (!(devSN.Substring(0, 3).Equals("BBF")) || devSN.Equals(strSN))          // 正常流程或者生产返修
             {
                 SNSave = true;
                 devSN = strSN;
@@ -1559,7 +1794,7 @@ namespace MySerialPort
                 // 无法在表格中找到设备对应的SN码和MAC地址，不保存SN码表
                 SNSave = false;
                 strSN = devSN;
-                myMessageBox.Show("设备SN与记录不一致,以设备为主,如需要修改设备SN,请修改SN文本框后点击'手动输入SN码'按钮,在点击'机器码写入'测试行!!", Color.Red);
+                myMessageBox.Show("设备SN与记录不一致,以设备为主,如需要修改设备SN,请修改SN文本框后点击'手动输入SN码'按钮,在点击\"SN码写入\"测试行!!", Color.Red);
                 myMessageBox.DialogResult = DialogResult.No;
             }
 
@@ -1582,8 +1817,8 @@ namespace MySerialPort
             foreach (DataGridViewRow dgrSN in dataGridViewMain.Rows)
             {
                 // 更新测试表
-                Object inputSN = dgrSN.Cells["名字"].EditedFormattedValue;
-                if (inputSN == null || inputSN.ToString() == "" || !"机器码写入".Equals(inputSN.ToString()))
+                Object inputSN = dgrSN.Cells["输入命令"].EditedFormattedValue;
+                if (inputSN == null || inputSN.ToString() == "" || !inputSN.ToString().Substring(6, 2).Equals("23"))
                 {
                     continue;
                 }
@@ -1642,6 +1877,7 @@ namespace MySerialPort
             dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
             dgr.Cells["是否通过"].Value = "✔";
             dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
+            dgr.Cells["数值显示"].Value = getResultInRecve(str);
         }
 
         public void failResult(DataGridViewRow dgr, String type)
@@ -1782,7 +2018,8 @@ namespace MySerialPort
                 return;
             }
 
-            string str = textBoxSN.Text.ToString();
+            string str = textBoxSN.Text;
+            strSN = textBoxSN.Text;
 
             if (str.IndexOf("\n") != -1)
             {
@@ -1794,18 +2031,19 @@ namespace MySerialPort
             }
             str = asciiToHex(str);
             str = str.Replace(" ", "");
-            foreach (DataGridViewRow dgr in dataGridViewMain.Rows)
+
+            foreach (DataGridViewRow dgrSN in dataGridViewMain.Rows)
             {
                 // 更新测试表
-                Object input = dgr.Cells["名字"].EditedFormattedValue;
-                if (input == null || input.ToString() == "" || !"机器码写入".Equals(input.ToString()))
+                Object inputSN = dgrSN.Cells["输入命令"].EditedFormattedValue;
+                if (inputSN == null || inputSN.ToString() == "" || !inputSN.ToString().Substring(6, 2).Equals("23"))
                 {
                     continue;
                 }
                 String fins = "bc aa 23 " + str + " 0d";
-                dgr.Cells["输入命令"].Value = fins;
+                dgrSN.Cells["输入命令"].Value = fins;
             }
-            myMessageBox.Show("编辑完SN码请手动点击机器码写入测试行。", Color.Green);
+            myMessageBox.Show("已完成SN码编辑，请点击\"SN码写入\"测试行完成设置", Color.Green);
             // 更新SN码表            待完善
         }
 
@@ -1827,7 +2065,9 @@ namespace MySerialPort
             chart1.Series.SuspendUpdates();
             axisyMax = 0;
             waveLength = 0;
-            
+
+            if (false == spectrographEnable)
+                return;
 
             for (pixel = 0; pixel <= 1520 - 1; pixel++)
             {
@@ -1854,34 +2094,57 @@ namespace MySerialPort
             chart1.ChartAreas[0].AxisY.Maximum = axisyMax;
             labelScope.Text = '(' + waveLength.ToString() + ", " + axisyMax.ToString() + ')';
 
-            if (SignalMode == SIGNAL_MODE.PPG_IR)
+
+            switch (SignalMode)
             {
-                if ((waveLength >= 950 - 50) && (waveLength <= 950 + 50))
-                    signalCnt++;
-            }
-            else if (SignalMode == SIGNAL_MODE.NIR_IR)
-            {
-                if ((waveLength >= 950 - 50) && (waveLength <= 950 + 50))
-                    signalCnt++;
-            }
-            else if (SignalMode == SIGNAL_MODE.NIR_1450)
-            {
-                if ((waveLength >= 1420 - 50) && (waveLength <= 1420 + 50))
-                    signalCnt++;
-            }
-            else if (SignalMode == SIGNAL_MODE.NIR_1600)
-            {
-                if ((waveLength >= 1560 - 20) && (waveLength <= 1560 + 20))
-                    signalCnt++;
-            }
-            else if (SignalMode == SIGNAL_MODE.NIR_1650)
-            {
-                if ((waveLength >= 1600 - 20) && (waveLength <= 1600 + 20))
-                    signalCnt++;
-            }
-            else
-            {
-                signalCnt = 0;
+                case SIGNAL_MODE.PPG_GREEN:
+                    if ((waveLength >= 450 - 50) && (waveLength <= 450 + 50))
+                        signalCnt++;
+                    break;
+
+                case SIGNAL_MODE.PPG_RED:
+                    if ((waveLength >= 660 - 50) && (waveLength <= 660 + 50))
+                        signalCnt++;
+                    break;
+
+                case SIGNAL_MODE.PPG_IR:
+                    if ((waveLength >= 950 - 50) && (waveLength <= 950 + 50))
+                        signalCnt++;
+                    break;
+
+                case SIGNAL_MODE.NIR_GREEN:
+                    if ((waveLength >= 450 - 50) && (waveLength <= 450 + 50))
+                        signalCnt++;
+                    break;
+
+                case SIGNAL_MODE.NIR_RED:
+                    if ((waveLength >= 660 - 50) && (waveLength <= 660 + 50))
+                        signalCnt++;
+                    break;
+
+                case SIGNAL_MODE.NIR_IR:
+                    if ((waveLength >= 950 - 50) && (waveLength <= 950 + 50))
+                        signalCnt++;
+                    break;
+
+                case SIGNAL_MODE.NIR_1450:
+                    if ((waveLength >= 1420 - 50) && (waveLength <= 1420 + 50))
+                        signalCnt++;
+                    break;
+
+                case SIGNAL_MODE.NIR_1600:
+                    if ((waveLength >= 1560 - 20) && (waveLength <= 1560 + 20))
+                        signalCnt++;
+                    break;
+
+                case SIGNAL_MODE.NIR_1650:
+                    if ((waveLength >= 1600 - 20) && (waveLength <= 1600 + 20))
+                        signalCnt++;
+                    break;
+
+                default:
+                    signalCnt = 0;
+                    break;
             }
 
             if (signalCnt >= 10)
