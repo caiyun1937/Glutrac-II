@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{340733C5-045C-43BA-961B-3ED76ADC235D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>MySerialPort</RootNamespace>
-    <AssemblyName>MySerialPort</AssemblyName>
+    <RootNamespace>GlutracUpper</RootNamespace>
+    <AssemblyName>GlutracUpper</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

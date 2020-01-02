@@ -35,10 +35,5 @@ namespace MySerialPort
             DialogResult = DialogResult.None;
             this.ShowDialog();
         }
-
-        private void myMsgBox_Load(object sender, EventArgs e)
-        {
-
-        }
     }
 }
