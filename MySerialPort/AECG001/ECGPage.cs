@@ -10,8 +10,6 @@ using WhaleTeqSDK;
 
 namespace AECG100Demo
 {
-    public delegate void setnumBMPValue(string textValue);
-
     public partial class ECGPage: UserControl, IPageControl
     {
         private ECG_WAVEFORM ecgWaveform;
@@ -29,10 +27,14 @@ namespace AECG100Demo
 
             comboWaveform.SelectedIndex = (int)ECGWaveformType.ECG;
             _radioElectrodeRightArm.Checked = (ecgWaveform.Electrode == (int)Electrode.RightArm);
+            _radioElectrodeLeftArm.Checked = (ecgWaveform.Electrode == (int)Electrode.LeftArm);
             checkImpedanceTest.Checked = (ecgWaveform.Impedance == (int)ECGImpedanceEnable.Off);
             numDCOffset.Value = ecgWaveform.DCOffset;
             checkDCOffsetVariable.Checked = (ecgWaveform.DCOffsetVariable != 0);
             numDCOffset.Increment = checkDCOffsetVariable.Checked ? 5 : 300;
+            ecgWaveform.Frequency = (double)numBPM.Value / 60.0;
+            ecgWaveform.TimePeriod = (int)(60000m / numBPM.Value);
+
         }
 
         public void onConnected ()
@@ -85,13 +87,14 @@ namespace AECG100Demo
         {
             if ((ecgWaveform.WaveformType > (int)ECGWaveformType.Square) && (numBPM.Value > 300)) {
                 numBPM.Value = 300;
+                return;
             }
 
-            else if ((ecgWaveform.WaveformType > (int)ECGWaveformType.Square) && (numBPM.Value < 30)) {
+            if ((ecgWaveform.WaveformType > (int)ECGWaveformType.Square) && (numBPM.Value < 30)) {
                 numBPM.Value = 30;
+                return;
             }
-            Form form1 = new Form();
-            
+
             ecgWaveform.Frequency = (double)numBPM.Value / 60.0;
             ecgWaveform.TimePeriod = (int)(60000m / numBPM.Value);
         }

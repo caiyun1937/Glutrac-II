@@ -127,39 +127,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AECG001\AECG100.cs" />
-    <Compile Include="AECG001\ECGPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="AECG001\ECGPage.Designer.cs">
-      <DependentUpon>ECGPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="AECG001\MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AECG001\MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="AECG001\PageControl.cs" />
-    <Compile Include="AECG001\PPGPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="AECG001\PPGPage.Designer.cs">
-      <DependentUpon>PPGPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="AECG001\PWVPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="AECG001\PWVPage.Designer.cs">
-      <DependentUpon>PWVPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="AECG001\SPO2Page.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="AECG001\SPO2Page.Designer.cs">
-      <DependentUpon>SPO2Page.cs</DependentUpon>
-    </Compile>
-    <Compile Include="AECG001\UtilConfig.cs" />
     <Compile Include="avaspec.cs" />
     <Compile Include="ExcelHelper.cs" />
     <Compile Include="EZioApi.cs" />
@@ -179,21 +146,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="AECG001\ECGPage.resx">
-      <DependentUpon>ECGPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="AECG001\MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="AECG001\PPGPage.resx">
-      <DependentUpon>PPGPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="AECG001\PWVPage.resx">
-      <DependentUpon>PWVPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="AECG001\SPO2Page.resx">
-      <DependentUpon>SPO2Page.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -242,6 +194,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\Debug\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="AECG001\AECG100Demo.csproj">
+      <Project>{35b08865-2689-458a-88fe-8b2a115b8456}</Project>
+      <Name>AECG100Demo</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

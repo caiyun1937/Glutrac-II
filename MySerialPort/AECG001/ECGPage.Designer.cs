@@ -730,7 +730,7 @@
             this.numBPM.TabIndex = 74;
             this.numBPM.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numBPM.Value = new decimal(new int[] {
-            60,
+            80,
             0,
             0,
             0});

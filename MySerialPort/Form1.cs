@@ -347,6 +347,8 @@ namespace MySerialPort
         bool isOpened = false;                      //串口状态标志
         bool spectrographEnable = false;            //是否需要连接光谱仪
 
+        static bool signalGenerator = false;
+
         private bool getTestCase()
         {
             if (Directory.GetFiles(Application.StartupPath.ToString(), "*.xls").Length > 0)
@@ -399,6 +401,12 @@ namespace MySerialPort
                 textBoxMAC.Focus();
                 textBoxMAC.ReadOnly = false;
                 textBoxSN.ReadOnly = true;
+                if (false.Equals(signalGenerator))
+                {
+                    signalGenerator = true;
+                    tabControl1.SelectedIndex = 4;
+                    myMessageBox.Show("开始整机测试前请先打开信号源", Color.Green);
+                }
             }
             else if (comboBoxTestItem.Text.Equals("整机PPG NIR测试") && File.Exists("整机PPG NIR测试" + ExpandedName))
             {
@@ -976,7 +984,7 @@ namespace MySerialPort
                 {
                     strSN = textBoxSN.Text;
                 }
-                else if ((comboBoxTestItem.Text.Equals("条形码测试") && textBoxMAC.Text.Length == 17) || ((comboBoxTestItem.Text.Equals("整机测试") || comboBoxTestItem.Text.Equals("整机PPG NIR测试")) && textBoxMAC.Text.Length == 12))
+                else if (((comboBoxTestItem.Text.Equals("条形码测试") || comboBoxTestItem.Text.Equals("整机测试") || comboBoxTestItem.Text.Equals("整机PPG NIR测试")) && textBoxMAC.Text.Length == 17))
                 {
                     strMAC = textBoxMAC.Text;
                 }
@@ -1021,6 +1029,10 @@ namespace MySerialPort
                     {
                         continue;
                     }
+                    byte[] temps = { 0xbc, 0xaa, 0x50, 0x0d };
+                    byte[] temp;
+                    string str;
+
 
                     //发送数据
                     if ("充电电流" == inputName)             //  没有输入命令的测试项
@@ -1041,7 +1053,7 @@ namespace MySerialPort
                         }
                         continue;
                     }
-                    else if (("SN码写入" == inputName || "SN码读出" == inputName || "SN码校验" == inputName) && comboBoxTestItem.Text.Equals("整机测试"))               // 实际是MAC地址
+                    else if ("SN码写入".Equals(inputName) && comboBoxTestItem.Text.Equals("整机测试"))               // 实际是MAC地址
                     {
                         continue;
                     }
@@ -1053,7 +1065,7 @@ namespace MySerialPort
                             QRCode(textBoxMAC.Text);
                             myMessageBox.Show("请用APP点击【主板蓝牙连接 + ECG功能测试】扫描二维码进行测试", Color.Black);
 
-                            myMessageBox.Show("蓝牙连接是否成功", Color.Black);
+                            myMessageBox.Show("APP是否提示蓝牙连接成功", Color.Black);
                             if (myMessageBox.DialogResult == DialogResult.Yes)
                             {
                                 dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
@@ -1079,11 +1091,42 @@ namespace MySerialPort
                             continue;
                         }
                     }
-                    else if ("ECG心率测试" == inputName)
+                    else if ("ECG心率测试" == inputName &&  comboBoxTestItem.Text.Equals("整机测试"))
+                    {
+                        if (gBTLinkStatus == true)
+                        {
+                            temp = ReadPort(temps);
+                            str = byteToHexStr(temp);
+                            dgr.Cells["返回参数"].Value = str;
+
+                            if (str.Equals("ACBB5002500D"))
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✔";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Green;
+                            }
+                            else
+                            {
+                                dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                                dgr.Cells["是否通过"].Value = "✘";
+                                dgr.Cells["是否通过"].Style.ForeColor = Color.Red;
+                                testError = false;
+                            }
+                        }
+                        continue;
+                    }
+                    else if ("ECG心率测试" == inputName && comboBoxTestItem.Text.Equals("主板测试"))
                     {
                         if (gBTLinkStatus == true)
                         {
                             myMessageBox.Show("请观察APP的ECG心率测试是否通过", Color.Black);
+                            if (serialPort.BytesToRead != 0)
+                            {
+                                temp = ReadPort(temps);
+                                str = byteToHexStr(temp);
+                                dgr.Cells["返回参数"].Value = str;
+                            }
+
                             if (myMessageBox.DialogResult == DialogResult.Yes)
                             {
                                 dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
@@ -1119,9 +1162,7 @@ namespace MySerialPort
                         labelScope.SendToBack();
                     }
 
-                    byte[] temps = strToToHexByte(inputCommand);
-                    byte[] temp;
-                    string str;
+                    temps = strToToHexByte(inputCommand);
 
                     //接受发送
                     WritePort(temps);
@@ -1231,7 +1272,6 @@ namespace MySerialPort
                                 testError = false;
                             }
                         }
-
                         continue;
                     }
 
@@ -1347,19 +1387,7 @@ namespace MySerialPort
             }
             else if (sendData[2] == 0x50)       // ECG心率
             {
-                noresponse = 40;
-            }
-            else if (sendData[2] == 0x39)       // SI1171测试 PPG IR
-            {
-                noresponse = 30;
-            }
-            else if (sendData[2] == 0x32)       // SFH7050测试 NIR IR
-            {
-                noresponse = 30;
-            }
-            else if (sendData[2] == 0x33)       // ADPD105测试 NIR CR4 1650
-            {
-                noresponse = 30;
+                noresponse = 20;
             }
             else
                 noresponse = 6;
@@ -1493,6 +1521,10 @@ namespace MySerialPort
                 byte[] recData = new byte[serialPort.BytesToRead];
                 serialPort.Read(recData, 0, recData.Length);
 
+                byte[] temps = { 0xbc, 0xaa, 0x50, 0x0d };
+                byte[] temp;
+                string str;
+
                 if ("充电电流" == inputName)             //  没有输入命令的测试项
                 {
                     myMessageBox.Show("请观察万用表" + inputName + "是否在100~450mA之间？", Color.Black);
@@ -1524,7 +1556,7 @@ namespace MySerialPort
                     }
                     myMessageBox.Show("请用APP击【主板蓝牙连接 + ECG功能测试】扫描二维码进行测试", Color.Black);
 
-                    myMessageBox.Show("蓝牙测试是否通过", Color.Black);
+                    myMessageBox.Show("APP是否提示蓝牙连接成功", Color.Black);
                     if (myMessageBox.DialogResult == DialogResult.Yes)
                     {
                         dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
@@ -1541,6 +1573,30 @@ namespace MySerialPort
                         pictureBoxShow.Visible = false;
                         testError = false;
                         gBTLinkStatus = false;
+                    }
+                    return;
+                }
+                else if ("ECG心率测试" == inputName && comboBoxTestItem.Text.Equals("整机测试"))
+                {
+                    if (gBTLinkStatus == true)
+                    {
+                        temp = ReadPort(temps);
+                        str = byteToHexStr(temp);
+                        dgv.Cells["返回参数"].Value = str;
+
+                        if (str.Equals("ACBB5002500D"))
+                        {
+                            dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                            dgv.Cells["是否通过"].Value = "✔";
+                            dgv.Cells["是否通过"].Style.ForeColor = Color.Green;
+                        }
+                        else
+                        {
+                            dgv.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
+                            dgv.Cells["是否通过"].Value = "✘";
+                            dgv.Cells["是否通过"].Style.ForeColor = Color.Red;
+                            testError = false;
+                        }
                     }
                     return;
                 }
@@ -1585,9 +1641,7 @@ namespace MySerialPort
                     labelScope.SendToBack();
                 }
 
-                byte[] temps = strToToHexByte(inputCommand);
-                byte[] temp;
-                string str;
+                temps = strToToHexByte(inputCommand);
 
                 //接受发送
                 WritePort(temps);
@@ -1929,17 +1983,19 @@ namespace MySerialPort
                 textBoxMAC.Text = finaltypes;
             else if (textBoxMAC.Text.Length.Equals(17))
             {
-                if (finaltypes != textBoxMAC.Text.Substring(0, 2) + textBoxMAC.Text.Substring(3, 2) + textBoxMAC.Text.Substring(6, 2) + textBoxMAC.Text.Substring(9, 2) + textBoxMAC.Text.Substring(12, 2) + textBoxMAC.Text.Substring(15, 2))
+                if (finaltypes == textBoxMAC.Text.Substring(0, 2) + textBoxMAC.Text.Substring(3, 2) + textBoxMAC.Text.Substring(6, 2) + textBoxMAC.Text.Substring(9, 2) + textBoxMAC.Text.Substring(12, 2) + textBoxMAC.Text.Substring(15, 2))
                 {
-                    myMessageBox.Show("扫描的MAC地址与机器MAC地址不一致,请使用其他扫描枪确认", Color.Red);
-                    myMessageBox.DialogResult = DialogResult.No;
-                    return;
+                    textBoxMAC.Text = finaltypes;
                 }
                 else
+                {
+                    myMessageBox.Show("扫描的MAC地址与机器MAC地址不一致,以读取的MAC为准", Color.Red);
+                    myMessageBox.DialogResult = DialogResult.No;
                     textBoxMAC.Text = finaltypes;
+                }
             }
 
-            if (textBoxMAC.Text.Length == 12)
+            if (textBoxMAC.Text.Equals(finaltypes))
             {
                 if (UpperMode == UPPER_MODE.PRINT_QRCODE)
                 {

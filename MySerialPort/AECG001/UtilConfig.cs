@@ -59,7 +59,7 @@ namespace AECG100Demo
             waveform.TDuration = 180;
             waveform.QTInterval = 350;
             waveform.Impedance = (int)ECGImpedanceEnable.Off;
-            waveform.Electrode = (int)Electrode.RightArm;
+            waveform.Electrode = (int)Electrode.LeftArm;
             waveform.WaveformType = (int)ECGWaveformType.ECG;
             waveform.PulseWidth = 100;
             waveform.NoiseAmplitude = 0.1;

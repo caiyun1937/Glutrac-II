@@ -42,7 +42,7 @@ namespace AECG100Demo
             this.Text = Title;
             connectedCB = new ConnectedCallback (DeviceConnectedHandler);
             ReconnectUSB ();
-
+            
 #if (DEBUG)
             //tabMain.SelectedIndex = 1;
 #endif
@@ -316,9 +316,8 @@ namespace AECG100Demo
             } else {
                 GraphReset ();
                 (tabMain.TabPages[tabMain.SelectedIndex].Controls[0] as IPageControl).onStartOutput ();
-                btnOutput.Enabled = false;
             }
-            
+            btnOutput.Enabled = false;
         }
 
         private void onFormClosing (object sender, FormClosingEventArgs e)
