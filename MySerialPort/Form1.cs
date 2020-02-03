@@ -343,8 +343,7 @@ namespace MySerialPort
                 base.WndProc(ref a_WinMess);
             }
         }
-
-        bool isOpened = false;                      //串口状态标志
+        
         bool spectrographEnable = false;            //是否需要连接光谱仪
 
         static bool signalGenerator = false;
@@ -430,8 +429,15 @@ namespace MySerialPort
             }
             else
             {
-                myMessageBox.Show("请选择测试项目", Color.Red);
-                comboBoxTestItem.Focus();
+                if (comboBoxTestItem.Text.Equals(""))
+                {
+                    myMessageBox.Show("请选择测试项目", Color.Red);
+                    comboBoxTestItem.Focus();
+                }
+                else
+                {
+                    myMessageBox.Show("目录下无目标文件", Color.Red);
+                }
                 return false;
             }
             return true;
@@ -454,7 +460,7 @@ namespace MySerialPort
                 return;
             }
 
-            if (!isOpened)
+            if (!serialPort.IsOpen)
             {
                 serialPort.PortName = cmbPort.Text;
                 serialPort.BaudRate = Convert.ToInt32(cmbBaud.Text, 10);
@@ -464,7 +470,6 @@ namespace MySerialPort
                     buttonOpenComm.Text = "关闭串口";
                     cmbPort.Enabled = false;//关闭使能
                     cmbBaud.Enabled = false;
-                    isOpened = true;
                     serialPort.DataReceived += new SerialDataReceivedEventHandler(post_DataReceived);//串口接收处理函数
                     comboBoxTestItem.Enabled = false;
                 }
@@ -482,7 +487,6 @@ namespace MySerialPort
                     buttonOpenComm.Text = "打开串口";
                     cmbPort.Enabled = true;//打开使能
                     cmbBaud.Enabled = true;
-                    isOpened = false;
                     comboBoxTestItem.Enabled = true;
 
                     if (spectrographEnable == true)
@@ -657,7 +661,6 @@ namespace MySerialPort
                 receive = 1;
             }
             
-
             //发送数据
             if (serialPort.IsOpen)
             {//如果串口开启
@@ -667,7 +670,6 @@ namespace MySerialPort
                     String sendStr= SendTbox.Text.Trim();
                     if (isCheck)
                     {
-
                         byte[] temps=strToToHexByte(sendStr);
                         serialPort.Write(temps, 0, temps.Length);
                       
@@ -1099,7 +1101,7 @@ namespace MySerialPort
                             str = byteToHexStr(temp);
                             dgr.Cells["返回参数"].Value = str;
 
-                            if (str.Equals("ACBB5002500D"))
+                            if (str.Equals("ACBB50024E0D") || str.Equals("ACBB50024F0D") || str.Equals("ACBB5002500D") || str.Equals("ACBB5002510D") || str.Equals("ACBB5002520D"))
                             {
                                 dgr.Cells["是否通过"].Style.Font = new Font("Tahoma", 24);
                                 dgr.Cells["是否通过"].Value = "✔";
@@ -1255,7 +1257,7 @@ namespace MySerialPort
                                 testError = false;
                             }
                         }
-                        else if (comboBoxTestItem.Text.Equals("主板测试") || comboBoxTestItem.Text.Equals("整机测试"))
+                        else if (comboBoxTestItem.Text.Equals("主板测试") || comboBoxTestItem.Text.Equals("整机测试") || comboBoxTestItem.Text.Equals("整机PPG NIR测试"))
                         {
                             if (str.Substring(6, 2).Equals("00") && str.Substring(8, 2).Equals("00"))
                             {
@@ -1444,13 +1446,17 @@ namespace MySerialPort
             {
                 commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_SHELL_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
+            else if (comboBoxTestItem.Text.Equals("NIR PCBA测试"))
+            {
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_PCBA_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+            }
             else if (comboBoxTestItem.Text.Equals("整机测试"))
             {
                 commandFile = @"D:\TestReport\Local\" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
-            else if (comboBoxTestItem.Text.Equals("NIR PCBA测试"))
+            else if (comboBoxTestItem.Text.Equals("整机PPG NIR测试"))
             {
-                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_PCBA_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                commandFile = @"D:\TestReport\Local\" + textBoxMAC.Text.ToString() + "_PPG_NIR_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
 
             DataTable table = (DataTable)dataGridViewMain.DataSource;
