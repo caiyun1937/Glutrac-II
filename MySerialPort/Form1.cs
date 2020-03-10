@@ -343,7 +343,8 @@ namespace MySerialPort
                 base.WndProc(ref a_WinMess);
             }
         }
-        
+
+        bool isOpened = false;                      //串口状态标志
         bool spectrographEnable = false;            //是否需要连接光谱仪
 
         static bool signalGenerator = false;
@@ -460,7 +461,7 @@ namespace MySerialPort
                 return;
             }
 
-            if (!serialPort.IsOpen)
+            if (!isOpened)
             {
                 serialPort.PortName = cmbPort.Text;
                 serialPort.BaudRate = Convert.ToInt32(cmbBaud.Text, 10);
@@ -470,6 +471,7 @@ namespace MySerialPort
                     buttonOpenComm.Text = "关闭串口";
                     cmbPort.Enabled = false;//关闭使能
                     cmbBaud.Enabled = false;
+                    isOpened = true;
                     serialPort.DataReceived += new SerialDataReceivedEventHandler(post_DataReceived);//串口接收处理函数
                     comboBoxTestItem.Enabled = false;
                 }
@@ -487,6 +489,7 @@ namespace MySerialPort
                     buttonOpenComm.Text = "打开串口";
                     cmbPort.Enabled = true;//打开使能
                     cmbBaud.Enabled = true;
+                    isOpened = false;
                     comboBoxTestItem.Enabled = true;
 
                     if (spectrographEnable == true)
@@ -942,6 +945,11 @@ namespace MySerialPort
                     pictureBoxShow.Visible = true;
                 }
             }
+            else if (str.Equals("51"))   //TP通道测试
+            {
+                pictureBoxShow.Image = imageList1.Images[2];
+                pictureBoxShow.Visible = true;
+            }
         }
 
         private void CheckECGHR()
@@ -1145,7 +1153,7 @@ namespace MySerialPort
                         }
                         continue;
                     }
-                    else if ("ADPD105测试" == inputName || "SI1171测试" == inputName || "SFH7050测试" == inputName)           // 传感器自检
+                    else if ("ADPD105+NIR 1650" == inputName || "SI1171+PPG 950" == inputName || "SFH7050+NIR 950" == inputName)           // 传感器自检
                     {
                         sampleImageShow(inputCommand.Substring(6, 2));
 
@@ -1176,7 +1184,7 @@ namespace MySerialPort
                             inputCommand.Substring(6, 2).Equals("34") || inputCommand.Substring(6, 2).Equals("35") ||
                             inputCommand.Substring(6, 2).Equals("36") || inputCommand.Substring(6, 2).Equals("37") ||
                             inputCommand.Substring(6, 2).Equals("38") || inputCommand.Substring(6, 2).Equals("39")) &&
-                            "SI1171测试" != inputName && "ADPD105测试" != inputName && "SFH7050测试" != inputName)                             // SI1171 || ADPD105测试
+                            "SI1171+PPG 950" != inputName && "ADPD105+NIR 1650" != inputName && "SFH7050+NIR 950" != inputName)                             // SI1171 || ADPD105测试
                         {
                             sampleImageShow(inputCommand.Substring(6, 2));
                             signalCnt = 0;
@@ -1305,6 +1313,10 @@ namespace MySerialPort
                         {
                             CheckSN(str);
                         }
+                        else if (str.Substring(4, 2).Equals("51"))   //TP通道测试
+                        {
+                            myMessageBox.Show("点击屏幕九宫格，对比示例图，" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
+                        }
                         else
                             myMessageBox.Show("对比示例图,请观察" + dgr.Cells["名字"].EditedFormattedValue.ToString() + "是否正常？", Color.Black);
 
@@ -1344,7 +1356,28 @@ namespace MySerialPort
             }
             else
             {
-                myMessageBox.Show("测试未通过,请保存测试报告,或者检查环境后重新测试!", Color.Red);
+                String FailItemstr = "测试项：";
+
+                foreach (DataGridViewRow dgr in dataGridViewMain.Rows)
+                {
+                    String inputPass = dgr.Cells["是否通过"].EditedFormattedValue.ToString();
+                    String inputName = dgr.Cells["名字"].EditedFormattedValue.ToString();
+                    String inputCommand = dgr.Cells["输入命令"].EditedFormattedValue.ToString();
+
+                    if ("✘".Equals(inputPass))
+                    {
+                        if (!"".Equals(inputCommand))
+                        {
+                            FailItemstr += inputCommand.Substring(6, 2) + ' ';
+                        }
+                        else
+                        {
+                            FailItemstr += inputName + ' ';
+                        }
+                    }
+                }
+                FailItemstr += "未通过,请在记录卡上记录!";
+                myMessageBox.Show(FailItemstr, Color.Red);
             }
             
             btn_go.Enabled = false;
@@ -1357,6 +1390,12 @@ namespace MySerialPort
                 btn_output_excel.Enabled = true;
             btn_print_QRCode.Enabled = false;
             btn_again.Enabled = false;
+
+            //自动保存并复位
+            if(!comboBoxTestItem.Text.Equals("条形码测试"))
+                btn_output_excel_Click(this, new EventArgs());
+
+            //btn_again_Click(this, new EventArgs());
         }
 
         public static object _lock = new object();
@@ -1628,7 +1667,7 @@ namespace MySerialPort
                     return;
                 }
 
-                if ("ADPD105测试" == inputName || "SI1171测试" == inputName || "SFH7050测试" == inputName)           // 传感器自检
+                if ("ADPD105+NIR 1650" == inputName || "SI1171+PPG 950" == inputName || "SFH7050+NIR 950" == inputName)           // 传感器自检
                 {
                     sampleImageShow(inputCommand.Substring(6, 2));
 
@@ -1659,7 +1698,7 @@ namespace MySerialPort
                         inputCommand.Substring(6, 2).Equals("34") || inputCommand.Substring(6, 2).Equals("35") ||
                         inputCommand.Substring(6, 2).Equals("36") || inputCommand.Substring(6, 2).Equals("37") ||
                         inputCommand.Substring(6, 2).Equals("38") || inputCommand.Substring(6, 2).Equals("39")) &&
-                        "SI1171测试" != inputName && "ADPD105测试" != inputName && "SFH7050测试" != inputName)                             // SI1171 || ADPD105测试
+                        "SI1171+PPG 950" != inputName && "ADPD105+NIR 1650" != inputName && "SFH7050+NIR 950" != inputName)                             // SI1171 || ADPD105测试
                     {
                         sampleImageShow(inputCommand.Substring(6, 2));
                         signalCnt = 0;
@@ -2336,6 +2375,8 @@ namespace MySerialPort
                 textBoxSN.Text = "";
                 textBoxBarCode.Text = "";
                 textBoxMAC.Focus();
+                strSN = "";
+                strMAC = "";
 
                 btn_go.Enabled = true;
                 buttonCheckBarCode.Enabled = false;
