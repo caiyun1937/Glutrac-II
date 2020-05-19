@@ -23,7 +23,11 @@ namespace MySerialPort
             this.fileName = fileName;
             disposed = false;
         }
-
+        public ExcelHelper(string fileName,string[] head,string sheetname)
+        {
+            this.fileName = fileName;
+            disposed = false;
+        }
         /// <summary>
         /// 将DataTable数据导入到excel中
         /// </summary>
@@ -75,6 +79,64 @@ namespace MySerialPort
                     for (j = 0; j < data.Columns.Count; ++j)
                     {
                         row.CreateCell(j).SetCellValue(data.Rows[i][j].ToString());
+                    }
+                    ++count;
+                }
+                workbook.Write(fs); //写入到excel
+                fs.Close();
+                return count;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// 将DataTable数据导入到excel中
+        /// </summary>
+        /// <param name="data">要导入的数据</param>
+        /// <param name="sheetName">要导入的excel的sheet的名称</param>
+        /// <returns>导入数据行数(包含列名那一行)</returns>
+        public int DataToExcel(List<string[]> data, string sheetName)
+        {
+            int count = 0;
+            ISheet sheet = null;
+
+            //fs = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            fs = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+           
+            if (fileName.IndexOf(".xlsx") > 0) // 2007版本
+                workbook = new XSSFWorkbook();
+            else if (fileName.IndexOf(".xls") > 0) // 2003版本
+                workbook = new HSSFWorkbook();
+
+            try
+            {
+                if (workbook != null)
+                {
+                    int index = workbook.GetSheetIndex(sheetName);
+                    if (index < 0)
+                        sheet = workbook.CreateSheet(sheetName);//CreateSheet(sheetName);
+                    else
+                        sheet = workbook.GetSheetAt(index);                
+                }
+                else
+                {
+                    return -1;
+                }
+
+
+                int startRow = sheet.LastRowNum;
+                foreach (string[] ss in data)
+                {
+                    IRow row = sheet.CreateRow(startRow++);
+                    int j = 0;
+                    foreach (string s in ss)
+                    {
+                        row.CreateCell(j).SetCellValue(s);
+                        j++;
                     }
                     ++count;
                 }

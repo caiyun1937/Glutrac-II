@@ -19,6 +19,8 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using ThoughtWorks.QRCode.Codec;
 using AECG100Demo;
+using GlutracUpper;
+using System.Data.Common;
 
 enum UPPER_MODE
 {
@@ -72,7 +74,6 @@ namespace MySerialPort
         {
             InitializeComponent();
             System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
-
         }
 
         private string strSN = "";
@@ -85,6 +86,17 @@ namespace MySerialPort
 
         private myMsgBox myMessageBox = new myMsgBox();
         private ECGPage ecgPage = new ECGPage();
+
+        byte[] m_curReq = null;
+        byte[] m_curResp = null;
+        private ConnectDlg serialPort1= new ConnectDlg("COM1",115200);
+        private ConnectDlg serialPort2= new ConnectDlg("COM2",115200);
+
+
+        byte range = 0x00, kind = 0x00;
+        List<string[]> list = new List<string[]>();//拥有存储电流表数据信息
+        Queue<byte[]> eleQueue = new Queue<byte[]>();
+        string add =  "测试电流值" +DateTime.Now.ToString("yy_MM_dd_HH_mm_ss") + ".xls";
 
         private void GetNewSN()
         {
@@ -273,22 +285,33 @@ namespace MySerialPort
             {
                 string[] sSubKeys = keyCom.GetValueNames();
                 cmbPort.Items.Clear();
+                cmbPort2.Items.Clear();
                 foreach (string sName in sSubKeys)
                 {
                     string sValue = (string)keyCom.GetValue(sName);
                     cmbPort.Items.Add(sValue);
+                    cmbPort2.Items.Add(sValue);
                 }
                 if (cmbPort.Items.Count > 0)
                     cmbPort.SelectedIndex = 0;
+                if (cmbPort2.Items.Count > 1)
+                    cmbPort2.SelectedIndex = 1;
             }
           
             cmbBaud.Text = "115200";
+            cmbBaud2.Text = "115200";
+            
+            string[] st = new string[] { "SN", "MAC", "条形码", "电流值" };
+            list.Add(st);
+
         }
 
         private const int WM_APP = 0x8000;
         private const int WM_MEAS_READY = WM_APP + 1;
         private const int WM_DBG_INFOAs = WM_APP + 2;
         private const int WM_DEVICE_RESET = WM_APP + 3;
+
+        int m_curCmdBatch = 0, m_maxCmdBatch=0;
 
         protected override void WndProc(ref Message a_WinMess)
         {
@@ -463,21 +486,41 @@ namespace MySerialPort
 
             if (!isOpened)
             {
-                serialPort.PortName = cmbPort.Text;
-                serialPort.BaudRate = Convert.ToInt32(cmbBaud.Text, 10);
-                try
+                serialPort1.Port = cmbPort.Text.Trim();
+                serialPort1.Baudrate = Convert.ToInt32(cmbBaud.Text, 10);
+                if (comboBoxTestItem.SelectedItem.ToString() == "主板测试" || comboBoxTestItem.SelectedItem.ToString() == "整机测试")
                 {
-                    serialPort.Open();     //打开串口
-                    buttonOpenComm.Text = "关闭串口";
-                    cmbPort.Enabled = false;//关闭使能
-                    cmbBaud.Enabled = false;
+                    serialPort2.Port = cmbPort2.Text.Trim();
+                    serialPort2.Baudrate = Convert.ToInt32(cmbBaud2.Text, 10);
+                }
+
+                    try
+                {
+                   if( serialPort1.OpenSio())//&&serialPort2.OpenSio())     //打开串口
+                    {
+                        buttonOpenComm.Text = "关闭串口";
+                        cmbPort.Enabled = false;//关闭使能
+                        cmbBaud.Enabled = false;
+                        if (comboBoxTestItem.SelectedItem.ToString() == "主板测试" || comboBoxTestItem.SelectedItem.ToString() == "整机测试")
+                        {
+                            if(serialPort2.OpenSio())
+                            {
+                                cmbPort2.Enabled = false;//关闭使能
+                                cmbBaud2.Enabled = false;
+                            }
+                            
+                        }
+                        }
+                    else
+                    {
+                        myMessageBox.Show("串口打开失败,请点亮屏幕再继续操作!", Color.Red);
+                    }
                     isOpened = true;
-                    serialPort.DataReceived += new SerialDataReceivedEventHandler(post_DataReceived);//串口接收处理函数
                     comboBoxTestItem.Enabled = false;
                 }
                 catch
                 {
-                    myMessageBox.Show("串口打开失败,请点亮屏幕再继续操作!", Color.Red);
+                    
                     return;
                 }
             }
@@ -485,10 +528,22 @@ namespace MySerialPort
             {
                 try
                 {
-                    serialPort.Close();     //关闭串口
-                    buttonOpenComm.Text = "打开串口";
+                    serialPort1.CloseSio();     //关闭串口
+                    if (comboBoxTestItem.SelectedItem.ToString() == "主板测试" || comboBoxTestItem.SelectedItem.ToString() == "整机测试")
+                    {
+                        serialPort2.CloseSio();     //关闭串口
+                    }
+
+                        buttonOpenComm.Text = "打开串口";
                     cmbPort.Enabled = true;//打开使能
                     cmbBaud.Enabled = true;
+                    //cmbPort2.Enabled = true;//关闭使能
+                    //cmbBaud2.Enabled = true;
+                    if(comboBoxTestItem.SelectedItem.ToString()=="主板测试"|| comboBoxTestItem.SelectedItem.ToString() == "整机测试")
+                    {
+                        cmbPort2.Enabled = true;//关闭使能
+                        cmbBaud2.Enabled = true;
+                    }
                     isOpened = false;
                     comboBoxTestItem.Enabled = true;
 
@@ -638,34 +693,26 @@ namespace MySerialPort
 
             if (isCheck)
             {
-                byte[] temp = new byte[serialPort.BytesToRead];
-                serialPort.Read(temp, 0, temp.Length);
+                byte[] temp = serialPort1.GetQueueMsg();
                 str = byteToHexStr(temp);
             }
             else
             {
-                str = serialPort.ReadExisting();//字符串方式读
+                str = DataConvert.ByteToString(serialPort1.GetQueueMsg());//字符串方式读
             }
 
             ReceiveTbox.Text = "";//先清除上一次的数据
             ReceiveTbox.Text += str;
         }
 
-        public static int receive = 1;
 
         private void button2_Click(object sender, EventArgs e)
         {
             //获取16进制是否选中
             bool isCheck=checkbox_16send.Checked;
-
-            if (receive == 0)
-            {
-                serialPort.DataReceived += new SerialDataReceivedEventHandler(post_DataReceived);//串口接收处理函数
-                receive = 1;
-            }
             
             //发送数据
-            if (serialPort.IsOpen)
+            if (serialPort1.IsOpen())
             {//如果串口开启
                 if (SendTbox.Text.Trim() != "")//如果框内不为空则
                 {
@@ -674,17 +721,18 @@ namespace MySerialPort
                     if (isCheck)
                     {
                         byte[] temps=strToToHexByte(sendStr);
-                        serialPort.Write(temps, 0, temps.Length);
+                        serialPort1.sendMsg(temps);
                       
                         return;
                        // sendStr = Encoding.ASCII.GetString(temps);
                     }
-                    serialPort.Write(sendStr.Trim());//写数据
+                    serialPort1.sendMsg(sendStr.Trim());//写数据
                 }
                 else
                 {
                     myMessageBox.Show("发送框没有数据", Color.Black);
                 }
+
             }
             else
             {
@@ -841,6 +889,23 @@ namespace MySerialPort
                     cmbPort.SelectedIndex = 0;
             }
         }
+
+        private void cmbPort2_DropDown(object sender, EventArgs e)
+        {
+            RegistryKey keyCom = Registry.LocalMachine.OpenSubKey("Hardware\\DeviceMap\\SerialComm");
+            if (keyCom != null)
+            {
+                string[] sSubKeys = keyCom.GetValueNames();
+                cmbPort2.Items.Clear();
+                foreach (string sName in sSubKeys)
+                {
+                    string sValue = (string)keyCom.GetValue(sName);
+                    cmbPort2.Items.Add(sValue);
+                }
+                if (cmbPort2.Items.Count > 0)
+                    cmbPort2.SelectedIndex = 0;
+            }
+        }
         private void sampleImageShow(String str)            //显示示例图
         {
             if (str.Equals("0E"))   //背灯关
@@ -956,14 +1021,12 @@ namespace MySerialPort
         {
             DateTime dt = DateTime.Now;
 
-            while (serialPort.BytesToRead == 0)
+            while (serialPort1.QueueMsgIsEmpty())
             {
                 Thread.Sleep(1);
             }
             Thread.Sleep(50); //50毫秒内数据接收完毕，可根据实际情况调整
-            byte[] recData = new byte[serialPort.BytesToRead];
-            serialPort.Read(recData, 0, recData.Length);
-
+            byte[] recData = serialPort1.GetQueueMsg();
             byte[] temp = recData;
             string str = byteToHexStr(temp);
 
@@ -975,15 +1038,84 @@ namespace MySerialPort
         }
 
         bool gBTLinkStatus = false;
+        //电流表消息处理
+        private void OnTestEleEvent(object sender, EventArgs e)
+        {
+            m_elcTestTimer.Enabled = false;
+            try
+            {
+                
+                if(m_curCmdBatch >= m_maxCmdBatch)
+                {
+                    SaveElec(comboBoxTestItem.SelectedItem.ToString());
+                    serialPort2.QueueEmpty();
+                    recordFlag = false;
+                    return;
+                }
+                else
+                {
+                    byte[] msg = eleQueue.Dequeue();
+                    serialPort2.sendMsg(msg);
+                    m_curCmdBatch++;
+                    DateTime startDateTime = DateTime.Now;
+                    while (serialPort2.QueueMsgIsEmpty())
+                    {
+                        if(DateTime.Now.Subtract(startDateTime).TotalSeconds>5)
+                        {
+                            MessageBox.Show("请检查电表连接！");
+                            break;
+                        }                        
+                    }
+                    byte[] remsg  = serialPort2.GetQueueMsg();
+                    HandlAmMeterMessage(remsg);
+                    m_elcTestTimer.Enabled = true;
+
+                }
+            }
+            catch { }
+        }
+         
+        private void LoadEleTest(string path)
+        {
+            //File file = new ();//FileInfo("电流表设置参数", FileMode.Open, FileAccess.Read);
+            using (StreamReader script =new StreamReader(path))
+            {
+                try
+                {
+                    while (script.Peek() >= 0)
+                        eleQueue.Enqueue(DataConvert.strToToHexByte(script.ReadLine()));
+                }
+                catch { }
+            }
+        }
+
+        private void InitEleTest()
+        {
+            try
+            {     
+                m_curCmdBatch = 0;
+                LoadEleTest("电流表参数.txt");
+                m_maxCmdBatch = eleQueue.Count;
+                recordFlag = false;
+            }
+            catch { }
+        }
+
+
 
         private void btn_go_Click(object sender, EventArgs e)
         {
+            
             ecgPage.Show();
             
             if (dataGridViewMain.DataSource == null)
             {
                 myMessageBox.Show("目标数据源为空,请确认目录下存在测试表!", Color.Black);
                 return;
+            }
+            if (comboBoxTestItem.SelectedItem.ToString() == "主板测试" || comboBoxTestItem.SelectedItem.ToString() == "整机测试")
+            {
+                myMessageBox.Show("请打开直流电流表", Color.Black);
             }
 
             if (UpperMode == UPPER_MODE.SCAN_QRCODE)
@@ -1020,20 +1152,18 @@ namespace MySerialPort
 
             testError = true;
 
-            serialPort.DataReceived -= new SerialDataReceivedEventHandler(post_DataReceived);
-            receive = 0; //解除绑定函数
             try
             {
                 foreach (DataGridViewRow dgr in dataGridViewMain.Rows)
                 {
+
                     String inputName = dgr.Cells["名字"].EditedFormattedValue.ToString();
                     String inputCommand = dgr.Cells["输入命令"].EditedFormattedValue.ToString();
 
                     if (inputName == "")
                         continue;
 
-                    byte[] recData = new byte[serialPort.BytesToRead];
-                    serialPort.Read(recData, 0, recData.Length);
+                    byte[] recData = serialPort1.GetQueueMsg();                 
 
                     if (comboBoxTestItem.Text.Equals("条形码测试") && inputName != "测试开始" && inputName != "MAC地址读出" && inputName != "SN码读出" && inputName != "测试结束")
                     {
@@ -1047,6 +1177,8 @@ namespace MySerialPort
                     //发送数据
                     if ("充电电流" == inputName)             //  没有输入命令的测试项
                     {
+                        InitEleTest();
+                        m_elcTestTimer.Enabled = true;
                         myMessageBox.Show("请观察万用表" + inputName + "是否在100~450mA之间？", Color.Black);
                         if (myMessageBox.DialogResult == DialogResult.Yes)
                         {
@@ -1130,7 +1262,7 @@ namespace MySerialPort
                         if (gBTLinkStatus == true)
                         {
                             myMessageBox.Show("请观察APP的ECG心率测试是否通过", Color.Black);
-                            if (serialPort.BytesToRead != 0)
+                            if (serialPort1.QueueMsgIsEmpty())
                             {
                                 temp = ReadPort(temps);
                                 str = byteToHexStr(temp);
@@ -1212,7 +1344,7 @@ namespace MySerialPort
                                 failResult(dgr, inputCommand.Substring(4, 2));
                             }
 
-                            if (serialPort.BytesToRead != 0)
+                            if (serialPort1.QueueMsgIsEmpty())
                             {
                                 temp = ReadPort(temps);
                                 str = byteToHexStr(temp);
@@ -1394,7 +1526,7 @@ namespace MySerialPort
             //自动保存并复位
             if(!comboBoxTestItem.Text.Equals("条形码测试"))
                 btn_output_excel_Click(this, new EventArgs());
-
+            
             //btn_again_Click(this, new EventArgs());
         }
 
@@ -1402,20 +1534,20 @@ namespace MySerialPort
 
         private void WritePort(byte[] sendData)
         {
-            if (!serialPort.IsOpen)
+            if (!serialPort1.IsOpen())
             {
-                serialPort.Open();
+                serialPort1.OpenSio();
             }
 
             //发送数据
-            serialPort.Write(sendData, 0, sendData.Length);
+            serialPort1.sendMsg(sendData);
         }
         //同步读取数据并返回
         private byte[] ReadPort(byte[] sendData)
         {
-            if (!serialPort.IsOpen)
+            if (!serialPort1.IsOpen())
             {
-                serialPort.Open();
+                serialPort1.OpenSio();
             }
 
             //读取返回数据
@@ -1430,10 +1562,14 @@ namespace MySerialPort
             {
                 noresponse = 20;
             }
+            else if (sendData[2] == 0x37 || sendData[2] == 0x38 || sendData[2] == 0x39)
+            {
+                noresponse = 20;
+            }
             else
                 noresponse = 6;
 
-            while (serialPort.BytesToRead == 0)
+            while (serialPort1.QueueMsgIsEmpty())
             {
                 Thread.Sleep(1);
                 if (DateTime.Now.Subtract(dt).TotalMilliseconds > (noresponse * 1000)) //如果30秒后仍然无数据返回，则视为超时
@@ -1443,9 +1579,7 @@ namespace MySerialPort
                 }
             }
             Thread.Sleep(50); //50毫秒内数据接收完毕，可根据实际情况调整
-            byte[] recData = new byte[serialPort.BytesToRead];
-            serialPort.Read(recData, 0, recData.Length);
-
+            byte[] recData = serialPort1.GetQueueMsg();
             return recData;
         }
 
@@ -1472,10 +1606,7 @@ namespace MySerialPort
 
             if (comboBoxTestItem.Text.Equals("主板测试"))
             {
-                if (textBoxMAC.Text.ToString().Length != 12)
-                    commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + "###########" + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
-                else
-                    commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
             else if (comboBoxTestItem.Text.Equals("PPG PCBA测试"))
             {
@@ -1483,7 +1614,7 @@ namespace MySerialPort
             }
             else if (comboBoxTestItem.Text.Equals("PPG 半成品测试"))
             {
-                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_SHELL_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                commandFile = @"D:\TestReport\Local\" +strSN.ToString() + "_SHELL_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
             else if (comboBoxTestItem.Text.Equals("NIR PCBA测试"))
             {
@@ -1491,11 +1622,11 @@ namespace MySerialPort
             }
             else if (comboBoxTestItem.Text.Equals("整机测试"))
             {
-                commandFile = @"D:\TestReport\Local\" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + "_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
             else if (comboBoxTestItem.Text.Equals("整机PPG NIR测试"))
             {
-                commandFile = @"D:\TestReport\Local\" + textBoxMAC.Text.ToString() + "_PPG_NIR_" + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
+                commandFile = @"D:\TestReport\Local\" + strSN.ToString() + "_" + textBoxMAC.Text.ToString() + dt.ToString("yy_MM_dd_HH_mm_ss") + ExpandedName;
             }
 
             DataTable table = (DataTable)dataGridViewMain.DataSource;
@@ -1538,7 +1669,7 @@ namespace MySerialPort
 
         private void dataGridView1_MouseClick(object sender, MouseEventArgs e)
         {
-            if (!serialPort.IsOpen)
+            if (!serialPort1.IsOpen())
             {
                 myMessageBox.Show("请先打开串口!", Color.Red);
                 return;
@@ -1550,9 +1681,6 @@ namespace MySerialPort
                 return;
             }
 
-            serialPort.DataReceived -= new SerialDataReceivedEventHandler(post_DataReceived);
-            receive = 0; //解除绑定函数
-
             try
             {
                 DataGridViewRow dgv = dataGridViewMain.SelectedRows[0];
@@ -1563,8 +1691,7 @@ namespace MySerialPort
                 dgv.Cells["返回参数"].Value = "";
                 dgv.Cells["是否通过"].Value = "";
 
-                byte[] recData = new byte[serialPort.BytesToRead];
-                serialPort.Read(recData, 0, recData.Length);
+                byte[] recData = serialPort1.GetQueueMsg();
 
                 byte[] temps = { 0xbc, 0xaa, 0x50, 0x0d };
                 byte[] temp;
@@ -1726,7 +1853,7 @@ namespace MySerialPort
                             failResult(dgv, inputCommand.Substring(4, 2));
                         }
 
-                        if (serialPort.BytesToRead != 0)
+                        if (serialPort1.QueueMsgIsEmpty())
                         {
                             temp = ReadPort(temps);
                             str = byteToHexStr(temp);
@@ -1876,10 +2003,9 @@ namespace MySerialPort
             }
 
             //将buffer清空
-            if (serialPort.IsOpen)
+            if (serialPort1.IsOpen())
             {
-                byte[] recData = new byte[serialPort.BytesToRead];
-                serialPort.Read(recData, 0, recData.Length);
+                byte[] recData = serialPort1.GetQueueMsg();
             }
 
             btn_go.Enabled = true;
@@ -2216,7 +2342,7 @@ namespace MySerialPort
         
         private void buttonManual_Click(object sender, EventArgs e)
         {
-            if (!serialPort.IsOpen)
+            if (!serialPort1.IsOpen())
             {
                 myMessageBox.Show("请先打开串口!", Color.Red);
                 return;
@@ -2389,5 +2515,121 @@ namespace MySerialPort
             }
 
         }
+
+        private bool CheckElecMessage(byte[] msg)
+        {
+            if ((msg[0] == amMeterMessage.FIEX_HEAD[0]) && (msg[1] == amMeterMessage.FIEX_HEAD[1]))
+                return true;
+            return false;
+        }
+
+
+        //电流表相应消息处理函数
+        private void HandlAmMeterMessage(byte[] msg)
+        {
+            try
+            {
+                switch (msg[amMeterMessage.FIEX_CMD_LOCATION])
+                {
+                    case amMeterMessage.CMD_ACK:
+                        break;
+                    case amMeterMessage.CMD_RET_INFO:
+                        range = msg[amMeterMessage.FIEX_CMD_LOCATION + 1];
+                        kind = msg[amMeterMessage.FIEX_CMD_LOCATION + 2];
+                        break;
+                    case amMeterMessage.CMD_RET_DATA:
+                        byte[] data = new byte[2];
+                        try
+                        {
+                            Array.Copy(msg, amMeterMessage.FIEX_CMD_LOCATION+1,data, 0,data.Length);
+                        }
+                        catch { }
+                        HandleAmMeterValue(data);
+                        break;
+                }
+            }
+            catch { }
+        }
+
+        private void panel3_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private bool recordFlag = false;
+
+        private void comboBoxTestItem_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxTestItem.SelectedItem.ToString() == "主板测试" || comboBoxTestItem.SelectedItem.ToString() == "整机测试")
+            {
+                cmbPort2.Visible = true;
+                cmbBaud2.Visible = true;
+                label7.Visible = true;
+                label9.Visible = true;
+            }
+            else 
+            {
+                cmbPort2.Visible = false;
+                cmbBaud2.Visible = false;
+                label7.Visible = false;
+                label9.Visible = false;
+            }
+            
+
+        }
+        private void HandleAmMeterValue(byte[] value)
+        {
+            if (value.Length < 2)
+                return;
+            Int64 Electic = (Int32)value[1] * 256 + (Int32)value[0];
+            float ele = Electic;
+            //for (int i = 0; i <3;i++)// (sbyte)amMeterMessage.GetFraction(kind, range); i++)
+                ele /= 10;
+            string[] info = new string[4];
+            info[0] = textBoxSN.Text;
+            info[1] = textBoxMAC.Text;
+            info[2] = textBoxBarCode.Text;
+            info[3] = ele.ToString()+" mA";
+            if (!recordFlag)
+            {
+                list.Add(info);
+                recordFlag = true;
+            }
+                
+        }
+
+        private bool SaveElec(string name)
+        {
+            string path = @"D:\TestReport\Local\"+ name + add; 
+            string sheetName = "电流值记录";     
+            try
+            {
+                // string[] st = new string[] { "SN", "MAC", "条形码", "电流值" };
+                ExcelHelper excelHelper = new ExcelHelper(path);
+                excelHelper.DataToExcel(list, sheetName);
+      
+                return true;
+            }
+            catch { return false; }
+        }
+
+        //private void SaveElecTxt(string name)
+        //{
+        //    string path = name + "测试电流值" + ".xls";
+        //    try
+        //    {
+        //        FileStream fileStream = new FileStream(name, FileMode.Append,FileAccess.ReadWrite);
+        //        StreamWriter writer=new StreamWriter()
+        //        foreach (string[] tt in list)
+        //        {
+        //            foreach (string t in tt)
+                        
+        //        }
+                    
+
+        //    }
+
+        //}
+
     }
 }

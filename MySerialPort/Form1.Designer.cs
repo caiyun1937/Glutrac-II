@@ -30,11 +30,14 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            this.serialPort = new System.IO.Ports.SerialPort(this.components);
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cmbBaud2 = new System.Windows.Forms.ComboBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.cmbPort2 = new System.Windows.Forms.ComboBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.comboBoxTestItem = new System.Windows.Forms.ComboBox();
             this.buttonOpenComm = new System.Windows.Forms.Button();
             this.cmbBaud = new System.Windows.Forms.ComboBox();
@@ -112,6 +115,7 @@
             this.panel6 = new System.Windows.Forms.Panel();
             this.button2 = new System.Windows.Forms.Button();
             this.signal_generator = new System.Windows.Forms.TabPage();
+            this.m_elcTestTimer = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -151,6 +155,10 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.cmbBaud2);
+            this.groupBox1.Controls.Add(this.label9);
+            this.groupBox1.Controls.Add(this.cmbPort2);
+            this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.comboBoxTestItem);
             this.groupBox1.Controls.Add(this.buttonOpenComm);
             this.groupBox1.Controls.Add(this.cmbBaud);
@@ -158,14 +166,59 @@
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(4, 4);
+            this.groupBox1.Location = new System.Drawing.Point(13, 4);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Size = new System.Drawing.Size(712, 54);
+            this.groupBox1.Size = new System.Drawing.Size(779, 90);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "串口设置";
+            // 
+            // cmbBaud2
+            // 
+            this.cmbBaud2.FormattingEnabled = true;
+            this.cmbBaud2.Items.AddRange(new object[] {
+            "4800",
+            "9600",
+            "19200",
+            "38400",
+            "115200"});
+            this.cmbBaud2.Location = new System.Drawing.Point(239, 53);
+            this.cmbBaud2.Margin = new System.Windows.Forms.Padding(4);
+            this.cmbBaud2.Name = "cmbBaud2";
+            this.cmbBaud2.Size = new System.Drawing.Size(112, 23);
+            this.cmbBaud2.TabIndex = 41;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(164, 57);
+            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(67, 15);
+            this.label9.TabIndex = 40;
+            this.label9.Text = "波特率：";
+            // 
+            // cmbPort2
+            // 
+            this.cmbPort2.FormattingEnabled = true;
+            this.cmbPort2.Location = new System.Drawing.Point(67, 53);
+            this.cmbPort2.Margin = new System.Windows.Forms.Padding(4);
+            this.cmbPort2.Name = "cmbPort2";
+            this.cmbPort2.Size = new System.Drawing.Size(69, 23);
+            this.cmbPort2.TabIndex = 38;
+            this.cmbPort2.DropDown += new System.EventHandler(this.cmbPort2_DropDown);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(8, 57);
+            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(60, 15);
+            this.label7.TabIndex = 37;
+            this.label7.Text = "串口2：";
             // 
             // comboBoxTestItem
             // 
@@ -178,14 +231,15 @@
             "整机测试",
             "整机PPG NIR测试",
             "条形码测试"});
-            this.comboBoxTestItem.Location = new System.Drawing.Point(419, 19);
+            this.comboBoxTestItem.Location = new System.Drawing.Point(470, 39);
             this.comboBoxTestItem.Name = "comboBoxTestItem";
-            this.comboBoxTestItem.Size = new System.Drawing.Size(173, 23);
+            this.comboBoxTestItem.Size = new System.Drawing.Size(158, 23);
             this.comboBoxTestItem.TabIndex = 36;
+            this.comboBoxTestItem.SelectedIndexChanged += new System.EventHandler(this.comboBoxTestItem_SelectedIndexChanged);
             // 
             // buttonOpenComm
             // 
-            this.buttonOpenComm.Location = new System.Drawing.Point(600, 16);
+            this.buttonOpenComm.Location = new System.Drawing.Point(657, 38);
             this.buttonOpenComm.Margin = new System.Windows.Forms.Padding(4);
             this.buttonOpenComm.Name = "buttonOpenComm";
             this.buttonOpenComm.Size = new System.Drawing.Size(100, 29);
@@ -203,16 +257,16 @@
             "19200",
             "38400",
             "115200"});
-            this.cmbBaud.Location = new System.Drawing.Point(235, 19);
+            this.cmbBaud.Location = new System.Drawing.Point(239, 21);
             this.cmbBaud.Margin = new System.Windows.Forms.Padding(4);
             this.cmbBaud.Name = "cmbBaud";
-            this.cmbBaud.Size = new System.Drawing.Size(86, 23);
+            this.cmbBaud.Size = new System.Drawing.Size(112, 23);
             this.cmbBaud.TabIndex = 3;
             // 
             // cmbPort
             // 
             this.cmbPort.FormattingEnabled = true;
-            this.cmbPort.Location = new System.Drawing.Point(83, 19);
+            this.cmbPort.Location = new System.Drawing.Point(67, 21);
             this.cmbPort.Margin = new System.Windows.Forms.Padding(4);
             this.cmbPort.Name = "cmbPort";
             this.cmbPort.Size = new System.Drawing.Size(69, 23);
@@ -222,7 +276,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(329, 23);
+            this.label6.Location = new System.Drawing.Point(380, 43);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(82, 15);
@@ -232,7 +286,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(160, 23);
+            this.label2.Location = new System.Drawing.Point(164, 23);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(67, 15);
@@ -245,14 +299,14 @@
             this.label1.Location = new System.Drawing.Point(8, 23);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(67, 15);
+            this.label1.Size = new System.Drawing.Size(60, 15);
             this.label1.TabIndex = 0;
-            this.label1.Text = "串口号：";
+            this.label1.Text = "串口1：";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(15, 23);
+            this.label4.Location = new System.Drawing.Point(12, 38);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(38, 15);
             this.label4.TabIndex = 12;
@@ -260,14 +314,14 @@
             // 
             // textBoxSN
             // 
-            this.textBoxSN.Location = new System.Drawing.Point(55, 18);
+            this.textBoxSN.Location = new System.Drawing.Point(52, 33);
             this.textBoxSN.Name = "textBoxSN";
-            this.textBoxSN.Size = new System.Drawing.Size(126, 25);
+            this.textBoxSN.Size = new System.Drawing.Size(97, 25);
             this.textBoxSN.TabIndex = 13;
             // 
             // buttonManualSN
             // 
-            this.buttonManualSN.Location = new System.Drawing.Point(189, 16);
+            this.buttonManualSN.Location = new System.Drawing.Point(170, 33);
             this.buttonManualSN.Name = "buttonManualSN";
             this.buttonManualSN.Size = new System.Drawing.Size(124, 29);
             this.buttonManualSN.TabIndex = 35;
@@ -278,7 +332,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(319, 23);
+            this.label5.Location = new System.Drawing.Point(300, 40);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(39, 15);
             this.label5.TabIndex = 15;
@@ -286,10 +340,10 @@
             // 
             // textBoxMAC
             // 
-            this.textBoxMAC.Location = new System.Drawing.Point(360, 18);
+            this.textBoxMAC.Location = new System.Drawing.Point(341, 35);
             this.textBoxMAC.Name = "textBoxMAC";
             this.textBoxMAC.ReadOnly = true;
-            this.textBoxMAC.Size = new System.Drawing.Size(148, 25);
+            this.textBoxMAC.Size = new System.Drawing.Size(119, 25);
             this.textBoxMAC.TabIndex = 16;
             // 
             // imageList1
@@ -329,24 +383,24 @@
             this.groupBox5.Controls.Add(this.textBoxSN);
             this.groupBox5.Controls.Add(this.textBoxMAC);
             this.groupBox5.Controls.Add(this.label5);
-            this.groupBox5.Location = new System.Drawing.Point(723, 4);
+            this.groupBox5.Location = new System.Drawing.Point(799, 4);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(708, 54);
+            this.groupBox5.Size = new System.Drawing.Size(632, 92);
             this.groupBox5.TabIndex = 36;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "设备标识";
             // 
             // textBoxBarCode
             // 
-            this.textBoxBarCode.Location = new System.Drawing.Point(576, 18);
+            this.textBoxBarCode.Location = new System.Drawing.Point(528, 35);
             this.textBoxBarCode.Name = "textBoxBarCode";
-            this.textBoxBarCode.Size = new System.Drawing.Size(126, 25);
+            this.textBoxBarCode.Size = new System.Drawing.Size(97, 25);
             this.textBoxBarCode.TabIndex = 37;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(514, 23);
+            this.label3.Location = new System.Drawing.Point(466, 40);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(60, 15);
             this.label3.TabIndex = 36;
@@ -360,16 +414,16 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1443, 62);
+            this.panel1.Size = new System.Drawing.Size(1443, 99);
             this.panel1.TabIndex = 0;
             // 
             // panel2
             // 
             this.panel2.Controls.Add(this.tabControl1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 62);
+            this.panel2.Location = new System.Drawing.Point(0, 99);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1443, 518);
+            this.panel2.Size = new System.Drawing.Size(1443, 481);
             this.panel2.TabIndex = 12;
             // 
             // tabControl1
@@ -383,7 +437,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1443, 518);
+            this.tabControl1.Size = new System.Drawing.Size(1443, 481);
             this.tabControl1.TabIndex = 11;
             // 
             // tabPage2
@@ -393,7 +447,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1435, 489);
+            this.tabPage2.Size = new System.Drawing.Size(1435, 452);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "主板测试";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -407,7 +461,7 @@
             this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel4.Location = new System.Drawing.Point(3, 40);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(1429, 446);
+            this.panel4.Size = new System.Drawing.Size(1429, 409);
             this.panel4.TabIndex = 20;
             // 
             // labelScope
@@ -421,29 +475,29 @@
             // 
             // chart1
             // 
-            chartArea3.AxisX.Interval = 100D;
-            chartArea3.AxisX.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
-            chartArea3.AxisX.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.DashDotDot;
-            chartArea3.AxisX.Maximum = 1700D;
-            chartArea3.AxisX.Minimum = 200D;
-            chartArea3.AxisX.Title = "WaveLength [nm]";
-            chartArea3.AxisY.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.DashDotDot;
-            chartArea3.AxisY.Maximum = 65535D;
-            chartArea3.AxisY.Minimum = 0D;
-            chartArea3.AxisY.Title = "Scope [ADC Counts]";
-            chartArea3.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea3);
-            legend3.Enabled = false;
-            legend3.Name = "Legend1";
-            legend3.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chart1.Legends.Add(legend3);
+            chartArea1.AxisX.Interval = 100D;
+            chartArea1.AxisX.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
+            chartArea1.AxisX.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.DashDotDot;
+            chartArea1.AxisX.Maximum = 1700D;
+            chartArea1.AxisX.Minimum = 200D;
+            chartArea1.AxisX.Title = "WaveLength [nm]";
+            chartArea1.AxisY.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.DashDotDot;
+            chartArea1.AxisY.Maximum = 65535D;
+            chartArea1.AxisY.Minimum = 0D;
+            chartArea1.AxisY.Title = "Scope [ADC Counts]";
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            legend1.TitleFont = new System.Drawing.Font("Consolas", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(746, 2);
             this.chart1.Name = "chart1";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.chart1.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(682, 415);
             this.chart1.TabIndex = 17;
             this.chart1.Text = "chart1";
@@ -465,9 +519,10 @@
             this.dataGridViewMain.Location = new System.Drawing.Point(0, 0);
             this.dataGridViewMain.Name = "dataGridViewMain";
             this.dataGridViewMain.ReadOnly = true;
+            this.dataGridViewMain.RowHeadersWidth = 51;
             this.dataGridViewMain.RowTemplate.Height = 27;
             this.dataGridViewMain.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewMain.Size = new System.Drawing.Size(1429, 446);
+            this.dataGridViewMain.Size = new System.Drawing.Size(1429, 409);
             this.dataGridViewMain.TabIndex = 3;
             this.dataGridViewMain.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dataGridView1_MouseClick);
             // 
@@ -484,6 +539,7 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(1429, 37);
             this.panel3.TabIndex = 19;
+            this.panel3.Paint += new System.Windows.Forms.PaintEventHandler(this.panel3_Paint);
             // 
             // buttonCheckBarCode
             // 
@@ -549,7 +605,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1435, 489);
+            this.tabPage3.Size = new System.Drawing.Size(1435, 452);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "SN表";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -560,8 +616,9 @@
             this.dataGridViewSN.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewSN.Location = new System.Drawing.Point(3, 3);
             this.dataGridViewSN.Name = "dataGridViewSN";
+            this.dataGridViewSN.RowHeadersWidth = 51;
             this.dataGridViewSN.RowTemplate.Height = 27;
-            this.dataGridViewSN.Size = new System.Drawing.Size(1429, 483);
+            this.dataGridViewSN.Size = new System.Drawing.Size(1429, 446);
             this.dataGridViewSN.TabIndex = 0;
             // 
             // tabPage4
@@ -571,7 +628,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 25);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1435, 489);
+            this.tabPage4.Size = new System.Drawing.Size(1435, 452);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "QRCode";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -980,7 +1037,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1435, 489);
+            this.tabPage1.Size = new System.Drawing.Size(1435, 452);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "串口通讯";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -993,7 +1050,7 @@
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox2.Size = new System.Drawing.Size(1429, 404);
+            this.groupBox2.Size = new System.Drawing.Size(1429, 367);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "接收数据";
@@ -1007,7 +1064,7 @@
             this.ReceiveTbox.Name = "ReceiveTbox";
             this.ReceiveTbox.ReadOnly = true;
             this.ReceiveTbox.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ReceiveTbox.Size = new System.Drawing.Size(1421, 378);
+            this.ReceiveTbox.Size = new System.Drawing.Size(1421, 341);
             this.ReceiveTbox.TabIndex = 0;
             // 
             // groupBox3
@@ -1015,7 +1072,7 @@
             this.groupBox3.Controls.Add(this.SendTbox);
             this.groupBox3.Controls.Add(this.panel5);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.groupBox3.Location = new System.Drawing.Point(3, 407);
+            this.groupBox3.Location = new System.Drawing.Point(3, 370);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
@@ -1111,10 +1168,15 @@
             this.signal_generator.Location = new System.Drawing.Point(4, 25);
             this.signal_generator.Name = "signal_generator";
             this.signal_generator.Padding = new System.Windows.Forms.Padding(3);
-            this.signal_generator.Size = new System.Drawing.Size(1435, 489);
+            this.signal_generator.Size = new System.Drawing.Size(1435, 452);
             this.signal_generator.TabIndex = 4;
             this.signal_generator.Text = "鲸杨信号发生器";
             this.signal_generator.UseVisualStyleBackColor = true;
+            // 
+            // m_elcTestTimer
+            // 
+            this.m_elcTestTimer.Interval = 30;
+            this.m_elcTestTimer.Tick += new System.EventHandler(this.OnTestEleEvent);
             // 
             // Form1
             // 
@@ -1180,8 +1242,6 @@
         }
 
         #endregion
-
-        private System.IO.Ports.SerialPort serialPort;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button buttonOpenComm;
         private System.Windows.Forms.ComboBox cmbBaud;
@@ -1260,6 +1320,11 @@
         private System.Windows.Forms.TextBox textBoxBarCode;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button buttonCheckBarCode;
+        private System.Windows.Forms.ComboBox cmbPort2;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.ComboBox cmbBaud2;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Timer m_elcTestTimer;
     }
 }
 
